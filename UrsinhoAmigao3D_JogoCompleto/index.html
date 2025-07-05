@@ -1,11 +1,78 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <title>Ursinho Amigão 3D - Fase 1</title>
-</head>
-<body>
-  <h1>Ursinho Amigão - Fase 1</h1>
-  <p>Este é o jogo em HTML. Suba este conteúdo no seu repositório GitHub (ursinho-amigao-3d).</p>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Ursinho Amigão 3D</title>
+    <style>
+      body { margin: 0; overflow: hidden; background-color: #aee1f9; }
+      canvas { display: block; }
+      #hud {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        color: white;
+        background: rgba(0,0,0,0.5);
+        padding: 10px;
+        border-radius: 8px;
+        font-family: sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="hud">❤️❤️❤️<br>Itens: 0/3<br>Tempo: 90s</div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.150.1/three.min.js"></script>
+    <script>
+      let scene = new THREE.Scene();
+      let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+      let renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      // Luz
+      let light = new THREE.HemisphereLight(0xffffff, 0x444444);
+      light.position.set(0, 200, 0);
+      scene.add(light);
+
+      // Chão
+      let groundGeo = new THREE.BoxGeometry(100, 1, 100);
+      let groundMat = new THREE.MeshLambertMaterial({ color: 0x66bb6a });
+      let ground = new THREE.Mesh(groundGeo, groundMat);
+      ground.position.y = -1;
+      scene.add(ground);
+
+      // Ursinho (representado como cubo)
+      let playerGeo = new THREE.BoxGeometry(1, 1, 1);
+      let playerMat = new THREE.MeshLambertMaterial({ color: 0xffc107 });
+      let player = new THREE.Mesh(playerGeo, playerMat);
+      player.position.y = 0.5;
+      scene.add(player);
+
+      // Câmera
+      camera.position.set(0, 5, 5);
+      camera.lookAt(player.position);
+
+      // Controles de movimento
+      let keys = {};
+      document.addEventListener("keydown", e => keys[e.key.toLowerCase()] = true);
+      document.addEventListener("keyup", e => keys[e.key.toLowerCase()] = false);
+
+      function animate() {
+        requestAnimationFrame(animate);
+
+        if (keys["w"]) player.position.z -= 0.1;
+        if (keys["s"]) player.position.z += 0.1;
+        if (keys["a"]) player.position.x -= 0.1;
+        if (keys["d"]) player.position.x += 0.1;
+
+        // Acompanhar jogador com câmera
+        camera.position.x = player.position.x + 5;
+        camera.position.z = player.position.z + 5;
+        camera.lookAt(player.position);
+
+        renderer.render(scene, camera);
+      }
+
+      animate();
+    </script>
+  </body>
 </html>
