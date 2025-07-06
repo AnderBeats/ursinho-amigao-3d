@@ -1,98 +1,273 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Ursinho Amigão 3D - Fase 1</title>
   <style>
-    body { margin: 0; overflow: hidden; }
+    body { margin: 0; overflow: hidden; font-family: sans-serif; background-color: #aee1f9; }
+    canvas { display: block; }
+
+    #personagemSelecao {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      color: white;
+      z-index: 20;
+    }
+
+    .personagem-opcoes {
+      display: flex;
+      gap: 30px;
+      margin-top: 20px;
+    }
+
+    .personagem {
+      width: 100px;
+      height: 100px;
+      background-color: #fff;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      color: #333;
+      font-weight: bold;
+    }
+
+    .personagem:hover {
+      background-color: #ffd54f;
+    }
+
     #hud {
       position: absolute;
       top: 10px;
       left: 10px;
       color: white;
-      font-family: sans-serif;
-      background: rgba(0,0,0,0.6);
+      background: rgba(0,0,0,0.5);
       padding: 10px;
       border-radius: 8px;
       z-index: 10;
     }
+
+    #mobileControls {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      z-index: 11;
+    }
+
+    #collectButton {
+      position: absolute;
+      bottom: 30px;
+      right: 20px;
+      background: rgba(255,255,255,0.8);
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 11;
+    }
   </style>
 </head>
 <body>
+  <div id="personagemSelecao">
+    <h2>Escolha seu personagem</h2>
+    <div class="personagem-opcoes">
+      <div class="personagem" onclick="selecionarPersonagem('urso')" style="background-color:#f4c542;">🐻<br>Urso</div>
+      <div class="personagem" onclick="selecionarPersonagem('gato')" style="background-color:#8bc34a;">🐱<br>Gato</div>
+      <div class="personagem" onclick="selecionarPersonagem('coelho')" style="background-color:#e91e63;">🐰<br>Coelho</div>
+      <div class="personagem" onclick="selecionarPersonagem('cachorro')" style="background-color:#03a9f4;">🐶<br>Cachorro</div>
+    </div>
+  </div>
+
   <div id="hud">
     ❤️❤️❤️<br>
-    Itens: 0 / 3<br>
+    Itens certos: <span id="itensCorretos">0</span> / 3<br>
     Tempo: <span id="timer">90</span>s
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.150.1/three.min.js"></script>
+  <div id="mobileControls">🎮</div>
+  <div id="collectButton">🎒 Coletar</div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r148/three.min.js"></script>
   <script>
-    // CENA
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xaee1f9);
-
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
-
-    // LUZ
-    const light = new THREE.HemisphereLight(0xffffff, 0x444444);
-    light.position.set(0, 100, 0);
-    scene.add(light);
-
-    // CHÃO
-    const groundGeometry = new THREE.BoxGeometry(50, 1, 50);
-    const groundMaterial = new THREE.MeshLambertMaterial({ color: 0x4caf50 });
-    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-    ground.position.y = -0.5;
-    scene.add(ground);
-
-    // JOGADOR
-    const playerGeometry = new THREE.BoxGeometry(1, 1, 1);
-    const playerMaterial = new THREE.MeshLambertMaterial({ color: 0xffc107 });
-    const player = new THREE.Mesh(playerGeometry, playerMaterial);
-    player.position.y = 0.5;
-    scene.add(player);
-
-    // CÂMERA
-    camera.position.set(3, 3, 5);
-    camera.lookAt(player.position);
-
-    // MOVIMENTO
-    const keys = {};
-    document.addEventListener("keydown", (e) => keys[e.key.toLowerCase()] = true);
-    document.addEventListener("keyup", (e) => keys[e.key.toLowerCase()] = false);
-
-    // HUD - CRONÔMETRO
+    let scene, camera, renderer, player;
+    let keys = {};
+    let itensCorretos = 0;
+    let vidas = 3;
     let tempo = 90;
-    const timerEl = document.getElementById("timer");
-    setInterval(() => {
-      if (tempo > 0) {
-        tempo--;
-        timerEl.innerText = tempo;
-      }
-    }, 1000);
+    let coletar = false;
+    let coletando = false;
 
-    // LOOP DE ANIMAÇÃO
-    function animate() {
-      requestAnimationFrame(animate);
+    const itens = [];
+    const errados = [];
 
-      const speed = 0.1;
-      if (keys["w"]) player.position.z -= speed;
-      if (keys["s"]) player.position.z += speed;
-      if (keys["a"]) player.position.x -= speed;
-      if (keys["d"]) player.position.x += speed;
-
-      // Câmera segue jogador
-      camera.position.x = player.position.x + 3;
-      camera.position.z = player.position.z + 5;
-      camera.lookAt(player.position);
-
-      renderer.render(scene, camera);
+    function selecionarPersonagem(tipo) {
+      document.getElementById("personagemSelecao").style.display = "none";
+      iniciarJogo(tipo);
     }
 
-    animate();
+    function iniciarJogo(tipo) {
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      const luz = new THREE.HemisphereLight(0xffffff, 0x444444);
+      scene.add(luz);
+
+      const chaoGeo = new THREE.BoxGeometry(60, 1, 60);
+      const chaoMat = new THREE.MeshLambertMaterial({ color: 0x4caf50 });
+      const chao = new THREE.Mesh(chaoGeo, chaoMat);
+      chao.position.y = -0.5;
+      scene.add(chao);
+
+      const mat = {
+        urso: 0xffc107,
+        gato: 0x8bc34a,
+        coelho: 0xe91e63,
+        cachorro: 0x03a9f4
+      };
+
+      const geo = new THREE.BoxGeometry(1, 1.2, 1);
+      const material = new THREE.MeshLambertMaterial({ color: mat[tipo] || 0xffffff });
+      player = new THREE.Mesh(geo, material);
+      player.position.y = 0.6;
+      scene.add(player);
+
+      camera.position.set(3, 3, 5);
+      camera.lookAt(player.position);
+
+      // Controles
+      document.addEventListener("keydown", e => {
+        keys[e.key.toLowerCase()] = true;
+        if (e.code === "Space") coletar = true;
+      });
+
+      document.addEventListener("keyup", e => {
+        keys[e.key.toLowerCase()] = false;
+        if (e.code === "Space") coletar = false;
+      });
+
+      document.getElementById("collectButton").addEventListener("touchstart", () => coletar = true);
+      document.getElementById("collectButton").addEventListener("touchend", () => coletar = false);
+
+      iniciarItens();
+      iniciarTempo();
+      animar();
+    }
+
+      function iniciarItens() {
+        const certoGeo = new THREE.BoxGeometry(0.6, 0.6, 0.6);
+        const erradoGeo = new THREE.BoxGeometry(0.6, 0.6, 0.6);
+        const certoMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+        const erradoMat = new THREE.MeshLambertMaterial({ color: 0x333333 });
+
+        for (let i = 0; i < 3; i++) {
+          const item = new THREE.Mesh(certoGeo, certoMat);
+          item.position.set(
+            Math.random() * 40 - 20,
+            0.3,
+            Math.random() * 40 - 20
+          );
+          scene.add(item);
+          itens.push(item);
+        }
+
+        for (let i = 0; i < 5; i++) {
+          const errado = new THREE.Mesh(erradoGeo, erradoMat);
+          errado.position.set(
+            Math.random() * 40 - 20,
+            0.3,
+            Math.random() * 40 - 20
+          );
+          scene.add(errado);
+          errados.push(errado);
+        }
+      }
+
+      function iniciarTempo() {
+        const timerEl = document.getElementById("timer");
+        const intervalo = setInterval(() => {
+          tempo--;
+          timerEl.innerText = tempo;
+          if (tempo <= 0) {
+            clearInterval(intervalo);
+            encerrar("⏱️ Tempo esgotado!");
+          }
+        }, 1000);
+      }
+
+      function verificarColeta() {
+        if (coletando || !coletar) return;
+        coletando = true;
+
+        for (let i = 0; i < itens.length; i++) {
+          if (player.position.distanceTo(itens[i].position) < 1) {
+            scene.remove(itens[i]);
+            itens.splice(i, 1);
+            itensCorretos++;
+            document.getElementById("itensCorretos").innerText = itensCorretos;
+            if (itensCorretos >= 3) encerrar("✅ Vitória!");
+            setTimeout(() => coletando = false, 500);
+            return;
+          }
+        }
+
+        for (let i = 0; i < errados.length; i++) {
+          if (player.position.distanceTo(errados[i].position) < 1) {
+            scene.remove(errados[i]);
+            errados.splice(i, 1);
+            vidas--;
+            atualizarVidas();
+            if (vidas <= 0) encerrar("❌ Derrota!");
+            setTimeout(() => coletando = false, 500);
+            return;
+          }
+        }
+
+        setTimeout(() => coletando = false, 500);
+      }
+
+      function atualizarVidas() {
+        let str = "";
+        for (let i = 0; i < vidas; i++) str += "❤️";
+        document.getElementById("hud").innerHTML = `
+          ${str}<br>
+          Itens certos: <span id="itensCorretos">${itensCorretos}</span> / 3<br>
+          Tempo: <span id="timer">${tempo}</span>s
+        `;
+      }
+
+      function encerrar(mensagem) {
+        alert(mensagem);
+        window.location.reload();
+      }
+
+      function animar() {
+        requestAnimationFrame(animar);
+
+        const vel = 0.15;
+        if (keys["w"]) player.position.z -= vel;
+        if (keys["s"]) player.position.z += vel;
+        if (keys["a"]) player.position.x -= vel;
+        if (keys["d"]) player.position.x += vel;
+
+        camera.position.x = player.position.x + 3;
+        camera.position.y = 3;
+        camera.position.z = player.position.z + 5;
+        camera.lookAt(player.position);
+
+        verificarColeta();
+        renderer.render(scene, camera);
+      }
+    }
   </script>
 </body>
 </html>
