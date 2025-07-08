@@ -186,11 +186,13 @@
       const geo = new THREE.BoxGeometry(1, 1.3, 1);
       const mat = new THREE.MeshLambertMaterial({ color: cores[tipo] || 0xffffff });
       jogador = new THREE.Mesh(geo, mat);
-      jogador.position.set(0, 0.65, 0);
-      cena.add(jogador);
+jogador.position.set(0, 1, 0); // sobe o personagem
+cena.add(jogador);
 
-      camera.position.set(3, 3, 5);
-      camera.lookAt(jogador.position);
+// Câmera um pouco mais acima e atrás
+camera.position.set(0, 3, 6);
+camera.lookAt(jogador.position);
+
 
       // Itens certos (brancos)
       for (let i = 0; i < 3; i++) {
