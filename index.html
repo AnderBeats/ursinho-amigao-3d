@@ -119,6 +119,21 @@
             z-index: 10;
             font-size: 1.1em;
             display: none; /* Oculta o HUD por padrão */
+            display: flex; /* Use flexbox for columns */
+            justify-content: space-around; /* Distribute space between columns */
+            width: 90%; /* Occupy most of the width */
+            max-width: 700px; /* Limit max width */
+            box-sizing: border-box; /* Include padding in width */
+        }
+        .hud-column {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* Align text to the left within each column */
+            flex: 1; /* Allow columns to grow and shrink */
+            padding: 0 10px; /* Add some internal padding */
+        }
+        .hud-column:last-child {
+            align-items: flex-end; /* Align right column text to the right */
         }
         #objetivoFase {
             position: absolute;
@@ -352,6 +367,13 @@
                 font-size: 0.9em;
                 padding: 8px;
                 top: 60px; /* Adjusted top for mobile */
+                flex-direction: row; /* Keep columns side-by-side if enough space */
+            }
+            .hud-column {
+                align-items: flex-start; /* Default for both columns */
+            }
+            .hud-column:last-child {
+                align-items: flex-end; /* Keep right column aligned right */
             }
             .botao-direcional, .botao-jogo {
                 width: 45px;
@@ -363,7 +385,6 @@
                 height: 60px;
                 font-size: 26px;
             }
-            /* Removed #botao-dica adjustments as the button is removed */
             #direcional {
                 bottom: 10px;
                 left: 10px;
@@ -372,7 +393,6 @@
                 bottom: 20px;
                 right: 10px;
             }
-            /* Removed #botao-dica adjustments as the button is removed */
             .modal-content {
                 padding: 20px;
                 font-size: 1.2em;
@@ -409,6 +429,16 @@
                 font-size: 0.8em;
                 padding: 5px;
                 top: 50px; /* Adjusted top for smaller mobile */
+                flex-direction: column; /* Stack columns vertically on very small screens */
+                align-items: center; /* Center stacked columns */
+            }
+            .hud-column {
+                width: 100%; /* Take full width when stacked */
+                align-items: center; /* Center text when stacked */
+                padding: 5px 0; /* Adjust padding */
+            }
+            .hud-column:last-child {
+                align-items: center; /* Center text when stacked */
             }
             .botao-direcional, .botao-jogo {
                 width: 40px;
@@ -420,7 +450,6 @@
                 height: 55px;
                 font-size: 24px;
             }
-            /* Removed #botao-dica adjustments as the button is removed */
             #direcional {
                 bottom: 5px;
                 left: 5px;
@@ -429,7 +458,6 @@
                 bottom: 15px;
                 right: 5px;
             }
-            /* Removed #botao-dica adjustments as the button is removed */
             .modal-content {
                 padding: 15px;
                 font-size: 1em;
@@ -477,11 +505,15 @@
 
     <!-- Heads-Up Display (HUD) -->
     <div id="hud">
-        <span id="vidasDisplay"></span><br>
-        <span id="hudObjectiveLine1"></span><br>
-        <span id="hudObjectiveLine2"></span><br>
-        <span id="totalAllItemsCollectedDisplay"></span><br>
-        <span id="tempo"></span><br> <!-- Corrected id to "tempo" -->
+        <div class="hud-column">
+            <span id="vidasDisplay"></span>
+            <span id="totalAllItemsCollectedDisplay"></span>
+            <span id="tempo"></span>
+        </div>
+        <div class="hud-column">
+            <span id="hudObjectiveLine1"></span>
+            <span id="hudObjectiveLine2"></span>
+        </div>
     </div>
 
     <!-- Título do Capítulo Centralizado -->
@@ -507,9 +539,6 @@
 
     <!-- Botão de Ação para Celular -->
     <button id="botao-acao" class="botao-jogo">A</button>
-
-    <!-- Novo Botão de Dica LLM -->
-    <!-- Removed #botao-dica as per user request -->
 
     <!-- Modal de Fim de Jogo/Vitória -->
     <div id="gameModal" class="modal">
@@ -693,7 +722,7 @@
             // Torna o HUD visível ao iniciar a fase
             const hudElementDiv = document.getElementById('hud');
             if (hudElementDiv) {
-                hudElementDiv.style.display = 'block';
+                hudElementDiv.style.display = 'flex'; // Changed to flex for columns
             }
 
             // Get HUD element references locally within iniciar
@@ -1216,7 +1245,7 @@
 
                     // Verifica colisão com objetos já posicionados
                     for (const placedObj of placedObjects) {
-                        const exclusionZone = 2.0; // Reduzido para permitir mais objetos, mas ainda evitar sobreposição direta
+                        const exclusionZone = 1.5; // Adjusted for tighter collision detection
                         const expandedRect = {
                             x: placedObj.x - (objSize * (exclusionZone - 1) / 2),
                             y: placedObj.y - (objSize * (exclusionZone - 1) / 2),
@@ -1881,56 +1910,56 @@
             const tempoDisplayElement = document.getElementById('tempo');
 
             let coracao = "❤️".repeat(vidas); // Exibe corações com base nas vidas
-            let hudObjectiveLine1Content = '';
-            let hudObjectiveLine2Content = ''; // For objectives with two lines in the HUD
+            let hudLeftColumnContent = '';
+            let hudRightColumnContent = '';
             let hudTotalCollectedContent = `Total Coletado: ${totalAllItemsCollected}`;
             let hudTempoContent = `Tempo: ${tempo}s`;
 
             // HUD content for Phase 1
             if (currentPhase === 1) {
-                hudObjectiveLine1Content = `🔴 Pedras: ${pedrasColetadas} / ${TOTAL_PEDRAS}<br>🔑 Chaves: ${keysColetadas} / ${TOTAL_CHAVES}`;
-                hudObjectiveLine2Content = `📦 Baú: ${pedrasColetadas === TOTAL_PEDRAS && keysColetadas === TOTAL_CHAVES ? '1/1 🔓' : '0/1 🔒'}`; // Corrected logic and format
+                hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
+                hudRightColumnContent = `🔴 Pedras: ${pedrasColetadas} / ${TOTAL_PEDRAS}<br>🔑 Chaves: ${keysColetadas} / ${TOTAL_CHAVES}<br>📦 Baú: ${pedrasColetadas === TOTAL_PEDRAS && keysColetadas === TOTAL_CHAVES ? '1/1 🔓' : '0/1 🔒'}`;
             } else if (currentPhase === 2) {
-                hudObjectiveLine1Content = `🎟️ Vales Sorvete: ${valesSorveteColetados} / ${TOTAL_VALES_SORVETE}`;
-                hudObjectiveLine2Content = `🍫🍦 Sorvetes: ${sorvetesObjetivoColetados} / ${TOTAL_SORVETES_OBJETIVO}`;
+                hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
+                hudRightColumnContent = `🎟️ Vales Sorvete: ${valesSorveteColetados} / ${TOTAL_VALES_SORVETE}<br>🍫🍦 Sorvetes: ${sorvetesObjetivoColetados} / ${TOTAL_SORVETES_OBJETIVO}`;
             } else if (currentPhase === 3) {
-                hudObjectiveLine1Content = `🏆 Troféus: ${trofeusColetados} / ${TOTAL_TROFEUS}<br>⚽ Bolas: ${bolasColetadas} / ${TOTAL_BOLAS_FASE3}`;
-                hudObjectiveLine2Content = `🪁 Pipas: ${pipasColetadas} / ${TOTAL_PIPAS}`;
+                hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
+                hudRightColumnContent = `🏆 Troféus: ${trofeusColetados} / ${TOTAL_TROFEUS}<br>⚽ Bolas: ${bolasColetadas} / ${TOTAL_BOLAS_FASE3}<br>🪁 Pipas: ${pipasColetadas} / ${TOTAL_PIPAS}`;
             } else if (currentPhase === 4) {
-                hudObjectiveLine1Content = `🧪 Tubos Ensaio: ${tubosEnsaioColetados} / ${TOTAL_TUBOS_ENSAIO}<br>🧲 Ímãs: ${imasColetados} / ${TOTAL_IMAS}`;
-                hudObjectiveLine2Content = `🔬 Microscópios: ${microscopioColetados} / ${TOTAL_MICROSCOPIO}`;
+                hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
+                hudRightColumnContent = `🧪 Tubos Ensaio: ${tubosEnsaioColetados} / ${TOTAL_TUBOS_ENSAIO}<br>🧲 Ímãs: ${imasColetados} / ${TOTAL_IMAS}<br>🔬 Microscópios: ${microscopioColetados} / ${TOTAL_MICROSCOPIO}`;
             } else if (currentPhase === 5) {
-                hudObjectiveLine1Content = `🐘 Elefantes: ${elefantesColetados} / ${TOTAL_ELEFANTES}<br>🦁 Leões: ${leoesColetados} / ${TOTAL_LEOES}`;
-                hudObjectiveLine2Content = `🦜 Aves: ${avesColetadas} / ${TOTAL_AVES}`;
+                hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
+                hudRightColumnContent = `🐘 Elefantes: ${elefantesColetados} / ${TOTAL_ELEFANTES}<br>🦁 Leões: ${leoesColetados} / ${TOTAL_LEOES}<br>🦜 Aves: ${avesColetadas} / ${TOTAL_AVES}`;
             } else if (currentPhase === 6) {
-                hudObjectiveLine1Content = `🎨 Pinturas: ${pinturasColetadas} / ${TOTAL_PINTURAS}`;
-                hudObjectiveLine2Content = `🗿 Esculturas: ${esculturasColetadas} / ${TOTAL_ESCULTURAS}<br>🦴 Fósseis: ${fosseisColetados} / ${TOTAL_FOSSEIS}`;
+                hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
+                hudRightColumnContent = `🎨 Pinturas: ${pinturasColetadas} / ${TOTAL_PINTURAS}<br>🗿 Esculturas: ${esculturasColetadas} / ${TOTAL_ESCULTURAS}<br>🦴 Fósseis: ${fosseisColetados} / ${TOTAL_FOSSEIS}`;
             } else if (currentPhase === 7) {
-                hudObjectiveLine1Content = `🧺 Cestas Piquenique: ${cestasPiqueniqueColetadas} / ${TOTAL_CESTAS_PIQUENIQUE}<br>⚽ Bolas: ${bolasFase7Coletadas} / ${TOTAL_BOLAS_FASE7}`;
-                hudObjectiveLine2Content = `🎠 Brinquedos: ${brinquedosParqueColetados} / ${TOTAL_BRINQUEDOS_PARQUE}`;
+                hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
+                hudRightColumnContent = `🧺 Cestas Piquenique: ${cestasPiqueniqueColetadas} / ${TOTAL_CESTAS_PIQUENIQUE}<br>⚽ Bolas: ${bolasFase7Coletadas} / ${TOTAL_BOLAS_FASE7}<br>🎠 Brinquedos: ${brinquedosParqueColetados} / ${TOTAL_BRINQUEDOS_PARQUE}`;
             } else if (currentPhase === 8) {
-                hudObjectiveLine1Content = `🗺️ Aventura: ${livroAventuraColetados} / ${TOTAL_LIVRO_AVENTURA}<br>🦁 Animais: ${livroAnimaisColetados} / ${TOTAL_LIVRO_ANIMAIS}`;
-                hudObjectiveLine2Content = `📜 Fábula: ${livroFabulaColetados} / ${TOTAL_LIVRO_FABULA}`;
+                hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
+                hudRightColumnContent = `🗺️ Aventura: ${livroAventuraColetados} / ${TOTAL_LIVRO_AVENTURA}<br>🦁 Animais: ${livroAnimaisColetados} / ${TOTAL_LIVRO_ANIMAIS}<br>📜 Fábula: ${livroFabulaColetados} / ${TOTAL_LIVRO_FABULA}`;
             } else if (currentPhase === 9) {
-                hudObjectiveLine1Content = `♻️ Reciclagem: ${lixeiraReciclagemColetados} / ${TOTAL_LIXEIRA_RECICLAGEM}<br>🧴 Plástico: ${garrafaPlasticoColetados} / ${TOTAL_GARRAFA_PLASTICO}`;
-                hudObjectiveLine2Content = `🌱 Árvore: ${arvoreMudaColetados} / ${TOTAL_ARVORE_MUDA}`;
+                hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
+                hudRightColumnContent = `♻️ Reciclagem: ${lixeiraReciclagemColetados} / ${TOTAL_LIXEIRA_RECICLAGEM}<br>🧴 Plástico: ${garrafaPlasticoColetados} / ${TOTAL_GARRAFA_PLASTICO}<br>🌱 Árvore: ${arvoreMudaColetados} / ${TOTAL_ARVORE_MUDA}`;
             } else if (currentPhase === 10) {
-                hudObjectiveLine1Content = `🌿 Plantas: ${plantaNativaColetados} / ${TOTAL_PLANTAS_NATIVAS}<br>🦁 Animais: ${animalSelvagemColetados} / ${TOTAL_ANIMAIS_SELVAGENS}`;
-                hudObjectiveLine2Content = `🔭 Telescópios: ${telescopioColetados} / ${TOTAL_TELESCOPIO}`;
+                hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
+                hudRightColumnContent = `🌿 Plantas: ${plantaNativaColetados} / ${TOTAL_PLANTAS_NATIVAS}<br>🦁 Animais: ${animalSelvagemColetados} / ${TOTAL_ANIMAIS_SELVAGENS}<br>🔭 Telescópios: ${telescopioColetados} / ${TOTAL_TELESCOPIO}`;
             } else if (currentPhase === 11) {
-                hudObjectiveLine1Content = `🖌️ Pincéis: ${pincelColetados} / ${TOTAL_PINCEL}<br>🎨 Tintas: ${tintaColetados} / ${TOTAL_TINTA}`;
-                hudObjectiveLine2Content = `🏺 Argila: ${argilaColetados} / ${TOTAL_ARGILA}`;
+                hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
+                hudRightColumnContent = `🖌️ Pincéis: ${pincelColetados} / ${TOTAL_PINCEL}<br>🎨 Tintas: ${tintaColetados} / ${TOTAL_TINTA}<br>🏺 Argila: ${argilaColetados} / ${TOTAL_ARGILA}`;
             } else if (currentPhase === 12) {
-                hudObjectiveLine1Content = `🎸 Violão: ${violaoColetados} / ${TOTAL_VIOLAO}<br>🎹 Piano: ${pianoColetados} / ${TOTAL_PIANO}`;
-                hudObjectiveLine2Content = `🎤 Microfone: ${microfoneColetados} / ${TOTAL_MICROFONE}`;
+                hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
+                hudRightColumnContent = `🎸 Violão: ${violaoColetados} / ${TOTAL_VIOLAO}<br>🎹 Piano: ${pianoColetados} / ${TOTAL_PIANO}<br>🎤 Microfone: ${microfoneColetados} / ${TOTAL_MICROFONE}`;
             }
 
             // Update the text content of HUD elements
-            if (vidasDisplayElement) vidasDisplayElement.innerText = `Vidas: ${coracao}`;
-            if (hudObjectiveLine1Element) hudObjectiveLine1Element.innerHTML = hudObjectiveLine1Content;
-            if (hudObjectiveLine2Element) hudObjectiveLine2Element.innerHTML = hudObjectiveLine2Content;
-            if (totalAllItemsCollectedDisplayElement) totalAllItemsCollectedDisplayElement.innerText = hudTotalCollectedContent;
-            if (tempoDisplayElement) tempoDisplayElement.innerText = hudTempoContent;
+            const hudLeftColumnElement = document.querySelector('#hud .hud-column:first-child');
+            const hudRightColumnElement = document.querySelector('#hud .hud-column:last-child');
+
+            if (hudLeftColumnElement) hudLeftColumnElement.innerHTML = hudLeftColumnContent;
+            if (hudRightColumnElement) hudRightColumnElement.innerHTML = hudRightColumnContent;
         }
 
         // Exibe a mensagem de fim de jogo em um modal e recarrega
@@ -2264,10 +2293,6 @@
                     }
                 }
             });
-
-            // Add listener for action button (touch)
-            document.getElementById('botao-acao').addEventListener('touchstart', (e) => { e.preventDefault(); coletando = true; });
-            document.getElementById('botao-acao').addEventListener('touchend', (e) => { e.preventDefault(); coletando = false; });
 
             // Removed #botao-dica event listener as the button is removed
 
