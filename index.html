@@ -2187,9 +2187,7 @@
             atualizarHUD();
         };
     </script>
-</body>
-</html>
-// Garante que toques acionem movimentação mesmo fora do teclado físico
+    // Garante que toques acionem movimentação mesmo fora do teclado físico
 document.querySelectorAll('.botao-direcional').forEach(botao => {
   botao.addEventListener('touchstart', e => {
     e.preventDefault();
@@ -2202,3 +2200,6 @@ document.querySelectorAll('.botao-direcional').forEach(botao => {
     tecla(letra, false);
   });
 });
+
+</body>
+</html>
