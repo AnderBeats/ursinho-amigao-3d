@@ -346,6 +346,133 @@
             text-align: center;
             white-space: nowrap; /* Evita quebra de linha */
         }
+
+        /* Media Queries for Mobile Adjustments */
+        @media (max-width: 768px) {
+            #introImagePlaceholder {
+                width: 80vw;
+                height: 40vh;
+                font-size: 6em;
+            }
+            #introScreen h1 {
+                font-size: 1.8em;
+            }
+            #introScreen p {
+                font-size: 1.2em;
+            }
+            #hud {
+                font-size: 0.9em;
+                padding: 8px;
+            }
+            .botao-direcional, .botao-jogo {
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+            }
+            #botao-acao {
+                width: 60px;
+                height: 60px;
+                font-size: 26px;
+            }
+            #botao-dica {
+                font-size: 14px;
+                padding: 4px 8px;
+                min-width: 45px;
+            }
+            #direcional {
+                bottom: 10px;
+                left: 10px;
+            }
+            #botao-acao {
+                bottom: 20px;
+                right: 10px;
+            }
+            #botao-dica {
+                bottom: 70px;
+                right: 10px;
+            }
+            .modal-content {
+                padding: 20px;
+                font-size: 1.2em;
+            }
+            .modal-content button {
+                padding: 10px 20px;
+                font-size: 1em;
+            }
+            #continueModal h2 {
+                font-size: 2em;
+            }
+            #continueModal p {
+                font-size: 1.5em;
+            }
+            #continueModal .botoes-continue button {
+                padding: 12px 25px;
+                font-size: 1.2em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #introImagePlaceholder {
+                width: 90vw;
+                height: 35vh;
+                font-size: 5em;
+            }
+            #introScreen h1 {
+                font-size: 1.5em;
+            }
+            #introScreen p {
+                font-size: 1em;
+            }
+            #hud {
+                font-size: 0.8em;
+                padding: 5px;
+            }
+            .botao-direcional, .botao-jogo {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+            #botao-acao {
+                width: 55px;
+                height: 55px;
+                font-size: 24px;
+            }
+            #botao-dica {
+                font-size: 12px;
+                padding: 3px 6px;
+                min-width: 40px;
+            }
+            #direcional {
+                bottom: 5px;
+                left: 5px;
+            }
+            #botao-acao {
+                bottom: 15px;
+                right: 5px;
+            }
+            #botao-dica {
+                bottom: 60px;
+                right: 5px;
+            }
+            .modal-content {
+                padding: 15px;
+                font-size: 1em;
+            }
+            .modal-content button {
+                padding: 8px 15px;
+                font-size: 0.9em;
+            }
+            #continueModal h2 {
+                font-size: 1.8em;
+            }
+            #continueModal p {
+                font-size: 1.2em;
+            }
+            #continueModal .botoes-continue button {
+                padding: 10px 20px;
+                font-size: 1em;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1113,7 +1240,7 @@
 
                     // Verifica colisão com objetos já posicionados
                     for (const placedObj of placedObjects) {
-                        const exclusionZone = 1.0; // Reduzido para permitir mais objetos, mas ainda evitar sobreposição direta
+                        const exclusionZone = 1.5; // Adjusted for tighter collision detection
                         const expandedRect = {
                             x: placedObj.x - (objSize * (exclusionZone - 1) / 2),
                             y: placedObj.y - (objSize * (exclusionZone - 1) / 2),
@@ -1786,12 +1913,7 @@
             // HUD content for Phase 1
             if (currentPhase === 1) {
                 hudObjectiveLine1Content = `🔴 Pedras: ${pedrasColetadas} / ${TOTAL_PEDRAS}<br>🔑 Chaves: ${keysColetadas} / ${TOTAL_CHAVES}`;
-                // Now, the chest status depends only on whether all keys and stones are collected
-                if (pedrasColetadas === TOTAL_PEDRAS && keysColetadas === TOTAL_CHAVES) {
-                    hudObjectiveLine2Content = `📦 Baú: 1/1 🔓`;
-                } else {
-                    hudObjectiveLine2Content = `📦 Baú: 0/1 🔒`;
-                }
+                hudObjectiveLine2Content = `📦 Baú: ${pedrasColetadas === TOTAL_PEDRAS && keysColetadas === TOTAL_CHAVES ? '1/1 🔓' : '0/1 🔒'}`; // Corrected logic and format
             } else if (currentPhase === 2) {
                 hudObjectiveLine1Content = `🎟️ Vales Sorvete: ${valesSorveteColetados} / ${TOTAL_VALES_SORVETE}`;
                 hudObjectiveLine2Content = `🍫🍦 Sorvetes: ${sorvetesObjetivoColetados} / ${TOTAL_SORVETES_OBJETIVO}`;
@@ -2187,6 +2309,5 @@
             atualizarHUD();
         };
     </script>
-
 </body>
 </html>
