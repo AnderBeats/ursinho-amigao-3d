@@ -413,23 +413,9 @@
             }
         }
 
-        @media (max-width: 480px) {
-            #introImagePlaceholder {
-                width: 90vw;
-                height: 35vh;
-                font-size: 5em;
-            }
-            #introScreen h1 {
-                font-size: 1.5em;
-            }
-            #introScreen p {
-                font-size: 1em;
-            }
+        @media (max-width: 600px) { /* Adjusted breakpoint for stacking columns */
             #hud {
-                font-size: 0.8em;
-                padding: 5px;
-                top: 50px; /* Adjusted top for smaller mobile */
-                flex-direction: column; /* Stack columns vertically on very small screens */
+                flex-direction: column; /* Stack columns vertically on smaller screens */
                 align-items: center; /* Center stacked columns */
             }
             .hud-column {
@@ -440,41 +426,36 @@
             .hud-column:last-child {
                 align-items: center; /* Center text when stacked */
             }
-            .botao-direcional, .botao-jogo {
-                width: 40px;
-                height: 40px;
-                font-size: 18px;
+        }
+
+        @media (max-width: 400px) { /* New breakpoint for even smaller screens */
+            #hud {
+                top: 40px; /* Further adjust top for very small screens */
+                font-size: 0.75em; /* Smaller font for very small screens */
             }
-            #botao-acao {
-                width: 55px;
-                height: 55px;
-                font-size: 24px;
+            #introScreen h1 {
+                font-size: 1.3em;
             }
-            #direcional {
-                bottom: 5px;
-                left: 5px;
-            }
-            #botao-acao {
-                bottom: 15px;
-                right: 5px;
-            }
-            .modal-content {
-                padding: 15px;
-                font-size: 1em;
-            }
-            .modal-content button {
-                padding: 8px 15px;
+            #introScreen p {
                 font-size: 0.9em;
             }
-            #continueModal h2 {
-                font-size: 1.8em;
+            .botao-direcional, .botao-jogo {
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
             }
-            #continueModal p {
-                font-size: 1.2em;
+            #botao-acao {
+                width: 50px;
+                height: 50px;
+                font-size: 22px;
             }
-            #continueModal .botoes-continue button {
-                padding: 10px 20px;
-                font-size: 1em;
+            #direcional {
+                bottom: 2px;
+                left: 2px;
+            }
+            #botao-acao {
+                bottom: 10px;
+                right: 2px;
             }
         }
     </style>
@@ -1918,7 +1899,8 @@
             // HUD content for Phase 1
             if (currentPhase === 1) {
                 hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
-                hudRightColumnContent = `🔴 Pedras: ${pedrasColetadas} / ${TOTAL_PEDRAS}<br>🔑 Chaves: ${keysColetadas} / ${TOTAL_CHAVES}<br>📦 Baú: ${pedrasColetadas === TOTAL_PEDRAS && keysColetadas === TOTAL_CHAVES ? '1/1 🔓' : '0/1 🔒'}`;
+                hudRightColumnContent = `🔴 Pedras: ${pedrasColetadas} / ${TOTAL_PEDRAS}<br>🔑 Chaves: ${keysColetadas} / ${TOTAL_CHAVES}<br>📦 Baú: ${pedrasColetadas === TOTAL_PEDRAS && keysColetadas === TOTAL_CHAVES ? '1/1 🔓' : '0/1 🔒'}`; // Corrected logic and format
+                console.log(`DEBUG HUD: Pedras: ${pedrasColetadas}, Chaves: ${keysColetadas}, Baú: ${pedrasColetadas === TOTAL_PEDRAS && keysColetadas === TOTAL_CHAVES ? 'ABERTO' : 'FECHADO'}`);
             } else if (currentPhase === 2) {
                 hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
                 hudRightColumnContent = `🎟️ Vales Sorvete: ${valesSorveteColetados} / ${TOTAL_VALES_SORVETE}<br>🍫🍦 Sorvetes: ${sorvetesObjetivoColetados} / ${TOTAL_SORVETES_OBJETIVO}`;
