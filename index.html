@@ -109,8 +109,9 @@
         }
         #hud {
             position: absolute;
-            top: 10px;
-            left: 10px;
+            top: 80px; /* Adjusted top for desktop */
+            left: 50%;
+            transform: translateX(-50%);
             color: white;
             background: rgba(0,0,0,0.6);
             padding: 10px;
@@ -175,20 +176,7 @@
             justify-content: center; /* Para centralizar o conteúdo */
             font-size: 30px; /* Ajusta o tamanho da fonte para o 'A' */
         }
-        #botao-dica {
-            position: fixed; /* Fixado na viewport */
-            bottom: 90px; /* Posiciona acima do botão de ação */
-            right: 20px;
-            z-index: 10;
-            background: rgba(33, 150, 243, 0.3); /* Azul com transparência */
-            color: white;
-            font-size: 16px; /* Ajusta o tamanho da fonte para o texto */
-            padding: 5px 10px; /* Ajusta o padding */
-            width: auto; /* Largura automática para o texto */
-            min-width: 50px; /* Garante um tamanho mínimo */
-            height: auto; /* Altura automática */
-            line-height: normal; /* Reseta a altura da linha */
-        }
+        /* Removed #botao-dica as per request */
 
         /* Modal para mensagens de fim de jogo */
         .modal {
@@ -363,6 +351,7 @@
             #hud {
                 font-size: 0.9em;
                 padding: 8px;
+                top: 60px; /* Adjusted top for mobile */
             }
             .botao-direcional, .botao-jogo {
                 width: 45px;
@@ -374,11 +363,7 @@
                 height: 60px;
                 font-size: 26px;
             }
-            #botao-dica {
-                font-size: 14px;
-                padding: 4px 8px;
-                min-width: 45px;
-            }
+            /* Removed #botao-dica adjustments as the button is removed */
             #direcional {
                 bottom: 10px;
                 left: 10px;
@@ -387,10 +372,7 @@
                 bottom: 20px;
                 right: 10px;
             }
-            #botao-dica {
-                bottom: 70px;
-                right: 10px;
-            }
+            /* Removed #botao-dica adjustments as the button is removed */
             .modal-content {
                 padding: 20px;
                 font-size: 1.2em;
@@ -426,6 +408,7 @@
             #hud {
                 font-size: 0.8em;
                 padding: 5px;
+                top: 50px; /* Adjusted top for smaller mobile */
             }
             .botao-direcional, .botao-jogo {
                 width: 40px;
@@ -437,11 +420,7 @@
                 height: 55px;
                 font-size: 24px;
             }
-            #botao-dica {
-                font-size: 12px;
-                padding: 3px 6px;
-                min-width: 40px;
-            }
+            /* Removed #botao-dica adjustments as the button is removed */
             #direcional {
                 bottom: 5px;
                 left: 5px;
@@ -450,10 +429,7 @@
                 bottom: 15px;
                 right: 5px;
             }
-            #botao-dica {
-                bottom: 60px;
-                right: 5px;
-            }
+            /* Removed #botao-dica adjustments as the button is removed */
             .modal-content {
                 padding: 15px;
                 font-size: 1em;
@@ -533,7 +509,7 @@
     <button id="botao-acao" class="botao-jogo">A</button>
 
     <!-- Novo Botão de Dica LLM -->
-    <button id="botao-dica" class="botao-jogo">✨ Pedir Dica</button>
+    <!-- Removed #botao-dica as per user request -->
 
     <!-- Modal de Fim de Jogo/Vitória -->
     <div id="gameModal" class="modal">
@@ -1043,7 +1019,7 @@
 
 
             // Gera os obstáculos temáticos da escola (comum para todas as fases)
-            for (let i = 0; i < 4; i++) { 
+            for (let i = 0; i < 3; i++) { // Reduced from 4 to 3 for each type
                 obstaculos.push(createGameObject('mesa', '🪑', OBSTACLE_SIZE, false, true)); 
                 obstaculos.push(createGameObject('cadeira', '🪑', OBSTACLE_SIZE, false, true));
                 obstaculos.push(createGameObject('armario', '🚪', OBSTACLE_SIZE, false, true));
@@ -1220,10 +1196,10 @@
             const playerStartY = canvas.height / 2 - PLAYER_SIZE / 2;
             // Aumentei a zona segura para 3x o tamanho do jogador (6x PLAYER_SIZE total)
             const playerSafeZone = {
-                x: playerStartX - PLAYER_SIZE * 2.5,
-                y: playerStartY - PLAYER_SIZE * 2.5,
-                width: PLAYER_SIZE * 6,
-                height: PLAYER_SIZE * 6
+                x: playerStartX - PLAYER_SIZE * 4, // Increased safe zone for player spawn
+                y: playerStartY - PLAYER_SIZE * 4, // Increased safe zone for player spawn
+                width: PLAYER_SIZE * 8, // Increased safe zone for player spawn
+                height: PLAYER_SIZE * 8 // Increased safe zone for player spawn
             };
 
             function getRandomPosition(objSize, isObstacle = false) {
@@ -1240,7 +1216,7 @@
 
                     // Verifica colisão com objetos já posicionados
                     for (const placedObj of placedObjects) {
-                        const exclusionZone = 1.5; // Adjusted for tighter collision detection
+                        const exclusionZone = 2.0; // Reduzido para permitir mais objetos, mas ainda evitar sobreposição direta
                         const expandedRect = {
                             x: placedObj.x - (objSize * (exclusionZone - 1) / 2),
                             y: placedObj.y - (objSize * (exclusionZone - 1) / 2),
@@ -2293,8 +2269,7 @@
             document.getElementById('botao-acao').addEventListener('touchstart', (e) => { e.preventDefault(); coletando = true; });
             document.getElementById('botao-acao').addEventListener('touchend', (e) => { e.preventDefault(); coletando = false; });
 
-            // Add listener for new hint button
-            document.getElementById('botao-dica').addEventListener('click', askForHint);
+            // Removed #botao-dica event listener as the button is removed
 
             // Add listeners for continue modal buttons
             document.getElementById('btnSim').addEventListener('click', () => handleContinue('sim'));
