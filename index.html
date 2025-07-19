@@ -119,18 +119,20 @@
             z-index: 10;
             font-size: 1.1em;
             display: none; /* Oculta o HUD por padrão */
-            display: flex; /* Use flexbox for columns */
+            flex-direction: row; /* Use flexbox for columns */
             justify-content: space-around; /* Distribute space between columns */
             width: 90%; /* Occupy most of the width */
             max-width: 700px; /* Limit max width */
             box-sizing: border-box; /* Include padding in width */
+            align-items: flex-start; /* Align columns to the top */
         }
         .hud-column {
             display: flex;
             flex-direction: column;
             align-items: flex-start; /* Align text to the left within each column */
-            flex: 1; /* Allow columns to grow and shrink */
+            flex-basis: 48%; /* Give columns a basis to distribute space */
             padding: 0 10px; /* Add some internal padding */
+            box-sizing: border-box; /* Include padding in width */
         }
         .hud-column:last-child {
             align-items: flex-end; /* Align right column text to the right */
@@ -413,10 +415,13 @@
             }
         }
 
-        @media (max-width: 600px) { /* Adjusted breakpoint for stacking columns */
+        @media (max-width: 400px) { /* Adjusted breakpoint for stacking columns on very small screens */
             #hud {
-                flex-direction: column; /* Stack columns vertically on smaller screens */
+                top: 40px; /* Further adjust top for very small screens */
+                font-size: 0.75em; /* Smaller font for very small screens */
+                flex-direction: column; /* Stack columns vertically on very small screens */
                 align-items: center; /* Center stacked columns */
+                width: 95%; /* Take full width when stacked */
             }
             .hud-column {
                 width: 100%; /* Take full width when stacked */
@@ -425,13 +430,6 @@
             }
             .hud-column:last-child {
                 align-items: center; /* Center text when stacked */
-            }
-        }
-
-        @media (max-width: 400px) { /* New breakpoint for even smaller screens */
-            #hud {
-                top: 40px; /* Further adjust top for very small screens */
-                font-size: 0.75em; /* Smaller font for very small screens */
             }
             #introScreen h1 {
                 font-size: 1.3em;
@@ -954,7 +952,7 @@
                 itens.push(createGameObject('globo', '🌍', ITEM_SIZE, true, false, null, false)); 
                 // Removed extra money bags from here for Chapters 8-12
                 chest = null; // Não há baú no Capítulo 8
-            } else if (currentPhase === 9) { // Capítulo 9: Planeta
+            } else if (currentPhase === 9) {
                 // Itens para o Capítulo 9: Reciclagem e Meio Ambiente (3 itens temáticos)
                 itens.push(createGameObject('lixeira_reciclagem', '♻️', ITEM_SIZE, true, false, null, true)); // isObstacle: false
                 itens.push(createGameObject('lixeira_reciclagem', '♻️', ITEM_SIZE, true, false, null, true));
@@ -972,7 +970,7 @@
                 itens.push(createGameObject('flor', '🌸', ITEM_SIZE, true, false, null, false)); // Não objetivo
                 // Removed extra money bags from here for Chapters 8-12
                 chest = null; // Não há baú no Capítulo 9
-            } else if (currentPhase === 10) { // Capítulo 10: Exploração da Natureza
+            } else if (currentPhase === 10) {
                 // Itens para o Capítulo 10: Exploração da Natureza (3 itens temáticos)
                 itens.push(createGameObject('planta_nativa', '🌿', ITEM_SIZE, true, false, null, true)); // isObstacle: false
                 itens.push(createGameObject('planta_nativa', '🌿', ITEM_SIZE, true, false, null, true));
@@ -989,7 +987,7 @@
                 itens.push(createGameObject('lupa', '🔎', ITEM_SIZE, true, false, null, false)); // Não objetivo
                 // Removed extra money bags from here for Chapters 8-12
                 chest = null; // Não há baú no Capítulo 10
-            } else if (currentPhase === 11) { // Capítulo 11: Oficina de Artes
+            } else if (currentPhase === 11) {
                 // Itens para o Capítulo 11: Oficina de Artes (3 itens temáticos)
                 itens.push(createGameObject('pincel', '🖌️', ITEM_SIZE, true, false, null, true)); // isObstacle: false
                 itens.push(createGameObject('pincel', '🖌️', ITEM_SIZE, true, false, null, true));
@@ -1007,7 +1005,7 @@
                 itens.push(createGameObject('tela', '🖼️', ITEM_SIZE, true, false, null, false)); // Não objetivo
                 // Removed extra money bags from here for Chapters 8-12
                 chest = null; // Não há baú no Capítulo 11
-            } else if (currentPhase === 12) { // Capítulo 12: Música e Dança
+            } else if (currentPhase === 12) {
                 // Itens para o Capítulo 12: Música e Dança (3 itens temáticos)
                 itens.push(createGameObject('violao', '🎸', ITEM_SIZE, true, false, null, true)); // isObstacle: false
                 itens.push(createGameObject('violao', '🎸', ITEM_SIZE, true, false, null, true));
@@ -1084,9 +1082,8 @@
                 if (tempo > 0 && vidas > 0 && !winConditionMet) {
                     tempo--; // DECREMENTO DE TEMPO
                     // Acessa o elemento 'tempo' diretamente aqui para garantir que não seja nulo
-                    const currentTempoElement = document.getElementById('tempo');
-                    if (currentTempoElement) {
-                        currentTempoElement.innerText = `Tempo: ${tempo}s`; // Atualiza o texto do tempo
+                    if (tempoDisplayElement) { // Use the global reference
+                        tempoDisplayElement.innerText = `Tempo: ${tempo}s`; // Atualiza o texto do tempo
                     } else {
                         console.error("Erro: Elemento 'tempo' não encontrado no DOM (dentro do setInterval).");
                     }
@@ -1206,10 +1203,10 @@
             const playerStartY = canvas.height / 2 - PLAYER_SIZE / 2;
             // Aumentei a zona segura para 3x o tamanho do jogador (6x PLAYER_SIZE total)
             const playerSafeZone = {
-                x: playerStartX - PLAYER_SIZE * 4, // Increased safe zone for player spawn
-                y: playerStartY - PLAYER_SIZE * 4, // Increased safe zone for player spawn
-                width: PLAYER_SIZE * 8, // Increased safe zone for player spawn
-                height: PLAYER_SIZE * 8 // Increased safe zone for player spawn
+                x: playerStartX - PLAYER_SIZE * 10, // Increased safe zone for player spawn
+                y: playerStartY - PLAYER_SIZE * 10, // Increased safe zone for player spawn
+                width: PLAYER_SIZE * 20, // Increased safe zone for player spawn
+                height: PLAYER_SIZE * 20 // Increased safe zone for player spawn
             };
 
             function getRandomPosition(objSize, isObstacle = false) {
