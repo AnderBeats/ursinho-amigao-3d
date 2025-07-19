@@ -2187,19 +2187,6 @@
             atualizarHUD();
         };
     </script>
-    // Garante que toques acionem movimentação mesmo fora do teclado físico
-document.querySelectorAll('.botao-direcional').forEach(botao => {
-  botao.addEventListener('touchstart', e => {
-    e.preventDefault();
-    const letra = botao.innerText.trim().toLowerCase();
-    tecla(letra, true);
-  });
-  botao.addEventListener('touchend', e => {
-    e.preventDefault();
-    const letra = botao.innerText.trim().toLowerCase();
-    tecla(letra, false);
-  });
-});
 
 </body>
 </html>
