@@ -120,7 +120,7 @@
             font-size: 1.1em;
             display: none; /* Oculta o HUD por padrão */
             flex-direction: row; /* Use flexbox for columns */
-            justify-content: space-around; /* Distribute space between columns */
+            justify-content: space-between; /* Distribute space between columns */
             width: 90%; /* Occupy most of the width */
             max-width: 700px; /* Limit max width */
             box-sizing: border-box; /* Include padding in width */
@@ -131,8 +131,10 @@
             flex-direction: column;
             align-items: flex-start; /* Align text to the left within each column */
             flex-basis: 48%; /* Give columns a basis to distribute space */
-            padding: 0 10px; /* Add some internal padding */
+            padding: 0 5px; /* Reduced internal padding for better fit */
             box-sizing: border-box; /* Include padding in width */
+            background: rgba(255,255,255,0.1); /* Light background for the "box" effect */
+            border-radius: 5px;
         }
         .hud-column:last-child {
             align-items: flex-end; /* Align right column text to the right */
@@ -175,6 +177,7 @@
             font-size: 24px; /* Fonte maior para ícones */
             box-shadow: 0 3px 5px rgba(0,0,0,0.2);
             transition: background 0.2s, transform 0.1s;
+            z-index: 10; /* Ensure buttons are above canvas */
         }
         .botao-direcional:active, .botao-jogo:active {
             background: rgba(255,255,255,0.5); /* Menos transparente ao clicar */
@@ -193,56 +196,7 @@
             justify-content: center; /* Para centralizar o conteúdo */
             font-size: 30px; /* Ajusta o tamanho da fonte para o 'A' */
         }
-        /* Removed #botao-dica as per request */
 
-        /* Modal para mensagens de fim de jogo */
-        .modal {
-            display: none; /* Oculto por padrão */
-            position: fixed; /* Permanece no lugar */
-            z-index: 20; /* Fica no topo */
-            left: 0;
-            top: 0;
-            width: 100%; /* Largura total */
-            height: 100%; /* Altura total */
-            overflow: auto; /* Habilita rolagem se necessário */
-            background-color: rgba(0,0,0,0.7); /* Preto com opacidade */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: auto;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-            text-align: center;
-            font-size: 1.5em;
-            color: #333;
-            max-width: 80%;
-            transform: scale(0.9);
-            animation: pop-in 0.3s forwards;
-        }
-        @keyframes pop-in {
-            from { opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        .modal-content button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.1em;
-            margin-top: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: background-color 0.2s, transform 0.1s;
-        }
-        .modal-content button:hover {
-            background-color: #45a049;
-            transform: translateY(-2px);
-        }
         /* Estilo do Canvas 2D */
         canvas {
             background-color: #8bc34a; /* Cor do chão para 2D */
@@ -284,8 +238,7 @@
             inset: 0;
             background: rgba(0, 0, 0, 0.9);
             color: white;
-            display: flex;
-            flex-direction: column;
+            flex-direction: column; /* Changed to flex for centering */
             align-items: center;
             justify-content: center;
             z-index: 30; /* Acima de outros modais */
@@ -306,12 +259,13 @@
         #continueModal .botoes-continue button {
             padding: 15px 30px;
             font-size: 1.5em;
-            border-radius: 10px;
             border: none;
+            border-radius: 10px;
             cursor: pointer;
             transition: background-color 0.2s, transform 0.1s;
         }
         #continueModal .botoes-continue button:hover {
+            background-color: #45a049;
             transform: translateY(-2px);
         }
         #continueModal #btnSim {
@@ -368,7 +322,7 @@
             #hud {
                 font-size: 0.9em;
                 padding: 8px;
-                top: 60px; /* Adjusted top for mobile */
+                top: 70px; /* Adjusted top for mobile */
                 flex-direction: row; /* Keep columns side-by-side if enough space */
             }
             .hud-column {
@@ -395,11 +349,11 @@
                 bottom: 20px;
                 right: 10px;
             }
-            .modal-content {
+            .modal-content { /* This rule is now unused as gameModal is removed */
                 padding: 20px;
                 font-size: 1.2em;
             }
-            .modal-content button {
+            .modal-content button { /* This rule is now unused as gameModal is removed */
                 padding: 10px 20px;
                 font-size: 1em;
             }
@@ -415,7 +369,7 @@
             }
         }
 
-        @media (max-width: 400px) { /* Adjusted breakpoint for stacking columns on very small screens */
+        @media (max-width: 360px) { /* Adjusted breakpoint for stacking columns on very small screens */
             #hud {
                 top: 40px; /* Further adjust top for very small screens */
                 font-size: 0.75em; /* Smaller font for very small screens */
@@ -518,14 +472,6 @@
 
     <!-- Botão de Ação para Celular -->
     <button id="botao-acao" class="botao-jogo">A</button>
-
-    <!-- Modal de Fim de Jogo/Vitória -->
-    <div id="gameModal" class="modal">
-        <div class="modal-content">
-            <p id="modalMessage"></p>
-            <button onclick="location.reload()">Jogar Novamente</button>
-        </div>
-    </div>
 
     <!-- Mensagem de Dica LLM -->
     <div id="llmHintMessage" style="display: none;">
@@ -673,7 +619,6 @@
         // Função para atualizar o estado da tecla (para teclado e toque)
         function tecla(k, v) {
             teclas[k] = v;
-            // console.log(`DEBUG: Tecla '${k}' set to ${v}. Current teclas:`, teclas); // Depuração
         }
 
         // Função para selecionar o personagem e iniciar o jogo
@@ -693,7 +638,6 @@
             updatePageTitle(currentPhase);
 
             // Garante que os modais estejam ocultos ao iniciar um novo jogo
-            document.getElementById('gameModal').style.display = 'none';
             document.getElementById('llmHintMessage').style.display = 'none';
             document.getElementById('continueModal').style.display = 'none';
             document.getElementById('temporaryMessage').style.display = 'none';
@@ -950,7 +894,6 @@
                 itens.push(createGameObject('oculos', '👓', ITEM_SIZE, true, false, null, false));
                 itens.push(createGameObject('caneta', '🖊️', ITEM_SIZE, true, false, null, false));
                 itens.push(createGameObject('globo', '🌍', ITEM_SIZE, true, false, null, false)); 
-                // Removed extra money bags from here for Chapters 8-12
                 chest = null; // Não há baú no Capítulo 8
             } else if (currentPhase === 9) {
                 // Itens para o Capítulo 9: Reciclagem e Meio Ambiente (3 itens temáticos)
@@ -968,7 +911,6 @@
 
                 itens.push(createGameObject('saco_lixo', '🗑️', ITEM_SIZE, true, false, null, false)); // Não objetivo
                 itens.push(createGameObject('flor', '🌸', ITEM_SIZE, true, false, null, false)); // Não objetivo
-                // Removed extra money bags from here for Chapters 8-12
                 chest = null; // Não há baú no Capítulo 9
             } else if (currentPhase === 10) {
                 // Itens para o Capítulo 10: Exploração da Natureza (3 itens temáticos)
@@ -985,7 +927,6 @@
                 itens.push(createGameObject('telescopio', '🔭', ITEM_SIZE, true, false, null, true));
 
                 itens.push(createGameObject('lupa', '🔎', ITEM_SIZE, true, false, null, false)); // Não objetivo
-                // Removed extra money bags from here for Chapters 8-12
                 chest = null; // Não há baú no Capítulo 10
             } else if (currentPhase === 11) {
                 // Itens para o Capítulo 11: Oficina de Artes (3 itens temáticos)
@@ -1001,9 +942,8 @@
                 itens.push(createGameObject('argila', '🏺', ITEM_SIZE, true, false, null, true));
                 itens.push(createGameObject('argila', '🏺', ITEM_SIZE, true, false, null, true));
 
-                itens.push(createGameObject('lapis_cor', '🖍️', ITEM_SIZE, true, false, null, false)); // Não objetivo
+                itens.push(createGameObject('lapis_color', '🖍️', ITEM_SIZE, true, false, null, false)); // Não objetivo
                 itens.push(createGameObject('tela', '🖼️', ITEM_SIZE, true, false, null, false)); // Não objetivo
-                // Removed extra money bags from here for Chapters 8-12
                 chest = null; // Não há baú no Capítulo 11
             } else if (currentPhase === 12) {
                 // Itens para o Capítulo 12: Música e Dança (3 itens temáticos)
@@ -1021,7 +961,6 @@
 
                 itens.push(createGameObject('fones_ouvido', '🎧', ITEM_SIZE, true, false, null, false)); // Não objetivo
                 itens.push(createGameObject('partitura', '🎼', ITEM_SIZE, true, false, null, false)); // Não objetivo
-                // Removed extra money bags from here for Chapters 8-12
                 chest = null; // Não há baú no Capítulo 12
             }
 
@@ -1051,7 +990,6 @@
             // Limpa qualquer temporizador anterior e inicia o novo
             if (gameInterval) clearInterval(gameInterval);
             gameInterval = setInterval(() => {
-                // console.log("DEBUG: setInterval is running. Current tempo:", tempo); // Debugging timer
                 let winConditionMet = false;
                 if (currentPhase === 1) {
                     winConditionMet = (pedrasColetadas === TOTAL_PEDRAS && keysColetadas === TOTAL_CHAVES && chest === null); // Updated win condition for 3 keys
@@ -1079,10 +1017,79 @@
                     winConditionMet = (violaoColetados >= TOTAL_VIOLAO && pianoColetados >= TOTAL_PIANO && microfoneColetados >= TOTAL_MICROFONE);
                 }
 
-                if (tempo > 0 && vidas > 0 && !winConditionMet) {
-                    tempo--; // DECREMENTO DE TEMPO
-                    // Acessa o elemento 'tempo' diretamente aqui para garantir que não seja nulo
-                    if (tempoDisplayElement) { // Use the global reference
+                if (winConditionMet) {
+                    clearInterval(gameInterval); // Para o temporador do jogo
+                    if (currentPhase < 12) { // Se não é a última fase do nível
+                        showTemporaryMessage(`Capítulo ${currentPhase} Concluído!`, 2000);
+                        setTimeout(() => {
+                            iniciar(currentPlayerType, currentPhase + 1); // Inicia a próxima fase
+                        }, 2000);
+                    } else if (currentPhase === 12 && currentLevel < 6) { // Fim do nível, sobe de nível
+                        currentLevel++;
+                        showTemporaryMessage(`Parabéns, você subiu para o Nível ${currentLevel}! 😊`, 3000);
+                        setTimeout(() => {
+                            iniciar(currentPlayerType, 1); // Reinicia na Fase 1 do novo nível
+                        }, 3000);
+                    } else if (currentPhase === 12 && currentLevel === 6) { // Fim do jogo (Nível 6, Fase 12)
+                        showTemporaryMessage("Fim de Jogo! Obrigado por jogar!", 3000); // Mensagem final
+                        setTimeout(() => {
+                            // Reset game to initial state for replay
+                            currentLevel = 1;
+                            currentPhase = 1;
+                            vidas = 3;
+                            totalAllItemsCollected = 0;
+                            // Reset all specific item counts as well
+                            pedrasColetadas = 0;
+                            keysColetadas = 0;
+                            valesSorveteColetados = 0;
+                            sorvetesObjetivoColetados = 0;
+                            trofeusColetados = 0;
+                            bolasColetadas = 0;
+                            pipasColetadas = 0;
+                            tubosEnsaioColetados = 0;
+                            imasColetados = 0;
+                            microscopioColetados = 0;
+                            elefantesColetados = 0;
+                            leoesColetados = 0;
+                            avesColetadas = 0;
+                            pinturasColetadas = 0;
+                            esculturasColetadas = 0;
+                            fosseisColetados = 0;
+                            cestasPiqueniqueColetadas = 0;
+                            bolasFase7Coletadas = 0;
+                            brinquedosParqueColetados = 0;
+                            livroAventuraColetados = 0;
+                            livroAnimaisColetados = 0;
+                            livroFabulaColetados = 0;
+                            lixeiraReciclagemColetados = 0;
+                            garrafaPlasticoColetados = 0;
+                            arvoreMudaColetados = 0;
+                            plantaNativaColetados = 0;
+                            animalSelvagemColetados = 0;
+                            telescopioColetados = 0;
+                            pincelColetados = 0;
+                            tintaColetados = 0;
+                            argilaColetados = 0;
+                            violaoColetados = 0;
+                            pianoColetados = 0;
+                            microfoneColetados = 0;
+                            tempo = BASE_TIME; // Reset time to base for new game
+                            coletando = false;
+                            hasKey = false;
+                            itens = [];
+                            obstaculos = [];
+                            schoolItems = [];
+                            chest = null;
+
+                            // Go back to intro screen for a full restart
+                            document.getElementById('introScreen').style.display = 'flex';
+                            document.getElementById('personagemSelecao').style.display = 'none';
+                            document.getElementById('hud').style.display = 'none';
+                        }, 3000);
+                    }
+                } else if (tempo > 0 && vidas > 0) {
+                    tempo--; // Decrementa o tempo
+                    if (tempoDisplayElement) { // Use a referência global
                         tempoDisplayElement.innerText = `Tempo: ${tempo}s`; // Atualiza o texto do tempo
                     } else {
                         console.error("Erro: Elemento 'tempo' não encontrado no DOM (dentro do setInterval).");
@@ -1105,33 +1112,6 @@
                                 showContinueScreen();
                             }
                         }, 3000); // Espera a duração da mensagem temporária
-                    }
-                } else if (winConditionMet) {
-                    clearInterval(gameInterval); // Para o jogo
-                    if (currentPhase < 12) { // Se não é a última fase do nível
-                        showTemporaryMessage(`Capítulo ${currentPhase} Concluído!`, 2000);
-                        setTimeout(() => {
-                            iniciar(currentPlayerType, currentPhase + 1); // Inicia a próxima fase
-                        }, 2000);
-                    } else if (currentPhase === 12 && currentLevel < 6) { // Fim do nível, sobe de nível
-                        currentLevel++;
-                        showTemporaryMessage(`Parabéns, você subiu para o Nível ${currentLevel}! 😊`, 3000);
-                        setTimeout(() => {
-                            iniciar(currentPlayerType, 1); // Reinicia na Fase 1 do novo nível
-                        }, 3000);
-                    } else if (currentPhase === 12 && currentLevel === 6) { // Fim do jogo (Nível 6, Fase 12)
-                        showTemporaryMessage("The End", 3000);
-                        setTimeout(() => {
-                            // Reset game to initial state for replay
-                            currentLevel = 1;
-                            currentPhase = 1;
-                            vidas = 3;
-                            totalAllItemsCollected = 0;
-                            // Optionally, show character selection again or reload
-                            document.getElementById('introScreen').style.display = 'flex'; // Show intro screen
-                            document.getElementById('personagemSelecao').style.display = 'none'; // Hide selection
-                            document.getElementById('hud').style.display = 'none'; // Hide HUD
-                        }, 3000);
                     }
                 } else if (vidas <= 0) { // Se vidas chegou a 0, mostra a tela de continue
                     clearInterval(gameInterval); // Para o jogo
@@ -1459,7 +1439,6 @@
                             console.log(`DEBUG: Moeda coletada! Tempo +5s. Tempo atual: ${tempo}`); // RE-ADICIONADO
                         }
                         atualizarHUD();
-                        // console.log(`DEBUG: Item coletado: ${collectedItem.type}. Total Coletado: ${totalAllItemsCollected}`);
                         coletando = false; 
                         return; 
                     }
@@ -1471,7 +1450,6 @@
                         const collectedItem = schoolItems.splice(i, 1)[0];
                         totalAllItemsCollected++; // Incrementa a contagem total
                         atualizarHUD();
-                        // console.log(`DEBUG: Item escolar coletado: ${collectedItem.type}. Total Coletado: ${totalAllItemsCollected}`);
                         coletando = false;
                         return;
                     }
@@ -1511,372 +1489,6 @@
             }
         }
 
-        // Função para pedir uma dica ao LLM
-        async function askForHint() {
-            const hintMessageDiv = document.getElementById('llmHintMessage');
-            if (hintMessageDiv) {
-                hintMessageDiv.innerText = "Aguarde a dica...";
-                hintMessageDiv.style.display = 'block'; // Mostra a mensagem de carregamento
-            }
-
-            if (hintTimeout) clearTimeout(hintTimeout); // Limpa qualquer timeout anterior
-
-            let objectFound = false;
-            let promptText = "";
-            let nearestObject = null; // Pode ser item, obstáculo, baú ou item escolar
-
-            // Encontra o objeto mais próximo para dar a dica
-            let minDistance = Infinity;
-            const allGameObjects = [...itens, ...obstaculos, ...schoolItems]; // Inclui todos os tipos de objetos
-            if (chest && currentPhase === 1) allGameObjects.push(chest); // Adiciona o baú se existir e for Fase 1
-
-            for (const obj of allGameObjects) {
-                const objCenter = { x: obj.x + obj.size / 2, y: obj.y + obj.size / 2 }; 
-                const playerCenter = { x: player.x + player.width / 2, y: player.y + player.height / 2 };
-                const distance = Math.sqrt(
-                    Math.pow(objCenter.x - playerCenter.x, 2) +
-                    Math.pow(objCenter.y - playerCenter.y, 2)
-                );
-
-                // Define um raio de proximidade para a dica
-                const HINT_RADIUS = 100; 
-                if (distance < HINT_RADIUS) {
-                    minDistance = distance;
-                    nearestObject = obj;
-                    break; // Corrigido: 'break' deve estar aqui para sair do loop
-                }
-            }
-
-            if (nearestObject) { // Se o jogador estiver perto de algum objeto
-                objectFound = true;
-                if (nearestObject.canBeCollected) { // Se o item pode ser coletado
-                    if (nearestObject.isObjective) {
-                        if (currentPhase === 1) {
-                            switch (nearestObject.type) {
-                                case 'pedra':
-                                    promptText = `Você é uma pedra ${nearestObject.color} vibrante, um dos itens essenciais para o tesouro. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e misterioso.`;
-                                    break;
-                                case 'chave':
-                                    promptText = `Você é a chave dourada, crucial para o tesouro. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e indique sua importância.`;
-                                    break;
-                            }
-                        } else if (currentPhase === 2) {
-                            switch (nearestObject.type) {
-                                case 'vale_sorvete':
-                                    promptText = `Você é um vale sorvete, muito desejado na Festa do Sorvete. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e alegre.`;
-                                    break;
-                                case 'sorvete':
-                                    promptText = `Você é um sorvete de ${nearestObject.color}. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e convidativo.`;
-                                    break;
-                            }
-                        } else if (currentPhase === 3) {
-                            switch (nearestObject.type) {
-                                case 'trofeu':
-                                    promptText = `Você é um troféu brilhante, um dos prêmios das brincadeiras do parque. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e inspirador.`;
-                                    break;
-                                case 'bola':
-                                    promptText = `Você é uma bola, usada para brincadeiras no parque. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e divertido.`;
-                                    break;
-                                case 'pipa':
-                                    promptText = `Você é uma pipa colorida, voando alto no céu. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e convide-o para te empinar.`;
-                                    break;
-                            }
-                        } else if (currentPhase === 4) {
-                            switch (nearestObject.type) {
-                                case 'tubo_ensaio':
-                                    promptText = `Você é um tubo de ensaio, essencial para as experiências no laboratório. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e curioso.`;
-                                    break;
-                                case 'ima':
-                                    promptText = `Você é um ímã, parte das experiências de força magnética. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e atraente.`;
-                                    break;
-                                case 'microscopio':
-                                    promptText = `Você é um microscópio, um dos equipamentos essenciais para as descobertas no laboratório. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e inspire a curiosidade.`;
-                                    break;
-                            }
-                        } else if (currentPhase === 5) {
-                            switch (nearestObject.type) {
-                                case 'elefante':
-                                    promptText = `Você é um elefante, um dos animais majestosos do zoológico. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e imponente.`;
-                                    break;
-                                case 'leao':
-                                    promptText = `Você é um leão, o rei da selva! O que você diria para o Ursinho Amigão que se aproxima? Seja breve e régio.`;
-                                    break;
-                                case 'ave':
-                                    promptText = `Você é uma ave exótica, com cores vibrantes. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e melódico.`;
-                                    break;
-                            }
-                        } else if (currentPhase === 6) {
-                            switch (nearestObject.type) {
-                                case 'pintura':
-                                    promptText = `Você é uma pintura, uma obra de arte no museu. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e artístico.`;
-                                    break;
-                                case 'escultura':
-                                    promptText = `Você é uma escultura, uma obra de arte tridimensional. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e imponente.`;
-                                    break;
-                                case 'fossil':
-                                    promptText = `Você é um fóssil de dinossauro, um vestígio da pré-história. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e misterioso.`;
-                                    break;
-                            }
-                        } else if (currentPhase === 7) {
-                            switch (nearestObject.type) {
-                                case 'cesta_piquenique':
-                                    promptText = `Você é uma cesta de piquenique, cheia de delícias para compartilhar no parque. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e convidativo.`;
-                                    break;
-                                case 'bola':
-                                    promptText = `Você é uma bola de futebol, pronta para um jogo divertido no parque. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e enérgico.`;
-                                    break;
-                                case 'brinquedo_parque':
-                                    promptText = `Você é um brinquedo do parque, que traz muita alegria. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e divertido.`;
-                                    break;
-                            }
-                        } else if (currentPhase === 8) { // Dicas para o Capítulo 8
-                            switch (nearestObject.type) {
-                                case 'livro_aventura':
-                                    promptText = `Você é um livro de aventura, pronto para ser lido. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e convide-o a explorar novas histórias.`;
-                                    break;
-                                case 'livro_animais':
-                                    promptText = `Você é um livro ilustrado de animais, cheio de criaturas fascinantes. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e sugira que ele descubra novos amigos.`;
-                                    break;
-                                case 'livro_fabula':
-                                    promptText = `Você é um pergaminho antigo com uma fábula, cheio de lições importantes. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e inspire-o a aprender com as histórias.`;
-                                    break;
-                                case 'oculos':
-                                    promptText = `Você é um par de óculos de leitura. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e sugira que eles ajudam a ver melhor as palavras.`;
-                                    break;
-                                case 'caneta':
-                                    promptText = `Você é uma caneta, pronta para escrever. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e inspire-o a criar suas próprias histórias.`;
-                                    break;
-                                case 'globo':
-                                    promptText = `Você é um globo terrestre. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e sugira que há muitas histórias para descobrir ao redor do mundo.`;
-                                    break;
-                                default:
-                                    promptText = `Você é um item da sala de leitura. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e relacionado à leitura.`;
-                            }
-                        } else if (currentPhase === 9) { // Dicas para o Capítulo 9
-                            switch (nearestObject.type) {
-                                case 'lixeira_reciclagem':
-                                    promptText = `Você é uma lixeira de reciclagem. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e incentive a separação do lixo.`;
-                                    break;
-                                case 'garrafa_plastico':
-                                    promptText = `Você é uma garrafa de plástico. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e sugira que você pode ser reciclada.`;
-                                    break;
-                                case 'arvore_muda':
-                                    promptText = `Você é uma muda de árvore. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e convide-o a te plantar para um futuro verde.`;
-                                    break;
-                                case 'saco_lixo':
-                                    promptText = `Você é um saco de lixo. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e sugira que você precisa ser descartado corretamente.`;
-                                    break;
-                                default:
-                                    promptText = `Você é um item relacionado ao meio ambiente. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e incentive o cuidado com o planeta.`;
-                            }
-                        } else if (currentPhase === 10) { // Dicas para o Capítulo 10
-                            switch (nearestObject.type) {
-                                case 'planta_nativa':
-                                    promptText = `Você é uma planta nativa da reserva. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e fale sobre a sua importância no ecossistema.`;
-                                    break;
-                                case 'animal_selvagem':
-                                    promptText = `Você é um animal selvagem. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e fale sobre a importância de proteger seu habitat.`;
-                                    break;
-                                case 'telescopio': // Renamed from binoculos
-                                    promptText = `Você é um telescópio, que ajuda a observar as estrelas e o universo. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e inspire a exploração do cosmos.`;
-                                    break;
-                                case 'lupa':
-                                    promptText = `Você é uma lupa. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e sugira que você ajuda a ver os pequenos detalhes da natureza.`;
-                                    break;
-                                default:
-                                    promptText = `Você é um item da reserva natural. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e incentive a exploração e o respeito pela natureza.`;
-                            }
-                        } else if (currentPhase === 11) { // Dicas para o Capítulo 11
-                            switch (nearestObject.type) {
-                                case 'pincel':
-                                    promptText = `Você é um pincel, pronto para criar uma obra de arte. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e convide-o a pintar.`;
-                                    break;
-                                case 'tinta':
-                                    promptText = `Você é uma tinta colorida. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e sugira que você pode dar vida aos desenhos.`;
-                                    break;
-                                case 'argila':
-                                    promptText = `Você é um pedaço de argila, esperando para ser moldado. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e inspire-o a criar uma escultura.`;
-                                    break;
-                                case 'lapis_color':
-                                    promptText = `Você é um lápis de cor vibrante. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e convide-o a colorir o mundo.`;
-                                    break;
-                                case 'tela':
-                                    promptText = `Você é uma tela em branco, esperando por uma obra-prima. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e incentive-o a expressar sua criatividade.`;
-                                    break;
-                                default:
-                                    promptText = `Você é um material de arte. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e incentive a criatividade.`;
-                            }
-                        } else if (currentPhase === 12) { // Dicas para o Capítulo 12
-                            switch (nearestObject.type) {
-                                case 'violao':
-                                    promptText = `Você é um violão. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e convide-o a tocar uma melodia.`;
-                                    break;
-                                case 'piano':
-                                    promptText = `Você é um piano. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e sugira que ele explore as teclas.`;
-                                    break;
-                                case 'microfone':
-                                    promptText = `Você é um microfone. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e convide-o a cantar.`;
-                                    break;
-                                case 'fones_ouvido':
-                                    promptText = `Você é um par de fones de ouvido. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e sugira que ele ouça a música com atenção.`;
-                                    break;
-                                case 'partitura':
-                                    promptText = `Você é uma partitura musical. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e sugira que você contém os segredos da música.`;
-                                    break;
-                                default:
-                                    promptText = `Você é um item musical. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e incentive a música e a dança.`;
-                            }
-                        }
-                    } else { // Itens coletáveis não-objetivo
-                        switch (nearestObject.type) {
-                            case 'moeda':
-                                promptText = `Você é uma moeda brilhante. O que você diria para o Ursinho Amigão que se aproxima? Dê uma dica sutil sobre sua utilidade, mas que não é crucial para o objetivo principal.`;
-                                break;
-                            case 'folha':
-                                promptText = `Você é uma folha encantada. O que você diria para o Ursinho Amigão que se aproxima? Dê uma dica sutil sobre sua beleza, mas que não é crucial para o objetivo principal.`;
-                                break;
-                            case 'lapis':
-                                promptText = `Você é um lápis. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e descreva sua função na escola.`;
-                                break;
-                            case 'caderno':
-                                promptText = `Você é um caderno. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e descreva sua função na escola.`;
-                                break;
-                            case 'sorvete': // Sorvetes não-objetivo
-                                promptText = `Você é um delicioso sorvete de sabor ${nearestObject.color}. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e convidativo.`;
-                                break;
-                            case 'bola':
-                                promptText = `Você é uma bola de futebol. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e convide-o para brincar.`;
-                                break;
-                            case 'pipa':
-                                promptText = `Você é uma pipa colorida. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e convide-o para te empinar no céu.`;
-                                break;
-                            case 'bequer':
-                                promptText = `Você é um béquer, usado para misturar líquidos no laboratório. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e científico.`;
-                                break;
-                            case 'microscopio':
-                                promptText = `Você é um microscópio, que ajuda a ver coisas muito pequenas. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e curioso.`;
-                                break;
-                            case 'pipeta':
-                                promptText = `Você é uma pipeta, usada para medir líquidos com precisão. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e exato.`;
-                                break;
-                            case 'macaco':
-                                promptText = `Você é um macaco travesso. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e brincalhão.`;
-                                break;
-                            case 'crocodilo':
-                                promptText = `Você é um crocodilo. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e um pouco assustador.`;
-                                break;
-                            case 'cobra':
-                                promptText = `Você é uma cobra. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e sutil.`;
-                                break;
-                            case 'lagarto':
-                                promptText = `Você é um lagarto. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e rápido.`;
-                                break;
-                            case 'artefato':
-                                promptText = `Você é um artefato antigo. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e misterioso, sobre sua história.`;
-                                break;
-                            case 'pincel':
-                                promptText = `Você é um pincel. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e descreva sua função na arte.`;
-                                break;
-                            case 'livro_arte':
-                                promptText = `Você é um livro de arte. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e inspire-o com a beleza da arte.`;
-                                break;
-                            case 'balao':
-                                promptText = `Você é um balão colorido, flutuando levemente. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e alegre.`;
-                                break;
-                            case 'flor':
-                                promptText = `Você é uma flor do parque, exalando um perfume suave. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e convidativo.`;
-                                break;
-                            case 'borboleta':
-                                promptText = `Você é uma borboleta, voando livremente pelo parque. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e encantador.`;
-                                break;
-                            default:
-                                promptText = `Você é um item coletável. O que você diria para o Ursinho Amigão que se aproxima? Dê uma dica sutil sobre sua utilidade, mas que não é crucial para o objetivo principal.`; // Mensagem mais genérica
-                        }
-                    }
-                } else if (nearestObject.type === 'bau') {
-                    if (pedrasColetadas === TOTAL_PEDRAS && keysColetadas === TOTAL_CHAVES) { // Updated condition
-                        promptText = `Você é um baú de tesouros. O que você diria para o Ursinho Amigão que se aproxima com todos os itens do objetivo? Seja breve e indique que a aventura está prestes a ser concluída.`;
-                    } else if (pedrasColetadas < TOTAL_PEDRAS || keysColetadas < TOTAL_CHAVES) { // If trying to open but not all collected
-                        let missingItems = [];
-                        if (pedrasColetadas < TOTAL_PEDRAS) {
-                            missingItems.push(`${TOTAL_PEDRAS - pedrasColetadas} pedras`);
-                        }
-                        if (keysColetadas < TOTAL_CHAVES) {
-                            missingItems.push(`${TOTAL_CHAVES - keysColetadas} chaves`);
-                        }
-                        promptText = `Você é um baú de tesouros. O que você diria para o Ursinho Amigão que se aproxima, mas ainda faltam ${missingItems.join(' e ')} para abri-lo? Seja breve e indique o que falta.`;
-                    }
-                } else { // Itens escolares não coletáveis
-                    switch (nearestObject.type) {
-                        case 'livro':
-                            promptText = `Você é um livro. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e descreva sua função na escola.`;
-                            break;
-                        case 'borracha':
-                            promptText = `Você é uma borracha. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e descreva sua função na escola.`;
-                            break;
-                        case 'mochila':
-                            promptText = `Você é uma mochila. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e descreva sua função na escola.`;
-                            break;
-                        default:
-                            promptText = `Você é um item comum da escola. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e descreva sua função na escola.`;
-                    }
-                }
-            }
-
-            if (!objectFound) {
-                if (hintMessageDiv) { // Check if element exists before setting innerText
-                    hintMessageDiv.innerText = "Não há objetos por perto para pedir uma dica.";
-                }
-                hintTimeout = setTimeout(() => {
-                    if (hintMessageDiv) { // Check again before hiding
-                        hintMessageDiv.style.display = 'none';
-                    }
-                }, 3000); // Esconde após 3 segundos
-                return;
-            }
-
-            try {
-                let chatHistory = [];
-                chatHistory.push({ role: "user", parts: [{ text: promptText }] });
-                const payload = { contents: chatHistory };
-                const apiKey = ""; // Deixe como está, a Canvas fornecerá em tempo de execução
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                const result = await response.json(); // AWAIT AQUI
-
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
-                    const text = result.candidates[0].content.parts[0].text;
-                    if (hintMessageDiv) { // Check if element exists before setting innerText
-                        hintMessageDiv.innerText = text; // Exibe a dica gerada
-                    }
-                } else {
-                    if (hintMessageDiv) { // Check if element exists before setting innerText
-                        hintMessageDiv.innerText = "Não foi possível obter a dica. Tente novamente.";
-                    }
-                    console.error("Estrutura de resposta LLM inesperada:", result);
-                }
-            } catch (error) {
-                if (hintMessageDiv) { // Check if element exists before setting innerText
-                    hintMessageDiv.innerText = "Erro ao conectar com a API de dicas. Tente novamente.";
-                }
-                    console.error("Erro ao chamar a API Gemini para dica:", error);
-            } finally {
-                hintTimeout = setTimeout(() => {
-                    if (hintMessageDiv) { // Check again before hiding
-                        hintMessageDiv.style.display = 'none';
-                    }
-                }, 5000); // Esconde a dica após 5 segundos
-            }
-        }
-
         // Atualiza a exibição do HUD
         function atualizarHUD() {
             // Get HUD element references locally within atualizarHUD
@@ -1897,7 +1509,6 @@
             if (currentPhase === 1) {
                 hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
                 hudRightColumnContent = `🔴 Pedras: ${pedrasColetadas} / ${TOTAL_PEDRAS}<br>🔑 Chaves: ${keysColetadas} / ${TOTAL_CHAVES}<br>📦 Baú: ${pedrasColetadas === TOTAL_PEDRAS && keysColetadas === TOTAL_CHAVES ? '1/1 🔓' : '0/1 🔒'}`; // Corrected logic and format
-                console.log(`DEBUG HUD: Pedras: ${pedrasColetadas}, Chaves: ${keysColetadas}, Baú: ${pedrasColetadas === TOTAL_PEDRAS && keysColetadas === TOTAL_CHAVES ? 'ABERTO' : 'FECHADO'}`);
             } else if (currentPhase === 2) {
                 hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
                 hudRightColumnContent = `🎟️ Vales Sorvete: ${valesSorveteColetados} / ${TOTAL_VALES_SORVETE}<br>🍫🍦 Sorvetes: ${sorvetesObjetivoColetados} / ${TOTAL_SORVETES_OBJETIVO}`;
@@ -1939,21 +1550,6 @@
 
             if (hudLeftColumnElement) hudLeftColumnElement.innerHTML = hudLeftColumnContent;
             if (hudRightColumnElement) hudRightColumnElement.innerHTML = hudRightColumnContent;
-        }
-
-        // Exibe a mensagem de fim de jogo em um modal e recarrega
-        function encerrar(msg) {
-            console.log("Encerrar chamado com mensagem:", msg); // Log de depuração
-            clearInterval(gameInterval); // Para o temporador do jogo
-            const llmHintMessageDiv = document.getElementById('llmHintMessage');
-            if (llmHintMessageDiv) {
-                llmHintMessageDiv.style.display = 'none'; // Oculta a mensagem de dica LLM
-            }
-            if (hintTimeout) clearTimeout(hintTimeout); // Limpa qualquer timeout de dica
-
-            const modal = document.getElementById('gameModal');
-            document.getElementById('modalMessage').innerText = msg;
-            modal.style.display = 'flex'; // Mostra o modal
         }
 
         // Exibe uma mensagem temporária no centro da tela
@@ -2087,7 +1683,7 @@
                 winConditionMet = (violaoColetados >= TOTAL_VIOLAO && pianoColetados >= TOTAL_PIANO && microfoneColetados >= TOTAL_MICROFONE);
             }
 
-            if (vidas <= 0 || tempo <= 0 || winConditionMet) { // Condição de tempo RE-ADICIONADA
+            if (vidas <= 0 || tempo <= 0 || winConditionMet) { 
                 // A lógica de encerramento/transição de fase é tratada no setInterval
                 return;
             }
@@ -2141,9 +1737,6 @@
             itens.forEach(drawItem);
             // 5. Jogador (sempre por cima)
             drawPlayer();
-
-            // Depuração: Log da posição do jogador e estado das teclas
-            // console.log(`DEBUG: Player Pos: (${player.x.toFixed(0)}, ${player.y.toFixed(0)}) | Teclas: W:${teclas.w} A:${teclas.a} S:${teclas.s} D:${teclas.d} | Speed: ${PLAYER_SPEED} | Phase: ${currentPhase}`);
         }
 
         // Função para atualizar o título da página com base na fase atual
@@ -2209,13 +1802,7 @@
             // Get references to intro screen elements
             const introScreen = document.getElementById('introScreen');
             const personagemSelecao = document.getElementById('personagemSelecao');
-            const gameModal = document.getElementById('gameModal'); // Get reference to gameModal
-
-            // Ensure gameModal is hidden initially
-            if (gameModal) {
-                gameModal.style.display = 'none';
-            }
-
+            
             // Event listener to dismiss intro screen on any click/keypress
             const dismissIntro = () => {
                 if (introScreen.style.display !== 'none') { // Only dismiss if visible
@@ -2273,15 +1860,13 @@
                 }
             });
 
-            // Removed #botao-dica event listener as the button is removed
+            // Add listener for action button (touch)
+            document.getElementById('botao-acao').addEventListener('touchstart', (e) => { e.preventDefault(); coletando = true; });
+            document.getElementById('botao-acao').addEventListener('touchend', (e) => { e.preventDefault(); coletando = false; });
 
             // Add listeners for continue modal buttons
             document.getElementById('btnSim').addEventListener('click', () => handleContinue('sim'));
             document.getElementById('btnNao').addEventListener('click', () => handleContinue('nao'));
-
-            console.log("DEBUG: Ouvintes de seleção de personagem, botões direcionais, botão de dica e botões de continue adicionados.");
-            // Focus the canvas to ensure it receives keyboard events
-            document.getElementById('gameCanvas').focus();
 
             // Call atualizarHUD() here to ensure the HUD is populated with initial values
             // even before a phase starts, but it will be hidden by CSS initially.
