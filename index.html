@@ -133,7 +133,7 @@
             flex-basis: 48%; /* Give columns a basis to distribute space */
             padding: 0 5px; /* Reduced internal padding for better fit */
             box-sizing: border-box; /* Include padding in width */
-            background: rgba(255,255,255,0.1); /* Light background for the "box" effect */
+            background: rgba(255,255,255,0.2); /* Light background for the "box" effect - Adjusted to 0.2 */
             border-radius: 5px;
         }
         .hud-column:last-child {
@@ -607,14 +607,15 @@
         var frameInterval = 1000 / targetFPS; // Intervalo de tempo entre frames em ms
         var lastFrameTime = 0; // Initialized globally
 
-        // Global references to HUD elements (declared, but initialized in window.onload)
+        // Global references to HUD elements, initialized directly
+        // Estas variáveis serão inicializadas no window.onload para garantir que os elementos DOM existam.
         let vidasDisplayElement;
         let hudObjectiveLine1Element;
         let hudObjectiveLine2Element;
         let totalAllItemsCollectedDisplayElement;
         let tempoDisplayElement;
         let chapterTitleDisplayElement;
-        let objetivoFaseElement; // This element is hidden, but still referenced for consistency.
+        let objetivoFaseElement;
         
         // Função para atualizar o estado da tecla (para teclado e toque)
         function tecla(k, v) {
@@ -647,17 +648,6 @@
             if (hudElementDiv) {
                 hudElementDiv.style.display = 'flex'; // Changed to flex for columns
             }
-
-            // Get HUD element references locally within iniciar
-            // This ensures they are always fresh when a new phase starts or restarts.
-            vidasDisplayElement = document.getElementById('vidasDisplay');
-            hudObjectiveLine1Element = document.getElementById('hudObjectiveLine1');
-            hudObjectiveLine2Element = document.getElementById('hudObjectiveLine2');
-            totalAllItemsCollectedDisplayElement = document.getElementById('totalAllItemsCollectedDisplay');
-            tempoDisplayElement = document.getElementById('tempo'); // Correctly referencing the span with id="tempo"
-            chapterTitleDisplayElement = document.getElementById('chapterTitleDisplay');
-            objetivoFaseElement = document.getElementById('objetivoFase'); // This element is hidden, but still referenced for consistency.
-
 
             // Se for um "continue", reinicia vidas para 3. Se for reinício de fase por tempo, apenas reinicia o tempo e itens.
             if (continueCountdownInterval) { // Se veio do continue screen
@@ -734,7 +724,14 @@
             itens = [];
             obstaculos = [];
             schoolItems = [];
-            chest = null;
+            
+            // Cria o baú do tesouro para a Fase 1 (com a nova propriedade isOpened)
+            if (currentPhase === 1) {
+                chest = createGameObject('bau', '📦', CHEST_SIZE, false, false);
+                chest.isOpened = false; // Novo: Estado inicial do baú
+            } else {
+                chest = null;
+            }
 
             // Geração de 2 moedas em cada fase
             itens.push(createGameObject('moeda', '💰', ITEM_SIZE, true, false, null, false));             // Moeda
@@ -754,9 +751,6 @@
                 itens.push(createGameObject('folha', '🍂', ITEM_SIZE, true, false, null, false));             // Folha encantada
                 itens.push(createGameObject('folha', '🍂', ITEM_SIZE, true, false, null, false));             // Outra folha encantada
 
-                // Cria o baú do tesouro para a Fase 1
-                chest = createGameObject('bau', '📦', CHEST_SIZE, false, false);
-
             } else if (currentPhase === 2) {
                 // Itens do objetivo principal da Fase 2: 4 Vales Sorvete e 4 Sorvetes de sabores específicos
                 itens.push(createGameObject('vale_sorvete', '🎟️', ITEM_SIZE, true, false, 'ticket', true)); // Ticket
@@ -772,9 +766,7 @@
                 // Outros itens coletáveis da Fase 2 (sorvetes não-objetivo)
                 itens.push(createGameObject('sorvete', '🥭🍦', ITEM_SIZE, true, false, 'manga', false)); // Sorvete de Manga (não objetivo)
                 itens.push(createGameObject('sorvete', '🍦', ITEM_SIZE, true, false, 'flocos', false)); // Sorvete de Flocos (não objetivo)
-
-                // Não há baú na Fase 2, a vitória é por coletar vales e sorvetes
-                chest = null; 
+                
             } else if (currentPhase === 3) {
                 // Itens do objetivo principal da Fase 3: 3 Troféus, 3 Bolas, 3 Pipas
                 itens.push(createGameObject('trofeu', '🏆', ITEM_SIZE, true, false, null, true));
@@ -789,8 +781,6 @@
                 itens.push(createGameObject('pipa', '🪁', ITEM_SIZE, true, false, null, true));
                 itens.push(createGameObject('pipa', '🪁', ITEM_SIZE, true, false, null, true));
 
-                // Não há baú na Fase 3
-                chest = null;
             } else if (currentPhase === 4) {
                 // Itens do objetivo principal da Fase 4: 3 Tubos de Ensaio, 3 Ímãs, 3 Microscópios
                 itens.push(createGameObject('tubo_ensaio', '🧪', ITEM_SIZE, true, false, null, true));
@@ -809,8 +799,6 @@
                 itens.push(createGameObject('bequer', '⚗️', ITEM_SIZE, true, false, null, false));
                 itens.push(createGameObject('pipeta', '💧', ITEM_SIZE, true, false, null, false)); 
                 
-                // Não há baú na Fase 4
-                chest = null;
             } else if (currentPhase === 5) {
                 // Itens do objetivo principal da Fase 5: 3 Elefantes, 3 Leões, 3 Aves
                 itens.push(createGameObject('elefante', '🐘', ITEM_SIZE, true, false, null, true));
@@ -831,8 +819,6 @@
                 itens.push(createGameObject('cobra', '🐍', ITEM_SIZE, true, false, null, false));
                 itens.push(createGameObject('lagarto', '🦎', ITEM_SIZE, true, false, null, false));
 
-                // Não há baú na Fase 5
-                chest = null;
             } else if (currentPhase === 6) {
                 // Itens do objetivo principal da Fase 6: 3 Pinturas, 3 Esculturas, 3 Fósseis
                 itens.push(createGameObject('pintura', '🎨', ITEM_SIZE, true, false, null, true));
@@ -850,8 +836,6 @@
                 itens.push(createGameObject('pincel', '🖌️', ITEM_SIZE, true, false, null, false));
                 itens.push(createGameObject('livro_arte', '🖼️', ITEM_SIZE, true, false, null, false));
 
-                // Não há baú na Fase 6
-                chest = null;
             } else if (currentPhase === 7) {
                 // Itens do objetivo principal da Fase 7: 3 Cestas de Piquenique, 3 Bolas, 3 Brinquedos de Parque
                 itens.push(createGameObject('cesta_piquenique', '🧺', ITEM_SIZE, true, false, null, true));
@@ -874,8 +858,6 @@
                 itens.push(createGameObject('borboleta', '🦋', ITEM_SIZE, true, false, null, false));
                 itens.push(createGameObject('borboleta', '🦋', ITEM_SIZE, true, false, null, false));
                 
-                // Não há baú na Fase 7
-                chest = null;
             } else if (currentPhase === 8) { // Capítulo 8: Leiturinhas
                 // Itens para o Capítulo 8: Leiturinhas (3 itens temáticos)
                 itens.push(createGameObject('livro_aventura', '🗺️', ITEM_SIZE, true, false, null, true)); // Livro de Aventura (objetivo)
@@ -894,7 +876,6 @@
                 itens.push(createGameObject('oculos', '👓', ITEM_SIZE, true, false, null, false));
                 itens.push(createGameObject('caneta', '🖊️', ITEM_SIZE, true, false, null, false));
                 itens.push(createGameObject('globo', '🌍', ITEM_SIZE, true, false, null, false)); 
-                chest = null; // Não há baú no Capítulo 8
             } else if (currentPhase === 9) {
                 // Itens para o Capítulo 9: Reciclagem e Meio Ambiente (3 itens temáticos)
                 itens.push(createGameObject('lixeira_reciclagem', '♻️', ITEM_SIZE, true, false, null, true)); // isObstacle: false
@@ -911,7 +892,6 @@
 
                 itens.push(createGameObject('saco_lixo', '🗑️', ITEM_SIZE, true, false, null, false)); // Não objetivo
                 itens.push(createGameObject('flor', '🌸', ITEM_SIZE, true, false, null, false)); // Não objetivo
-                chest = null; // Não há baú no Capítulo 9
             } else if (currentPhase === 10) {
                 // Itens para o Capítulo 10: Exploração da Natureza (3 itens temáticos)
                 itens.push(createGameObject('planta_nativa', '🌿', ITEM_SIZE, true, false, null, true)); // isObstacle: false
@@ -927,7 +907,6 @@
                 itens.push(createGameObject('telescopio', '🔭', ITEM_SIZE, true, false, null, true));
 
                 itens.push(createGameObject('lupa', '🔎', ITEM_SIZE, true, false, null, false)); // Não objetivo
-                chest = null; // Não há baú no Capítulo 10
             } else if (currentPhase === 11) {
                 // Itens para o Capítulo 11: Oficina de Artes (3 itens temáticos)
                 itens.push(createGameObject('pincel', '🖌️', ITEM_SIZE, true, false, null, true)); // isObstacle: false
@@ -944,7 +923,6 @@
 
                 itens.push(createGameObject('lapis_color', '🖍️', ITEM_SIZE, true, false, null, false)); // Não objetivo
                 itens.push(createGameObject('tela', '🖼️', ITEM_SIZE, true, false, null, false)); // Não objetivo
-                chest = null; // Não há baú no Capítulo 11
             } else if (currentPhase === 12) {
                 // Itens para o Capítulo 12: Música e Dança (3 itens temáticos)
                 itens.push(createGameObject('violao', '🎸', ITEM_SIZE, true, false, null, true)); // isObstacle: false
@@ -961,7 +939,6 @@
 
                 itens.push(createGameObject('fones_ouvido', '🎧', ITEM_SIZE, true, false, null, false)); // Não objetivo
                 itens.push(createGameObject('partitura', '🎼', ITEM_SIZE, true, false, null, false)); // Não objetivo
-                chest = null; // Não há baú no Capítulo 12
             }
 
 
@@ -990,9 +967,17 @@
             // Limpa qualquer temporizador anterior e inicia o novo
             if (gameInterval) clearInterval(gameInterval);
             gameInterval = setInterval(() => {
+                // Decrementa o tempo a cada segundo
+                if (tempo > 0) {
+                    tempo--;
+                    if (tempoDisplayElement) {
+                        tempoDisplayElement.innerText = `Tempo: ${tempo}s`;
+                    }
+                }
+
                 let winConditionMet = false;
                 if (currentPhase === 1) {
-                    winConditionMet = (pedrasColetadas === TOTAL_PEDRAS && keysColetadas === TOTAL_CHAVES && chest === null); // Updated win condition for 3 keys
+                    winConditionMet = (chest && chest.isOpened); // Condição de vitória para Fase 1: baú aberto
                 } else if (currentPhase === 2) {
                     winConditionMet = (valesSorveteColetados === TOTAL_VALES_SORVETE && sorvetesObjetivoColetados === TOTAL_SORVETES_OBJETIVO);
                 } else if (currentPhase === 3) {
@@ -1087,32 +1072,22 @@
                             document.getElementById('hud').style.display = 'none';
                         }, 3000);
                     }
-                } else if (tempo > 0 && vidas > 0) {
-                    tempo--; // Decrementa o tempo
-                    if (tempoDisplayElement) { // Use a referência global
-                        tempoDisplayElement.innerText = `Tempo: ${tempo}s`; // Atualiza o texto do tempo
-                    } else {
-                        console.error("Erro: Elemento 'tempo' não encontrado no DOM (dentro do setInterval).");
-                    }
+                } else if (tempo === 0 && vidas > 0) { // Tempo esgotado, mas ainda tem vidas
+                    clearInterval(gameInterval); // Para o jogo enquanto a mensagem é exibida
+                    showTemporaryMessage("Perdeu!", 3000); // Exibe "Perdeu!" por 3 segundos
                     
-                    if (tempo === 0) {
-                        // Tempo esgotado, mas ainda tem vidas
-                        clearInterval(gameInterval); // Para o jogo enquanto a mensagem é exibida
-                        showTemporaryMessage("Perdeu!", 3000); // Exibe "Perdeu!" por 3 segundos
-                        
-                        setTimeout(() => { // Após a mensagem temporária
-                            vidas--; // Consome uma vida
-                            atualizarHUD(); // Atualiza o HUD para mostrar a vida perdida
+                    setTimeout(() => { // Após a mensagem temporária
+                        vidas--; // Consome uma vida
+                        atualizarHUD(); // Atualiza o HUD para mostrar a vida perdida
 
-                            if (vidas > 0) {
-                                // Ainda tem vidas, reinicia a fase
-                                iniciar(currentPlayerType, currentPhase); // Reinicia a fase atual
-                            } else {
-                                // Perdeu a última vida, mostra a tela de continue
-                                showContinueScreen();
-                            }
-                        }, 3000); // Espera a duração da mensagem temporária
-                    }
+                        if (vidas > 0) {
+                            // Ainda tem vidas, reinicia a fase
+                            iniciar(currentPlayerType, currentPhase); // Reinicia a fase atual
+                        } else {
+                            // Perdeu a última vida, mostra a tela de continue
+                            showContinueScreen();
+                        }
+                    }, 3000); // Espera a duração da mensagem temporária
                 } else if (vidas <= 0) { // Se vidas chegou a 0, mostra a tela de continue
                     clearInterval(gameInterval); // Para o jogo
                     showContinueScreen();
@@ -1181,18 +1156,19 @@
             // Define uma área segura no centro para o jogador
             const playerStartX = canvas.width / 2 - PLAYER_SIZE / 2;
             const playerStartY = canvas.height / 2 - PLAYER_SIZE / 2;
-            // Aumentei a zona segura para 3x o tamanho do jogador (6x PLAYER_SIZE total)
+            // Aumentei a zona segura para 5x o tamanho do jogador (10x PLAYER_SIZE total)
             const playerSafeZone = {
-                x: playerStartX - PLAYER_SIZE * 10, // Increased safe zone for player spawn
-                y: playerStartY - PLAYER_SIZE * 10, // Increased safe zone for player spawn
-                width: PLAYER_SIZE * 20, // Increased safe zone for player spawn
-                height: PLAYER_SIZE * 20 // Increased safe zone for player spawn
+                x: playerStartX - PLAYER_SIZE * 5, // Increased safe zone for player spawn
+                y: playerStartY - PLAYER_SIZE * 5, // Increased safe zone for player spawn
+                width: PLAYER_SIZE * 10, // Increased safe zone for player spawn
+                height: PLAYER_SIZE * 10 // Increased safe zone for player spawn
             };
 
             function getRandomPosition(objSize, isObstacle = false) {
                 let newX, newY, collision;
                 let attempts = 0;
                 const maxAttempts = 1000; // Aumentado para mais chances de posicionamento
+                const exclusionZoneFactor = 2.0; // Aumentado para garantir mais espaço entre os objetos
 
                 do {
                     collision = false;
@@ -1203,12 +1179,11 @@
 
                     // Verifica colisão com objetos já posicionados
                     for (const placedObj of placedObjects) {
-                        const exclusionZone = 1.5; // Adjusted for tighter collision detection
                         const expandedRect = {
-                            x: placedObj.x - (objSize * (exclusionZone - 1) / 2),
-                            y: placedObj.y - (objSize * (exclusionZone - 1) / 2),
-                            width: placedObj.width * exclusionZone,
-                            height: placedObj.height * exclusionZone
+                            x: placedObj.x - (objSize * (exclusionZoneFactor - 1) / 2),
+                            y: placedObj.y - (objSize * (exclusionZoneFactor - 1) / 2),
+                            width: placedObj.width * exclusionZoneFactor,
+                            height: placedObj.height * exclusionZoneFactor
                         };
                         if (checkCollision(newRect, expandedRect)) {
                             collision = true;
@@ -1459,10 +1434,11 @@
                 // 2. Interação com o Baú (apenas na Fase 1)
                 if (currentPhase === 1 && chest && checkCollision(player, chest)) { // Only check collision if chest exists
                     if (pedrasColetadas === TOTAL_PEDRAS && keysColetadas === TOTAL_CHAVES) { // Updated condition
-                        chest = null; // Remove o baú após ser usado
+                        chest.isOpened = true; // Marca o baú como aberto
                         console.log("DEBUG: Baú aberto com sucesso!");
                         coletando = false;
-                        // A transição de fase é tratada no setInterval principal
+                        atualizarHUD(); // Atualiza o HUD para mostrar o baú aberto
+                        // A transição de fase é tratada no setInterval principal, que agora verifica chest.isOpened
                         return; 
                     } else { // If trying to open but not all collected
                         const hintMessageDiv = document.getElementById('llmHintMessage');
@@ -1491,13 +1467,8 @@
 
         // Atualiza a exibição do HUD
         function atualizarHUD() {
-            // Get HUD element references locally within atualizarHUD
-            // This ensures they are always fresh when called.
-            const vidasDisplayElement = document.getElementById('vidasDisplay');
-            const hudObjectiveLine1Element = document.getElementById('hudObjectiveLine1');
-            const hudObjectiveLine2Element = document.getElementById('hudObjectiveLine2');
-            const totalAllItemsCollectedDisplayElement = document.getElementById('totalAllItemsCollectedDisplay');
-            const tempoDisplayElement = document.getElementById('tempo');
+            // As referências aos elementos do HUD são globais e já foram inicializadas.
+            // Não é necessário re-inicializá-las aqui.
 
             let coracao = "❤️".repeat(vidas); // Exibe corações com base nas vidas
             let hudLeftColumnContent = '';
@@ -1508,7 +1479,8 @@
             // HUD content for Phase 1
             if (currentPhase === 1) {
                 hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
-                hudRightColumnContent = `🔴 Pedras: ${pedrasColetadas} / ${TOTAL_PEDRAS}<br>🔑 Chaves: ${keysColetadas} / ${TOTAL_CHAVES}<br>📦 Baú: ${pedrasColetadas === TOTAL_PEDRAS && keysColetadas === TOTAL_CHAVES ? '1/1 🔓' : '0/1 🔒'}`; // Corrected logic and format
+                // Atualizado para verificar chest.isOpened
+                hudRightColumnContent = `🔴 Pedras: ${pedrasColetadas} / ${TOTAL_PEDRAS}<br>🔑 Chaves: ${keysColetadas} / ${TOTAL_CHAVES}<br>📦 Baú: ${chest && chest.isOpened ? '1/1 🔓' : '0/1 🔒'}`; 
             } else if (currentPhase === 2) {
                 hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
                 hudRightColumnContent = `🎟️ Vales Sorvete: ${valesSorveteColetados} / ${TOTAL_VALES_SORVETE}<br>🍫🍦 Sorvetes: ${sorvetesObjetivoColetados} / ${TOTAL_SORVETES_OBJETIVO}`;
@@ -1603,7 +1575,7 @@
                 pipasColetadas = 0; // Reset for new game
                 tubosEnsaioColetados = 0;
                 imasColetados = 0;
-                microscopioColetados = 0; // Reset for new game
+                microscopioColetados = 0;
                 elefantesColetados = 0;
                 leoesColetados = 0;
                 avesColetadas = 0;
@@ -1636,7 +1608,7 @@
                 itens = [];
                 obstaculos = [];
                 schoolItems = [];
-                chest = null;
+                chest = null; // Reset chest for new game
                 currentPhase = 1; // Reseta para a Fase 1
                 // O iniciar será chamado novamente quando o personagem for selecionado
             } else {
@@ -1658,7 +1630,7 @@
             // A condição de parada agora é mais complexa, então a verificamos no início
             let winConditionMet = false;
             if (currentPhase === 1) {
-                winConditionMet = (pedrasColetadas === TOTAL_PEDRAS && keysColetadas === TOTAL_CHAVES && chest === null); // Updated win condition for 3 keys
+                winConditionMet = (chest && chest.isOpened); // Condição de vitória para Fase 1: baú aberto
             } else if (currentPhase === 2) {
                 winConditionMet = (valesSorveteColetados === TOTAL_VALES_SORVETE && sorvetesObjetivoColetados === TOTAL_SORVETES_OBJETIVO);
             } else if (currentPhase === 3) {
@@ -1790,7 +1762,7 @@
 
         // Inicia o loop de animação quando a janela carrega
         window.onload = function () {
-            // Get global references to HUD elements
+            // Inicializa as referências globais aos elementos do HUD aqui
             vidasDisplayElement = document.getElementById('vidasDisplay');
             hudObjectiveLine1Element = document.getElementById('hudObjectiveLine1');
             hudObjectiveLine2Element = document.getElementById('hudObjectiveLine2');
