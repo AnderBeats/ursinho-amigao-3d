@@ -30,6 +30,7 @@
             text-align: center;
             padding: 20px;
             box-sizing: border-box;
+            cursor: pointer; /* Adicionado para indicar que a tela é clicável */
         }
         #introImagePlaceholder { /* New style for the image placeholder */
             width: 400px;
@@ -607,8 +608,7 @@
         var frameInterval = 1000 / targetFPS; // Intervalo de tempo entre frames em ms
         var lastFrameTime = 0; // Initialized globally
 
-        // Global references to HUD elements, initialized directly
-        // Estas variáveis serão inicializadas no window.onload para garantir que os elementos DOM existam.
+        // Global references to HUD elements, initialized in window.onload
         let vidasDisplayElement;
         let hudObjectiveLine1Element;
         let hudObjectiveLine2Element;
@@ -624,15 +624,15 @@
 
         // Função para selecionar o personagem e iniciar o jogo
         function selecionar(tipo) {
+            console.log("DEBUG: Selecionar personagem:", tipo); // Log para depuração
             document.getElementById("personagemSelecao").style.display = 'none'; // Esconde a tela de seleção
             currentPlayerType = tipo; // Armazena o tipo de personagem
-            console.log("Personagem selecionado:", tipo);
             iniciar(tipo, 1); // Inicia o jogo na Fase 1
         }
 
         // Inicializa o canvas 2D e os elementos do jogo
         function iniciar(tipo, phase) {
-            console.log(`Iniciando o jogo 2D com personagem: ${tipo}, Fase: ${phase}`);
+            console.log(`DEBUG: Iniciando o jogo 2D com personagem: ${tipo}, Fase: ${phase}`); // Log para depuração
             currentPhase = phase; // Atualiza a fase atual
 
             // Atualiza o título da página com o nome do capítulo
@@ -708,6 +708,11 @@
             // Ajusta o tempo inicial com base no nível atual
             tempo = BASE_TIME - (currentLevel - 1) * TIME_DECREMENT_PER_LEVEL;
             if (tempo < 10) tempo = 10; // Garante que o tempo mínimo seja 10s
+
+            // Atualiza o tempo no HUD imediatamente ao iniciar a fase
+            if (tempoDisplayElement) {
+                tempoDisplayElement.innerText = `Tempo: ${tempo}s`;
+            }
 
             coletando = false;
             hasKey = false;
@@ -943,15 +948,14 @@
 
 
             // Gera os obstáculos temáticos da escola (comum para todas as fases)
-            for (let i = 0; i < 3; i++) { // Reduced from 4 to 3 for each type
-                obstaculos.push(createGameObject('mesa', '🪑', OBSTACLE_SIZE, false, true)); 
+            for (let i = 0; i < 3; i++) { // Loop para 3 de cada
+                obstaculos.push(createGameObject('mesa', '🔲', OBSTACLE_SIZE, false, true)); // Alterado emoji da mesa
                 obstaculos.push(createGameObject('cadeira', '🪑', OBSTACLE_SIZE, false, true));
                 obstaculos.push(createGameObject('armario', '🚪', OBSTACLE_SIZE, false, true));
-                obstaculos.push(createGameObject('quadro', '🖼️', OBSTACLE_SIZE, false, true));
             }
 
             // Gera os itens escolares (não coletáveis, não obstáculos - comum para todas as fases)
-            for (let i = 0; i < 5; i++) { 
+            for (let i = 0; i < 3; i++) { // Loop para 3 de cada
                 schoolItems.push(createGameObject('lapis', '✏️', SCHOOL_ITEM_SIZE, true, false, null, false)); 
                 schoolItems.push(createGameObject('caderno', '📓', SCHOOL_ITEM_SIZE, true, false, null, false)); 
                 schoolItems.push(createGameObject('livro', '📚', SCHOOL_ITEM_SIZE, false, false)); 
@@ -973,6 +977,7 @@
                     if (tempoDisplayElement) {
                         tempoDisplayElement.innerText = `Tempo: ${tempo}s`;
                     }
+                    console.log(`DEBUG: Tempo: ${tempo}s`); // Mantido para depuração, pode ser removido
                 }
 
                 let winConditionMet = false;
@@ -1064,7 +1069,7 @@
                             itens = [];
                             obstaculos = [];
                             schoolItems = [];
-                            chest = null;
+                            chest = null; // Reset chest for new game
 
                             // Go back to intro screen for a full restart
                             document.getElementById('introScreen').style.display = 'flex';
@@ -1154,21 +1159,19 @@
             const placedObjects = []; // Para controlar a sobreposição
 
             // Define uma área segura no centro para o jogador
-            const playerStartX = canvas.width / 2 - PLAYER_SIZE / 2;
-            const playerStartY = canvas.height / 2 - PLAYER_SIZE / 2;
-            // Aumentei a zona segura para 5x o tamanho do jogador (10x PLAYER_SIZE total)
+            const safeZoneRadius = 150; // Raio em pixels da área segura no centro
             const playerSafeZone = {
-                x: playerStartX - PLAYER_SIZE * 5, // Increased safe zone for player spawn
-                y: playerStartY - PLAYER_SIZE * 5, // Increased safe zone for player spawn
-                width: PLAYER_SIZE * 10, // Increased safe zone for player spawn
-                height: PLAYER_SIZE * 10 // Increased safe zone for player spawn
+                x: canvas.width / 2 - safeZoneRadius,
+                y: canvas.height / 2 - safeZoneRadius,
+                width: safeZoneRadius * 2,
+                height: safeZoneRadius * 2
             };
 
             function getRandomPosition(objSize, isObstacle = false) {
                 let newX, newY, collision;
                 let attempts = 0;
                 const maxAttempts = 1000; // Aumentado para mais chances de posicionamento
-                const exclusionZoneFactor = 2.0; // Aumentado para garantir mais espaço entre os objetos
+                const exclusionZoneFactor = 5.0; // Aumentado para garantir um espaçamento ainda maior entre os objetos
 
                 do {
                     collision = false;
@@ -1320,7 +1323,8 @@
                                     microscopioColetados++;
                                     console.log(`DEBUG: Microscópio coletado! Total: ${microscopioColetados}/${TOTAL_MICROSCOPIO}`);
                                 }
-                            } else if (currentPhase === 5) { // Lógica de objetivo da Fase 5
+                            } else if (currentPhase === 5) {
+                                // Itens do objetivo principal da Fase 5: 3 Elefantes, 3 Leões, 3 Aves
                                 if (collectedItem.type === 'elefante') {
                                     elefantesColetados++;
                                     console.log(`DEBUG: Elefante coletado! Total: ${elefantesColetados}/${TOTAL_ELEFANTES}`);
@@ -1331,7 +1335,8 @@
                                     avesColetadas++;
                                     console.log(`DEBUG: Ave coletada! Total: ${avesColetadas}/${TOTAL_AVES}`);
                                 }
-                            } else if (currentPhase === 6) { // Lógica de objetivo da Fase 6
+                            } else if (currentPhase === 6) {
+                                // Itens do objetivo principal da Fase 6: 3 Pinturas, 3 Esculturas, 3 Fósseis
                                 if (collectedItem.type === 'pintura') {
                                     pinturasColetadas++;
                                     console.log(`DEBUG: Pintura coletada! Total: ${pinturasColetadas}/${TOTAL_PINTURAS}`);
@@ -1342,7 +1347,8 @@
                                     fosseisColetados++;
                                     console.log(`DEBUG: Fóssil coletado! Total: ${fosseisColetados}/${TOTAL_FOSSEIS}`);
                                 }
-                            } else if (currentPhase === 7) { // Lógica de objetivo da Fase 7
+                            } else if (currentPhase === 7) {
+                                // Itens do objetivo principal da Fase 7: 3 Cestas de Piquenique, 3 Bolas, 3 Brinquedos de Parque
                                 if (collectedItem.type === 'cesta_piquenique') {
                                     cestasPiqueniqueColetadas++;
                                     console.log(`DEBUG: Cesta de Piquenique coletada! Total: ${cestasPiqueniqueColetadas}/${TOTAL_CESTAS_PIQUENIQUE}`);
@@ -1353,7 +1359,7 @@
                                     brinquedosParqueColetados++;
                                     console.log(`DEBUG: Brinquedo de Parque coletado! Total: ${brinquedosParqueColetados}/${TOTAL_BRINQUEDOS_PARQUE}`);
                                 }
-                            } else if (currentPhase === 8) { // Lógica de objetivo da Fase 8
+                            } else if (currentPhase === 8) { // Capítulo 8: Leiturinhas
                                 if (collectedItem.type === 'livro_aventura') {
                                     livroAventuraColetados++;
                                     console.log(`DEBUG: Livro de Aventura coletado! Total: ${livroAventuraColetados}/${TOTAL_LIVRO_AVENTURA}`);
@@ -1364,7 +1370,7 @@
                                     livroFabulaColetados++;
                                     console.log(`DEBUG: Livro de Fábula coletado! Total: ${livroFabulaColetados}/${TOTAL_LIVRO_FABULA}`);
                                 }
-                            } else if (currentPhase === 9) { // Lógica de objetivo da Fase 9
+                            } else if (currentPhase === 9) {
                                 if (collectedItem.type === 'lixeira_reciclagem') {
                                     lixeiraReciclagemColetados++;
                                     console.log(`DEBUG: Lixeira de Reciclagem coletada! Total: ${lixeiraReciclagemColetados}/${TOTAL_LIXEIRA_RECICLAGEM}`);
@@ -1375,18 +1381,18 @@
                                     arvoreMudaColetados++;
                                     console.log(`DEBUG: Muda de Árvore coletada! Total: ${arvoreMudaColetados}/${TOTAL_ARVORE_MUDA}`);
                                 }
-                            } else if (currentPhase === 10) { // Lógica de objetivo da Fase 10
+                            } else if (currentPhase === 10) {
                                 if (collectedItem.type === 'planta_nativa') {
                                     plantaNativaColetados++;
                                     console.log(`DEBUG: Planta Nativa coletada! Total: ${plantaNativaColetados}/${TOTAL_PLANTAS_NATIVAS}`);
                                 } else if (collectedItem.type === 'animal_selvagem') {
                                     animalSelvagemColetados++;
                                     console.log(`DEBUG: Animal Selvagem coletado! Total: ${animalSelvagemColetados}/${TOTAL_ANIMAIS_SELVAGENS}`);
-                                } else if (collectedItem.type === 'telescopio') { // Renamed from binoculosColetados
+                                } else if (collectedItem.type === 'telescopio') {
                                     telescopioColetados++;
                                     console.log(`DEBUG: Telescópio coletado! Total: ${telescopioColetados}/${TOTAL_TELESCOPIO}`);
                                 }
-                            } else if (currentPhase === 11) { // Lógica de objetivo da Fase 11
+                            } else if (currentPhase === 11) {
                                 if (collectedItem.type === 'pincel') {
                                     pincelColetados++;
                                     console.log(`DEBUG: Pincel coletado! Total: ${pincelColetados}/${TOTAL_PINCEL}`);
@@ -1397,7 +1403,7 @@
                                     argilaColetados++;
                                     console.log(`DEBUG: Argila coletada! Total: ${argilaColetados}/${TOTAL_ARGILA}`);
                                 }
-                            } else if (currentPhase === 12) { // Lógica de objetivo da Fase 12
+                            } else if (currentPhase === 12) {
                                 if (collectedItem.type === 'violao') {
                                     violaoColetados++;
                                     console.log(`DEBUG: Violão coletado! Total: ${violaoColetados}/${TOTAL_VIOLAO}`);
@@ -1409,16 +1415,17 @@
                                     console.log(`DEBUG: Microfone coletado! Total: ${microfoneColetados}/${TOTAL_MICROFONE}`);
                                 }
                             }
-                        } else if (collectedItem.type === 'moeda') { // Moedas aumentam o tempo
-                            tempo += 5; // RE-ADICIONADO
-                            console.log(`DEBUG: Moeda coletada! Tempo +5s. Tempo atual: ${tempo}`); // RE-ADICIONADO
+                        } else if (collectedItem.type === 'moeda') {
+                            tempo += 5;
+                            console.log(`DEBUG: Moeda coletada! Tempo +5s. Tempo atual: ${tempo}`);
                         }
                         atualizarHUD();
-                        coletando = false; 
-                        return; 
+                        coletando = false;
+                        return;
                     }
                 }
-                
+
+
                 // Depois verifica itens escolares coletáveis (se houver)
                 for (let i = 0; i < schoolItems.length; i++) {
                     if (schoolItems[i].canBeCollected && checkCollision(player, schoolItems[i])) {
@@ -1435,11 +1442,12 @@
                 if (currentPhase === 1 && chest && checkCollision(player, chest)) { // Only check collision if chest exists
                     if (pedrasColetadas === TOTAL_PEDRAS && keysColetadas === TOTAL_CHAVES) { // Updated condition
                         chest.isOpened = true; // Marca o baú como aberto
+                        chest.emoji = '🗃️'; // Muda o emoji do baú para aberto
                         console.log("DEBUG: Baú aberto com sucesso!");
                         coletando = false;
                         atualizarHUD(); // Atualiza o HUD para mostrar o baú aberto
                         // A transição de fase é tratada no setInterval principal, que agora verifica chest.isOpened
-                        return; 
+                        return;
                     } else { // If trying to open but not all collected
                         const hintMessageDiv = document.getElementById('llmHintMessage');
                         let msg = "Você precisa coletar todos os itens do objetivo antes de abrir o baú!";
@@ -1459,7 +1467,7 @@
                                 hintMessageDiv.style.display = 'none';
                             }
                         }, 5000);
-                        coletando = false; 
+                        coletando = false;
                     }
                 }
             }
@@ -1474,13 +1482,14 @@
             let hudLeftColumnContent = '';
             let hudRightColumnContent = '';
             let hudTotalCollectedContent = `Total Coletado: ${totalAllItemsCollected}`;
+            // hudTempoContent é atualizado no setInterval, mas a string inicial é definida aqui
             let hudTempoContent = `Tempo: ${tempo}s`;
 
             // HUD content for Phase 1
             if (currentPhase === 1) {
                 hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
                 // Atualizado para verificar chest.isOpened
-                hudRightColumnContent = `🔴 Pedras: ${pedrasColetadas} / ${TOTAL_PEDRAS}<br>🔑 Chaves: ${keysColetadas} / ${TOTAL_CHAVES}<br>📦 Baú: ${chest && chest.isOpened ? '1/1 🔓' : '0/1 🔒'}`; 
+                hudRightColumnContent = `🔴 Pedras: ${pedrasColetadas} / ${TOTAL_PEDRAS}<br>🔑 Chaves: ${keysColetadas} / ${TOTAL_CHAVES}<br>📦 Baú: ${chest && chest.isOpened ? '1/1 🔓' : '0/1 🔒'}`;
             } else if (currentPhase === 2) {
                 hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
                 hudRightColumnContent = `🎟️ Vales Sorvete: ${valesSorveteColetados} / ${TOTAL_VALES_SORVETE}<br>🍫🍦 Sorvetes: ${sorvetesObjetivoColetados} / ${TOTAL_SORVETES_OBJETIVO}`;
@@ -1516,334 +1525,311 @@
                 hudRightColumnContent = `🎸 Violão: ${violaoColetados} / ${TOTAL_VIOLAO}<br>🎹 Piano: ${pianoColetados} / ${TOTAL_PIANO}<br>🎤 Microfone: ${microfoneColetados} / ${TOTAL_MICROFONE}`;
             }
 
-            // Update the text content of HUD elements
-            const hudLeftColumnElement = document.querySelector('#hud .hud-column:first-child');
-            const hudRightColumnElement = document.querySelector('#hud .hud-column:last-child');
+                            const hudLeftColumnElement = document.querySelector('#hud .hud-column:first-child');
+                            const hudRightColumnElement = document.querySelector('#hud .hud-column:last-child');
 
-            if (hudLeftColumnElement) hudLeftColumnElement.innerHTML = hudLeftColumnContent;
-            if (hudRightColumnElement) hudRightColumnElement.innerHTML = hudRightColumnContent;
-        }
+                            if (hudLeftColumnElement) hudLeftColumnElement.innerHTML = hudLeftColumnContent;
+                            if (hudRightColumnElement) hudRightColumnElement.innerHTML = hudRightColumnContent;
+                        }
 
-        // Exibe uma mensagem temporária no centro da tela
-        function showTemporaryMessage(msg, duration) {
-            const tempMessageDiv = document.getElementById('temporaryMessage');
-            if (tempMessageDiv) { // Ensure element exists before manipulating
-                tempMessageDiv.innerText = msg;
-                tempMessageDiv.style.display = 'block';
-                setTimeout(() => {
-                    tempMessageDiv.style.display = 'none';
-                }, duration);
-            }
-        }
+                        function showTemporaryMessage(msg, duration) {
+                            const tempMessageDiv = document.getElementById('temporaryMessage');
+                            if (tempMessageDiv) {
+                                tempMessageDiv.innerText = msg;
+                                tempMessageDiv.style.display = 'block';
+                                setTimeout(() => {
+                                    tempMessageDiv.style.display = 'none';
+                                }, duration);
+                            }
+                        }
 
-        // Exibe a tela de continue
-        function showContinueScreen() {
-            document.getElementById('continueModal').style.display = 'flex';
-            continueTime = 10; // Reinicia o contador
-            document.getElementById('continueCountdown').innerText = continueTime;
+                        function showContinueScreen() {
+                            document.getElementById('continueModal').style.display = 'flex';
+                            continueTime = 10;
+                            document.getElementById('continueCountdown').innerText = continueTime;
 
-            if (continueCountdownInterval) clearInterval(continueCountdownInterval);
-            continueCountdownInterval = setInterval(() => {
-                continueTime--;
-                document.getElementById('continueCountdown').innerText = continueTime;
-                if (continueTime <= 0) {
-                    clearInterval(continueCountdownInterval);
-                    handleContinue('nao'); // Se o tempo acabar, é como se clicasse em "Não"
-                }
-            }, 1000);
-        }
+                            if (continueCountdownInterval) clearInterval(continueCountdownInterval);
+                            continueCountdownInterval = setInterval(() => {
+                                continueTime--;
+                                document.getElementById('continueCountdown').innerText = continueTime;
+                                if (continueTime <= 0) {
+                                    clearInterval(continueCountdownInterval);
+                                    handleContinue('nao');
+                                }
+                            }, 1000);
+                        }
 
-        // Lida com a escolha do jogador na tela de continue
-        function handleContinue(choice) {
-            clearInterval(continueCountdownInterval);
-            document.getElementById('continueModal').style.display = 'none';
+                        function handleContinue(choice) {
+                            clearInterval(continueCountdownInterval);
+                            document.getElementById('continueModal').style.display = 'none';
 
-            if (choice === 'sim') {
-                console.log("DEBUG: Jogador escolheu SIM. Reiniciando para seleção de personagem.");
-                vidas = 3; // Restaura vidas
-                // Mostra a tela de seleção de personagem
-                document.getElementById('personagemSelecao').style.display = 'flex'; // Should be 'flex' or 'block'
-                // Limpa o canvas para a próxima inicialização
-                if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpa o canvas se já foi inicializado
-                // Reinicia todas as variáveis do jogo para um novo começo
-                pedrasColetadas = 0;
-                keysColetadas = 0; // Reset for new game
-                valesSorveteColetados = 0;
-                sorvetesObjetivoColetados = 0;
-                trofeusColetados = 0;
-                bolasColetadas = 0;
-                pipasColetadas = 0; // Reset for new game
-                tubosEnsaioColetados = 0;
-                imasColetados = 0;
-                microscopioColetados = 0;
-                elefantesColetados = 0;
-                leoesColetados = 0;
-                avesColetadas = 0;
-                pinturasColetadas = 0;
-                esculturasColetadas = 0;
-                fosseisColetados = 0;
-                cestasPiqueniqueColetadas = 0;
-                bolasFase7Coletadas = 0;
-                brinquedosParqueColetados = 0;
-                totalAllItemsCollected = 0;
-                livroAventuraColetados = 0; // Reset for new game
-                livroAnimaisColetados = 0; // Reset for new game
-                livroFabulaColetados = 0; // Reset for new game
-                lixeiraReciclagemColetados = 0;
-                garrafaPlasticoColetados = 0;
-                arvoreMudaColetados = 0;
-                plantaNativaColetados = 0;
-                animalSelvagemColetados = 0;
-                telescopioColetados = 0; // Reset for new game
-                pincelColetados = 0;
-                tintaColetados = 0;
-                argilaColetados = 0;
-                violaoColetados = 0;
-                pianoColetados = 0;
-                microfoneColetados = 0;
-                tempo = BASE_TIME - (currentLevel - 1) * TIME_DECREMENT_PER_LEVEL; // Recalculate time for new level
-                if (tempo < 10) tempo = 10; // Ensure minimum time
-                coletando = false;
-                hasKey = false;
-                itens = [];
-                obstaculos = [];
-                schoolItems = [];
-                chest = null; // Reset chest for new game
-                currentPhase = 1; // Reseta para a Fase 1
-                // O iniciar será chamado novamente quando o personagem for selecionado
-            } else {
-                console.log("DEBUG: Jogador escolheu NÃO ou tempo esgotou. Recarrega a página.");
-                location.reload(); // Recarrega a página para reiniciar completamente
-            }
-        }
+                            if (choice === 'sim') {
+                                console.log("DEBUG: Jogador escolheu SIM. Reiniciando para seleção de personagem.");
+                                vidas = 3;
+                                document.getElementById('personagemSelecao').style.display = 'flex';
+                                if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+                                pedrasColetadas = 0;
+                                keysColetadas = 0;
+                                valesSorveteColetados = 0;
+                                sorvetesObjetivoColetados = 0;
+                                trofeusColetados = 0;
+                                bolasColetadas = 0;
+                                pipasColetadas = 0;
+                                tubosEnsaioColetados = 0;
+                                imasColetados = 0;
+                                microscopioColetados = 0;
+                                elefantesColetados = 0;
+                                leoesColetados = 0;
+                                avesColetadas = 0;
+                                pinturasColetadas = 0;
+                                esculturasColetadas = 0;
+                                fosseisColetados = 0;
+                                cestasPiqueniqueColetadas = 0;
+                                bolasFase7Coletadas = 0;
+                                brinquedosParqueColetados = 0;
+                                totalAllItemsCollected = 0;
+                                livroAventuraColetados = 0;
+                                livroAnimaisColetados = 0;
+                                livroFabulaColetados = 0;
+                                lixeiraReciclagemColetados = 0;
+                                garrafaPlasticoColetados = 0;
+                                arvoreMudaColetados = 0;
+                                plantaNativaColetados = 0;
+                                animalSelvagemColetados = 0;
+                                telescopioColetados = 0;
+                                pincelColetados = 0;
+                                tintaColetados = 0;
+                                argilaColetados = 0;
+                                violaoColetados = 0;
+                                pianoColetados = 0;
+                                microfoneColetados = 0;
+                                tempo = BASE_TIME - (currentLevel - 1) * TIME_DECREMENT_PER_LEVEL;
+                                if (tempo < 10) tempo = 10;
+                                coletando = false;
+                                hasKey = false;
+                                itens = [];
+                                obstaculos = [];
+                                schoolItems = [];
+                                chest = null;
+                                currentPhase = 1;
+                            } else {
+                                console.log("DEBUG: Jogador escolheu NÃO ou tempo esgotou. Recarrega a página.");
+                                location.reload();
+                            }
+                        }
 
-        // Loop principal de animação do jogo 2D
-        function animar(currentTime) {
-            requestAnimationFrame(animar);
+                        function animar(currentTime) {
+                            requestAnimationFrame(animar);
 
-            // Limitar FPS
-            if (currentTime < lastFrameTime + frameInterval) {
-                return;
-            }
-            lastFrameTime = currentTime;
+                            if (currentTime < lastFrameTime + frameInterval) {
+                                return;
+                            }
+                            lastFrameTime = currentTime;
 
-            // A condição de parada agora é mais complexa, então a verificamos no início
-            let winConditionMet = false;
-            if (currentPhase === 1) {
-                winConditionMet = (chest && chest.isOpened); // Condição de vitória para Fase 1: baú aberto
-            } else if (currentPhase === 2) {
-                winConditionMet = (valesSorveteColetados === TOTAL_VALES_SORVETE && sorvetesObjetivoColetados === TOTAL_SORVETES_OBJETIVO);
-            } else if (currentPhase === 3) {
-                winConditionMet = (trofeusColetados >= TOTAL_TROFEUS && bolasColetadas >= TOTAL_BOLAS_FASE3 && pipasColetadas >= TOTAL_PIPAS);
-            } else if (currentPhase === 4) {
-                winConditionMet = (tubosEnsaioColetados >= TOTAL_TUBOS_ENSAIO && imasColetados >= TOTAL_IMAS && microscopioColetados >= TOTAL_MICROSCOPIO); // Updated win condition
-            } else if (currentPhase === 5) {
-                winConditionMet = (elefantesColetados >= TOTAL_ELEFANTES && leoesColetados >= TOTAL_LEOES && avesColetadas >= TOTAL_AVES);
-            } else if (currentPhase === 6) {
-                winConditionMet = (pinturasColetadas === TOTAL_PINTURAS && esculturasColetadas === TOTAL_ESCULTURAS && fosseisColetados >= TOTAL_FOSSEIS); // Updated win condition
-            } else if (currentPhase === 7) {
-                winConditionMet = (cestasPiqueniqueColetadas >= TOTAL_CESTAS_PIQUENIQUE && bolasFase7Coletadas >= TOTAL_BOLAS_FASE7 && brinquedosParqueColetados >= TOTAL_BRINQUEDOS_PARQUE); // Updated win condition
-            } else if (currentPhase === 8) {
-                winConditionMet = (livroAventuraColetados >= TOTAL_LIVRO_AVENTURA && livroAnimaisColetados >= TOTAL_LIVRO_ANIMAIS && livroFabulaColetados >= TOTAL_LIVRO_FABULA);
-            } else if (currentPhase === 9) {
-                winConditionMet = (lixeiraReciclagemColetados >= TOTAL_LIXEIRA_RECICLAGEM && garrafaPlasticoColetados >= TOTAL_GARRAFA_PLASTICO && arvoreMudaColetados >= TOTAL_ARVORE_MUDA);
-            } else if (currentPhase === 10) {
-                winConditionMet = (plantaNativaColetados >= TOTAL_PLANTAS_NATIVAS && animalSelvagemColetados >= TOTAL_ANIMAIS_SELVAGENS && telescopioColetados >= TOTAL_TELESCOPIO); // Updated win condition
-            } else if (currentPhase === 11) {
-                winConditionMet = (pincelColetados >= TOTAL_PINCEL && tintaColetados >= TOTAL_TINTA && argilaColetados >= TOTAL_ARGILA);
-            } else if (currentPhase === 12) {
-                winConditionMet = (violaoColetados >= TOTAL_VIOLAO && pianoColetados >= TOTAL_PIANO && microfoneColetados >= TOTAL_MICROFONE);
-            }
+                            let winConditionMet = false;
+                            if (currentPhase === 1) {
+                                winConditionMet = (chest && chest.isOpened);
+                            } else if (currentPhase === 2) {
+                                winConditionMet = (valesSorveteColetados === TOTAL_VALES_SORVETE && sorvetesObjetivoColetados === TOTAL_SORVETES_OBJETIVO);
+                            } else if (currentPhase === 3) {
+                                winConditionMet = (trofeusColetados >= TOTAL_TROFEUS && bolasColetadas >= TOTAL_BOLAS_FASE3 && pipasColetadas >= TOTAL_PIPAS);
+                            } else if (currentPhase === 4) {
+                                winConditionMet = (tubosEnsaioColetados >= TOTAL_TUBOS_ENSAIO && imasColetados >= TOTAL_IMAS && microscopioColetados >= TOTAL_MICROSCOPIO);
+                            } else if (currentPhase === 5) {
+                                winConditionMet = (elefantesColetados >= TOTAL_ELEFANTES && leoesColetados >= TOTAL_LEOES && avesColetadas >= TOTAL_AVES);
+                            } else if (currentPhase === 6) {
+                                winConditionMet = (pinturasColetadas === TOTAL_PINTURAS && esculturasColetadas === TOTAL_ESCULTURAS && fosseisColetados >= TOTAL_FOSSEIS);
+                            } else if (currentPhase === 7) {
+                                winConditionMet = (cestasPiqueniqueColetadas >= TOTAL_CESTAS_PIQUENIQUE && bolasFase7Coletadas >= TOTAL_BOLAS_FASE7 && brinquedosParqueColetados >= TOTAL_BRINQUEDOS_PARQUE);
+                            } else if (currentPhase === 8) {
+                                winConditionMet = (livroAventuraColetados >= TOTAL_LIVRO_AVENTURA && livroAnimaisColetados >= TOTAL_LIVRO_ANIMAIS && livroFabulaColetados >= TOTAL_LIVRO_FABULA);
+                            } else if (currentPhase === 9) {
+                                winConditionMet = (lixeiraReciclagemColetados >= TOTAL_LIXEIRA_RECICLAGEM && garrafaPlasticoColetados >= TOTAL_GARRAFA_PLASTICO && arvoreMudaColetados >= TOTAL_ARVORE_MUDA);
+                            } else if (currentPhase === 10) {
+                                winConditionMet = (plantaNativaColetados >= TOTAL_PLANTAS_NATIVAS && animalSelvagemColetados >= TOTAL_ANIMAIS_SELVAGENS && telescopioColetados >= TOTAL_TELESCOPIO);
+                            } else if (currentPhase === 11) {
+                                winConditionMet = (pincelColetados >= TOTAL_PINCEL && tintaColetados >= TOTAL_TINTA && argilaColetados >= TOTAL_ARGILA);
+                            } else if (currentPhase === 12) {
+                                winConditionMet = (violaoColetados >= TOTAL_VIOLAO && pianoColetados >= TOTAL_PIANO && microfoneColetados >= TOTAL_MICROFONE);
+                            }
 
-            if (vidas <= 0 || tempo <= 0 || winConditionMet) { 
-                // A lógica de encerramento/transição de fase é tratada no setInterval
-                return;
-            }
+                            if (vidas <= 0 || tempo <= 0 || winConditionMet) {
+                                return;
+                            }
 
-            // Limpa o canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+                            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Guarda a posição anterior do jogador para reverter em caso de colisão com obstáculo
-            const prevX = player.x;
-            const prevY = player.y;
+                            const prevX = player.x;
+                            const prevY = player.y;
 
-            // Atualiza a posição do jogador com base nas teclas pressionadas
-            if (teclas["w"]) player.y -= PLAYER_SPEED;
-            if (teclas["s"]) player.y += PLAYER_SPEED;
-            if (teclas["a"]) player.x -= PLAYER_SPEED;
-            if (teclas["d"]) player.x += PLAYER_SPEED;
+                            if (teclas["w"]) player.y -= PLAYER_SPEED;
+                            if (teclas["s"]) player.y += PLAYER_SPEED;
+                            if (teclas["a"]) player.x -= PLAYER_SPEED;
+                            if (teclas["d"]) player.x += PLAYER_SPEED;
 
-            // Limita a posição do jogador para permanecer dentro dos limites do canvas
-            player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
-            player.y = Math.max(0, Math.min(canvas.height - player.height, player.y));
+                            player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
+                            player.y = Math.max(0, Math.min(canvas.height - player.height, player.y));
 
-            // Verifica colisão com obstáculos e reverte a posição se houver colisão
-            obstaculos.forEach(obstacle => {
-                const exclusionZone = 1.0; // Adjusted for tighter collision detection
-                const expandedObstacleRect = {
-                    x: obstacle.x - (obstacle.size * (exclusionZone - 1) / 2),
-                    y: obstacle.y - (obstacle.size * (exclusionZone - 1) / 2),
-                    width: obstacle.width * exclusionZone,
-                    height: obstacle.height * exclusionZone
-                };
-                if (obstacle.isObstacle && checkCollision(player, expandedObstacleRect)) { // Check collision with expanded obstacle rect
-                    // Reverte a posição do jogador
-                    player.x = prevX;
-                    player.y = prevY;
-                }
-            });
+                            obstaculos.forEach(obstacle => {
+                                const exclusionZone = 1.0;
+                                const expandedObstacleRect = {
+                                    x: obstacle.x - (obstacle.size * (exclusionZone - 1) / 2),
+                                    y: obstacle.y - (obstacle.size * (exclusionZone - 1) / 2),
+                                    width: obstacle.width * exclusionZone,
+                                    height: obstacle.height * exclusionZone
+                                };
+                                if (obstacle.isObstacle && checkCollision(player, expandedObstacleRect)) {
+                                    player.x = prevX;
+                                    player.y = prevY;
+                                }
+                            });
 
-            // Realiza as interações (coleta, baú)
-            handleInteractions();
+                            handleInteractions();
 
-            // Ordem de desenho para simular profundidade:
-            // 1. Baú (fundo - apenas na Fase 1)
-            if (chest && currentPhase === 1) {
-                drawItem(chest);
-            }
-            // 2. Itens escolares (fundo)
-            schoolItems.forEach(drawItem);
-            // 3. Obstáculos (fundo)
-            obstaculos.forEach(drawItem);
-            // 4. Itens coletáveis (para que o jogador possa passar "por cima" deles)
-            itens.forEach(drawItem);
-            // 5. Jogador (sempre por cima)
-            drawPlayer();
-        }
+                            if (chest && currentPhase === 1) {
+                                drawItem(chest);
+                            }
+                            schoolItems.forEach(drawItem);
+                            obstaculos.forEach(drawItem);
+                            itens.forEach(drawItem);
+                            drawPlayer();
+                        }
 
-        // Função para atualizar o título da página com base na fase atual
-        function updatePageTitle(phase) {
-            let title = "Ursinho Amigão 2D - ";
-            switch (phase) {
-                case 1:
-                    title += "Capítulo 1: Uma Aventura de Aprendizados";
-                    break;
-                case 2:
-                    title += "Capítulo 2: A Festa do Sorvete";
-                    break;
-                case 3:
-                    title += "Capítulo 3: Brincadeira de Criança";
-                    break;
-                case 4:
-                    title += "Capítulo 4: Nem Todo Dia é Brincadeira, mas Também é...";
-                    break;
-                case 5:
-                    title += "Capítulo 5: No Reino dos Animais";
-                    break;
-                case 6:
-                    title += "Capítulo 6: Aprender é uma Arte";
-                    break;
-                case 7:
-                    title += "Capítulo 7: Lazer no Parque"; // Novo título para Fase 7
-                    break;
-                case 8:
-                    title += "Capítulo 8: Leiturinhas"; // Novo título para Fase 8
-                    break;
-                case 9:
-                    title += "Capítulo 9: Planeta"; // Novo título para Fase 9
-                    break;
-                case 10:
-                    title += "Capítulo 10: Exploração da Natureza"; // Novo título para Fase 10
-                    break;
-                case 11:
-                    title += "Capítulo 11: Oficina de Artes"; // Novo título para Fase 11
-                    break;
-                case 12:
-                    title += "Capítulo 12: Música e Dança"; // Novo título para Fase 12
-                    break;
-                default:
-                    title += "Aventura Desconhecida";
-            }
-            document.title = title;
-            if (chapterTitleDisplayElement) {
-                chapterTitleDisplayElement.innerText = title.split(" - ")[1]; // Exibe apenas o nome do capítulo
-            }
-        }
+                        function updatePageTitle(phase) {
+                            let title = "Ursinho Amigão 2D - ";
+                            switch (phase) {
+                                case 1:
+                                    title += "Capítulo 1: Uma Aventura de Aprendizados";
+                                    break;
+                                case 2:
+                                    title += "Capítulo 2: A Festa do Sorvete";
+                                    break;
+                                case 3:
+                                    title += "Capítulo 3: Brincadeira de Criança";
+                                    break;
+                                case 4:
+                                    title += "Capítulo 4: Nem Todo Dia é Brincadeira, mas Também é...";
+                                    break;
+                                case 5:
+                                    title += "Capítulo 5: No Reino dos Animais";
+                                    break;
+                                case 6:
+                                    title += "Capítulo 6: Aprender é uma Arte";
+                                    break;
+                                case 7:
+                                    title += "Capítulo 7: Lazer no Parque";
+                                    break;
+                                case 8:
+                                    title += "Capítulo 8: Leiturinhas";
+                                    break;
+                                case 9:
+                                    title += "Capítulo 9: Planeta";
+                                    break;
+                                case 10:
+                                    title += "Capítulo 10: Exploração da Natureza";
+                                    break;
+                                case 11:
+                                    title += "Capítulo 11: Oficina de Artes";
+                                    break;
+                                case 12:
+                                    title += "Capítulo 12: Música e Dança";
+                                    break;
+                                default:
+                                    title += "Aventura Desconhecida";
+                            }
+                            document.title = title;
+                            if (chapterTitleDisplayElement) {
+                                chapterTitleDisplayElement.innerText = title.split(" - ")[1];
+                            }
+                        }
 
-        // Inicia o loop de animação quando a janela carrega
-        window.onload = function () {
-            // Inicializa as referências globais aos elementos do HUD aqui
-            vidasDisplayElement = document.getElementById('vidasDisplay');
-            hudObjectiveLine1Element = document.getElementById('hudObjectiveLine1');
-            hudObjectiveLine2Element = document.getElementById('hudObjectiveLine2');
-            totalAllItemsCollectedDisplayElement = document.getElementById('totalAllItemsCollectedDisplay');
-            tempoDisplayElement = document.getElementById('tempo');
-            chapterTitleDisplayElement = document.getElementById('chapterTitleDisplay');
-            objetivoFaseElement = document.getElementById('objetivoFase'); // This element is hidden, but still referenced for consistency.
+                        window.onload = function () {
+                            vidasDisplayElement = document.getElementById('vidasDisplay');
+                            hudObjectiveLine1Element = document.getElementById('hudObjectiveLine1');
+                            hudObjectiveLine2Element = document.getElementById('hudObjectiveLine2');
+                            totalAllItemsCollectedDisplayElement = document.getElementById('totalAllItemsCollectedDisplay');
+                            tempoDisplayElement = document.getElementById('tempo');
+                            chapterTitleDisplayElement = document.getElementById('chapterTitleDisplay');
+                            objetivoFaseElement = document.getElementById('objetivoFase');
 
-            // Get references to intro screen elements
-            const introScreen = document.getElementById('introScreen');
-            const personagemSelecao = document.getElementById('personagemSelecao');
-            
-            // Event listener to dismiss intro screen on any click/keypress
-            const dismissIntro = () => {
-                if (introScreen.style.display !== 'none') { // Only dismiss if visible
-                    introScreen.style.display = 'none';
-                    personagemSelecao.style.display = 'flex'; // Show character selection
-                    // Remove the event listener after it's used once
-                    document.removeEventListener('keydown', dismissIntro);
-                    document.removeEventListener('click', dismissIntro);
-                    document.removeEventListener('touchstart', dismissIntro);
-                }
-            };
+                            const introScreen = document.getElementById('introScreen');
+                            const personagemSelecao = document.getElementById('personagemSelecao');
+                            
+                            const dismissIntro = () => {
+                                console.log("DEBUG: dismissIntro called."); // Log para depuração
+                                // Re-obtenha as referências para garantir que não são nulas se o DOM mudou
+                                const currentIntroScreen = document.getElementById('introScreen');
+                                const currentPersonagemSelecao = document.getElementById('personagemSelecao');
 
-            // Add event listeners to the document for dismissing the intro screen
-            document.addEventListener('keydown', dismissIntro);
-            document.addEventListener('click', dismissIntro);
-            document.addEventListener('touchstart', dismissIntro); // For mobile taps
+                                if (currentIntroScreen && currentIntroScreen.style.display !== 'none') {
+                                    currentIntroScreen.style.display = 'none';
+                                    if (currentPersonagemSelecao) {
+                                        currentPersonagemSelecao.style.display = 'flex';
+                                        console.log("DEBUG: Transição para seleção de personagem.");
+                                    } else {
+                                        console.error("ERRO: Elemento 'personagemSelecao' não encontrado no DOM (dentro de dismissIntro).");
+                                    }
+                                    // Remova os listeners para evitar múltiplas chamadas
+                                    document.removeEventListener('keydown', dismissIntro);
+                                    currentIntroScreen.removeEventListener('click', dismissIntro);
+                                    currentIntroScreen.removeEventListener('touchstart', dismissIntro);
+                                }
+                            };
 
-            // Add event listeners for character selection
-            document.getElementById('personagemUrso').addEventListener('click', () => selecionar('urso'));
-            document.getElementById('personagemGato').addEventListener('click', () => selecionar('gato'));
-            document.getElementById('personagemGirafa').addEventListener('click', () => selecionar('girafa'));
-            document.getElementById('personagemCoelho').addEventListener('click', () => selecionar('coelho'));
+                            // Adicione os event listeners à introScreen e ao documento para keydown
+                            if (introScreen) {
+                                introScreen.addEventListener('click', dismissIntro);
+                                introScreen.addEventListener('touchstart', dismissIntro);
+                            } else {
+                                console.error("ERRO: Elemento 'introScreen' não encontrado no DOM (no window.onload).");
+                            }
+                            document.addEventListener('keydown', dismissIntro); // Keydown no documento para maior acessibilidade
 
-            // Add event listeners for directional buttons (touch)
-            document.getElementById('btnUp').addEventListener('touchstart', (e) => { e.preventDefault(); tecla('w', true); });
-            document.getElementById('btnUp').addEventListener('touchend', (e) => { e.preventDefault(); tecla('w', false); });
-            document.getElementById('btnLeft').addEventListener('touchstart', (e) => { e.preventDefault(); tecla('a', true); });
-            document.getElementById('btnLeft').addEventListener('touchend', (e) => { e.preventDefault(); tecla('a', false); });
-            document.getElementById('btnDown').addEventListener('touchstart', (e) => { e.preventDefault(); tecla('s', true); });
-            document.getElementById('btnDown').addEventListener('touchend', (e) => { e.preventDefault(); tecla('s', false); });
-            document.getElementById('btnRight').addEventListener('touchstart', (e) => { e.preventDefault(); tecla('d', true); });
-            document.getElementById('btnRight').addEventListener('touchend', (e) => { e.preventDefault(); tecla('d', false); });
+                            document.getElementById('personagemUrso').addEventListener('click', () => selecionar('urso'));
+                            document.getElementById('personagemGato').addEventListener('click', () => selecionar('gato'));
+                            document.getElementById('personagemGirafa').addEventListener('click', () => selecionar('girafa'));
+                            document.getElementById('personagemCoelho').addEventListener('click', () => selecionar('coelho'));
 
-            // Add event listeners for keyboard (W, A, S, D)
-            document.addEventListener('keydown', (e) => {
-                const key = e.key.toLowerCase();
-                if (['w', 'a', 's', 'd', ' '].includes(key)) {
-                    e.preventDefault();
-                    if (key === ' ') {
-                        coletando = true;
-                    } else {
-                        tecla(key, true);
-                    }
-                }
-            });
-            document.addEventListener('keyup', (e) => {
-                const key = e.key.toLowerCase();
-                if (['w', 'a', 's', 'd', ' '].includes(key)) {
-                    e.preventDefault();
-                    if (key === ' ') {
-                        coletando = false;
-                    } else {
-                        tecla(key, false);
-                    }
-                }
-            });
+                            document.getElementById('btnUp').addEventListener('touchstart', (e) => { e.preventDefault(); tecla('w', true); });
+                            document.getElementById('btnUp').addEventListener('touchend', (e) => { e.preventDefault(); tecla('w', false); });
+                            document.getElementById('btnLeft').addEventListener('touchstart', (e) => { e.preventDefault(); tecla('a', true); });
+                            document.getElementById('btnLeft').addEventListener('touchend', (e) => { e.preventDefault(); tecla('a', false); });
+                            document.getElementById('btnDown').addEventListener('touchstart', (e) => { e.preventDefault(); tecla('s', true); });
+                            document.getElementById('btnDown').addEventListener('touchend', (e) => { e.preventDefault(); tecla('s', false); });
+                            document.getElementById('btnRight').addEventListener('touchstart', (e) => { e.preventDefault(); tecla('d', true); });
+                            document.getElementById('btnRight').addEventListener('touchend', (e) => { e.preventDefault(); tecla('d', false); });
 
-            // Add listener for action button (touch)
-            document.getElementById('botao-acao').addEventListener('touchstart', (e) => { e.preventDefault(); coletando = true; });
-            document.getElementById('botao-acao').addEventListener('touchend', (e) => { e.preventDefault(); coletando = false; });
+                            document.addEventListener('keydown', (e) => {
+                                const key = e.key.toLowerCase();
+                                if (['w', 'a', 's', 'd', ' '].includes(key)) {
+                                    e.preventDefault();
+                                    if (key === ' ') {
+                                        coletando = true;
+                                    } else {
+                                        tecla(key, true);
+                                    }
+                                }
+                            });
+                            document.addEventListener('keyup', (e) => {
+                                const key = e.key.toLowerCase();
+                                if (['w', 'a', 's', 'd', ' '].includes(key)) {
+                                    e.preventDefault();
+                                    if (key === ' ') {
+                                        coletando = false;
+                                    } else {
+                                        tecla(key, false);
+                                    }
+                                }
+                            });
 
-            // Add listeners for continue modal buttons
-            document.getElementById('btnSim').addEventListener('click', () => handleContinue('sim'));
-            document.getElementById('btnNao').addEventListener('click', () => handleContinue('nao'));
+                            document.getElementById('botao-acao').addEventListener('touchstart', (e) => { e.preventDefault(); coletando = true; });
+                            document.getElementById('botao-acao').addEventListener('touchend', (e) => { e.preventDefault(); coletando = false; });
 
-            // Call atualizarHUD() here to ensure the HUD is populated with initial values
-            // even before a phase starts, but it will be hidden by CSS initially.
-            atualizarHUD();
-        };
+                            document.getElementById('btnSim').addEventListener('click', () => handleContinue('sim'));
+                            document.getElementById('btnNao').addEventListener('click', () => handleContinue('nao'));
+
+                            atualizarHUD();
+                        };
     </script>
 </body>
 </html>
