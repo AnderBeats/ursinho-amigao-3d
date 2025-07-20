@@ -1208,28 +1208,12 @@
                 return { x: newX, y: newY, width: objSize, height: objSize };
             }
 
-            // Posicionar itens
-            itens.forEach(item => {
-                const pos = getRandomPosition(item.size);
-                item.x = pos.x;
-                item.y = pos.y;
-                placedObjects.push(item);
-            });
-
-            // Posicionar obstáculos
+            // Posicionar obstáculos primeiro para garantir o espaçamento
             obstaculos.forEach(obstacle => {
                 const pos = getRandomPosition(obstacle.size, true); // Passa true para isObstacle
                 obstacle.x = pos.x;
                 obstacle.y = pos.y;
                 placedObjects.push(obstacle);
-            });
-
-            // Posicionar itens escolares
-            schoolItems.forEach(sItem => {
-                const pos = getRandomPosition(sItem.size);
-                sItem.x = pos.x;
-                sItem.y = pos.y;
-                placedObjects.push(sItem);
             });
 
             // Posicionar o baú (apenas na Fase 1)
@@ -1239,6 +1223,22 @@
                 chest.y = pos.y;
                 placedObjects.push(chest);
             }
+
+            // Posicionar itens
+            itens.forEach(item => {
+                const pos = getRandomPosition(item.size);
+                item.x = pos.x;
+                item.y = pos.y;
+                placedObjects.push(item);
+            });
+
+            // Posicionar itens escolares
+            schoolItems.forEach(sItem => {
+                const pos = getRandomPosition(sItem.size);
+                sItem.x = pos.x;
+                sItem.y = pos.y;
+                placedObjects.push(sItem);
+            });
         }
 
         // Desenha um objeto no canvas
