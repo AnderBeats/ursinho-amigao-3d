@@ -948,7 +948,7 @@
 
 
             // Gera os obstáculos temáticos da escola (comum para todas as fases)
-            for (let i = 0; i < 3; i++) { // Loop para 3 de cada
+            for (let i = 0; i < 2; i++) { // Loop para 2 de cada tipo
                 obstaculos.push(createGameObject('mesa', '🔲', OBSTACLE_SIZE, false, true)); // Alterado emoji da mesa
                 obstaculos.push(createGameObject('cadeira', '🪑', OBSTACLE_SIZE, false, true));
                 obstaculos.push(createGameObject('armario', '🚪', OBSTACLE_SIZE, false, true));
@@ -1482,7 +1482,6 @@
             let hudLeftColumnContent = '';
             let hudRightColumnContent = '';
             let hudTotalCollectedContent = `Total Coletado: ${totalAllItemsCollected}`;
-            // hudTempoContent é atualizado no setInterval, mas a string inicial é definida aqui
             let hudTempoContent = `Tempo: ${tempo}s`;
 
             // HUD content for Phase 1
