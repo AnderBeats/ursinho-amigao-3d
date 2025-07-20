@@ -76,7 +76,7 @@
             inset: 0;
             background: rgba(0, 0, 0, 0.8);
             color: white;
-            display: none; /* Oculto por padrão, será exibido após a introdução */
+            display: flex; /* Changed from none to flex to ensure it's visible initially */
             flex-direction: column;
             align-items: center;
             justify-content: center;
@@ -119,7 +119,7 @@
             border-radius: 8px;
             z-index: 10;
             font-size: 1.1em;
-            display: flex; /* Always flex to maintain layout */
+            display: none; /* Oculta o HUD por padrão */
             flex-direction: row; /* Use flexbox for columns */
             justify-content: space-between; /* Distribute space between columns */
             width: 90%; /* Occupy most of the width */
@@ -1170,9 +1170,8 @@
                 let newX, newY, collision;
                 let attempts = 0;
                 const maxAttempts = 1000; // Aumentado para mais chances de posicionamento
-                // Define a distância mínima de afastamento para objetos (2 vezes o tamanho de um obstáculo)
-                // Isso garante que mesmo itens pequenos terão um bom espaçamento se colocados perto de obstáculos.
-                const minClearanceBetweenObjects = 2 * OBSTACLE_SIZE; // Use OBSTACLE_SIZE as a reference for spacing
+                // Define a distância mínima de afastamento para objetos (3 vezes o tamanho de um obstáculo)
+                const minClearanceBetweenObjects = 3 * OBSTACLE_SIZE; 
 
                 do {
                     collision = false;
@@ -1195,8 +1194,8 @@
                         }
                     }
 
-                    // Se for um obstáculo, verifica também colisão com a zona segura do jogador
-                    if (!collision && isObstacle && checkCollision(newRect, playerSafeZone)) {
+                    // Se for um obstáculo ou um item coletável, verifica também colisão com a zona segura do jogador
+                    if (!collision && (isObstacle || newRect.canBeCollected) && checkCollision(newRect, playerSafeZone)) {
                         collision = true;
                     }
 
