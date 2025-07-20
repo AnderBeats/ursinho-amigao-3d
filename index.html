@@ -1158,8 +1158,8 @@
 
             const placedObjects = []; // Para controlar a sobreposição
 
-            // Define uma área segura no centro para o jogador
-            const safeZoneRadius = 150; // Raio em pixels da área segura no centro
+            // Define uma área segura no centro para o jogador (25% da menor dimensão do canvas)
+            const safeZoneRadius = Math.min(canvas.width, canvas.height) * 0.25; 
             const playerSafeZone = {
                 x: canvas.width / 2 - safeZoneRadius,
                 y: canvas.height / 2 - safeZoneRadius,
@@ -1525,19 +1525,19 @@
                 hudRightColumnContent = `🎸 Violão: ${violaoColetados} / ${TOTAL_VIOLAO}<br>🎹 Piano: ${pianoColetados} / ${TOTAL_PIANO}<br>🎤 Microfone: ${microfoneColetados} / ${TOTAL_MICROFONE}`;
             }
 
-                            const hudLeftColumnElement = document.querySelector('#hud .hud-column:first-child');
-                            const hudRightColumnElement = document.querySelector('#hud .hud-column:last-child');
+            const hudLeftColumnElement = document.querySelector('#hud .hud-column:first-child');
+            const hudRightColumnElement = document.querySelector('#hud .hud-column:last-child');
 
-                            if (hudLeftColumnElement) hudLeftColumnElement.innerHTML = hudLeftColumnContent;
-                            if (hudRightColumnElement) hudRightColumnElement.innerHTML = hudRightColumnContent;
-                        }
+            if (hudLeftColumnElement) hudLeftColumnElement.innerHTML = hudLeftColumnContent;
+            if (hudRightColumnElement) hudRightColumnElement.innerHTML = hudRightColumnContent;
+        }
 
-                        function showTemporaryMessage(msg, duration) {
-                            const tempMessageDiv = document.getElementById('temporaryMessage');
-                            if (tempMessageDiv) {
-                                tempMessageDiv.innerText = msg;
-                                tempMessageDiv.style.display = 'block';
-                                setTimeout(() => {
+        function showTemporaryMessage(msg, duration) {
+            const tempMessageDiv = document.getElementById('temporaryMessage');
+            if (tempMessageDiv) {
+                tempMessageDiv.innerText = msg;
+                tempMessageDiv.style.display = 'block';
+                setTimeout(() => {
                                     tempMessageDiv.style.display = 'none';
                                 }, duration);
                             }
@@ -1756,8 +1756,7 @@
                             const personagemSelecao = document.getElementById('personagemSelecao');
                             
                             const dismissIntro = () => {
-                                console.log("DEBUG: dismissIntro called."); // Log para depuração
-                                // Re-obtenha as referências para garantir que não são nulas se o DOM mudou
+                                console.log("DEBUG: dismissIntro called.");
                                 const currentIntroScreen = document.getElementById('introScreen');
                                 const currentPersonagemSelecao = document.getElementById('personagemSelecao');
 
@@ -1769,21 +1768,19 @@
                                     } else {
                                         console.error("ERRO: Elemento 'personagemSelecao' não encontrado no DOM (dentro de dismissIntro).");
                                     }
-                                    // Remova os listeners para evitar múltiplas chamadas
                                     document.removeEventListener('keydown', dismissIntro);
                                     currentIntroScreen.removeEventListener('click', dismissIntro);
                                     currentIntroScreen.removeEventListener('touchstart', dismissIntro);
                                 }
                             };
 
-                            // Adicione os event listeners à introScreen e ao documento para keydown
                             if (introScreen) {
                                 introScreen.addEventListener('click', dismissIntro);
                                 introScreen.addEventListener('touchstart', dismissIntro);
                             } else {
                                 console.error("ERRO: Elemento 'introScreen' não encontrado no DOM (no window.onload).");
                             }
-                            document.addEventListener('keydown', dismissIntro); // Keydown no documento para maior acessibilidade
+                            document.addEventListener('keydown', dismissIntro);
 
                             document.getElementById('personagemUrso').addEventListener('click', () => selecionar('urso'));
                             document.getElementById('personagemGato').addEventListener('click', () => selecionar('gato'));
