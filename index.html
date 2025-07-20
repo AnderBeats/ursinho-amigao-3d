@@ -103,10 +103,17 @@
             font-weight: bold;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Sombra suave */
             transition: transform 0.2s, background-color 0.2s; /* Transição suave */
+            text-align: center; /* Adicionado para centralizar o texto dentro da caixinha */
+            font-size: 3em; /* Ajustado o tamanho do emoji para caber na caixa */
         }
         .personagem:hover {
             background-color: #ffd54f; /* Amarelo ao passar o mouse */
             transform: translateY(-5px); /* Efeito de elevação ao passar o mouse */
+        }
+        .personagem span { /* Estilo para o nome do personagem */
+            font-size: 0.3em; /* Reduz o tamanho da fonte para o nome */
+            display: block; /* Garante que o nome fique em uma nova linha */
+            margin-top: 0.2em; /* Ajusta a margem para aproximar o nome do emoji e subir o emoji */
         }
         #hud {
             position: absolute;
@@ -381,7 +388,6 @@
             .hud-column {
                 width: 100%; /* Take full width when stacked */
                 align-items: center; /* Center text when stacked */
-                padding: 5px 0; /* Adjust padding */
             }
             .hud-column:last-child {
                 align-items: center; /* Center text when stacked */
@@ -430,10 +436,10 @@
     <div id="personagemSelecao">
         <h2>Escolha seu personagem</h2>
         <div class="personagem-opcoes">
-            <div class="personagem" id="personagemUrso" style="background:#f4c542;">🐻<br>Urso</div>
-            <div class="personagem" id="personagemGato" style="background:#8bc34a;">🐱<br>Gato</div>
-            <div class="personagem" id="personagemGirafa" style="background:#ffb74d;">🦒<br>Girafa</div>
-            <div class="personagem" id="personagemCoelho" style="background:#e91e63;">🐰<br>Coelha</div>
+            <div class="personagem" id="personagemUrso" style="background:#f4c542;">🐻<br><span>URSINHO<br>AMIGÃO</span></div>
+            <div class="personagem" id="personagemGato" style="background:#8bc34a;">🐱<br><span>GATINHO<br>TITO</span></div>
+            <div class="personagem" id="personagemGirafa" style="background:#ffb74d;">🦒<br><span>GIRAFINHA<br>GINA</span></div>
+            <div class="personagem" id="personagemCoelho" style="background:#e91e63;">🐰<br><span>COELHINHA<br>LILI</span></div>
         </div>
     </div>
 
