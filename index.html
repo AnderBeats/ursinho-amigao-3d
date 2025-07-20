@@ -119,7 +119,7 @@
             border-radius: 8px;
             z-index: 10;
             font-size: 1.1em;
-            display: none; /* Oculta o HUD por padrão */
+            display: flex; /* Always flex to maintain layout */
             flex-direction: row; /* Use flexbox for columns */
             justify-content: space-between; /* Distribute space between columns */
             width: 90%; /* Occupy most of the width */
@@ -709,11 +709,6 @@
             tempo = BASE_TIME - (currentLevel - 1) * TIME_DECREMENT_PER_LEVEL;
             if (tempo < 10) tempo = 10; // Garante que o tempo mínimo seja 10s
 
-            // Atualiza o tempo no HUD imediatamente ao iniciar a fase
-            if (tempoDisplayElement) {
-                tempoDisplayElement.innerText = `Tempo: ${tempo}s`;
-            }
-
             coletando = false;
             hasKey = false;
             
@@ -974,10 +969,14 @@
                 // Decrementa o tempo a cada segundo
                 if (tempo > 0) {
                     tempo--;
-                    if (tempoDisplayElement) {
-                        tempoDisplayElement.innerText = `Tempo: ${tempo}s`;
+                    // Obtenha a referência ao elemento 'tempo' aqui, dentro do setInterval
+                    const currentTempoElement = document.getElementById('tempo');
+                    if (currentTempoElement) {
+                        currentTempoElement.innerText = `Tempo: ${tempo}s`; // Atualiza o texto do tempo
+                    } else {
+                        console.error("Erro: Elemento 'tempo' não encontrado no DOM (dentro do setInterval).");
                     }
-                    console.log(`DEBUG: Cronômetro rodando. Tempo atual: ${tempo}s. Elemento: `, tempoDisplayElement); // Log de depuração detalhado
+                    console.log(`DEBUG: Cronômetro rodando. Tempo atual: ${tempo}s. Elemento: `, currentTempoElement); // Log de depuração detalhado
                 }
 
                 let winConditionMet = false;
@@ -988,19 +987,19 @@
                 } else if (currentPhase === 3) {
                     winConditionMet = (trofeusColetados >= TOTAL_TROFEUS && bolasColetadas >= TOTAL_BOLAS_FASE3 && pipasColetadas >= TOTAL_PIPAS);
                 } else if (currentPhase === 4) {
-                    winConditionMet = (tubosEnsaioColetados >= TOTAL_TUBOS_ENSAIO && imasColetados >= TOTAL_IMAS && microscopioColetados >= TOTAL_MICROSCOPIO); // Updated win condition
+                    winConditionMet = (tubosEnsaioColetados >= TOTAL_TUBOS_ENSAIO && imasColetados >= TOTAL_IMAS && microscopioColetados >= TOTAL_MICROSCOPIO);
                 } else if (currentPhase === 5) {
                     winConditionMet = (elefantesColetados >= TOTAL_ELEFANTES && leoesColetados >= TOTAL_LEOES && avesColetadas >= TOTAL_AVES);
                 } else if (currentPhase === 6) {
-                    winConditionMet = (pinturasColetadas === TOTAL_PINTURAS && esculturasColetadas === TOTAL_ESCULTURAS && fosseisColetados >= TOTAL_FOSSEIS); // Updated win condition
+                    winConditionMet = (pinturasColetadas === TOTAL_PINTURAS && esculturasColetadas === TOTAL_ESCULTURAS && fosseisColetados >= TOTAL_FOSSEIS);
                 } else if (currentPhase === 7) {
-                    winConditionMet = (cestasPiqueniqueColetadas >= TOTAL_CESTAS_PIQUENIQUE && bolasFase7Coletadas >= TOTAL_BOLAS_FASE7 && brinquedosParqueColetados >= TOTAL_BRINQUEDOS_PARQUE); // Updated win condition
+                    winConditionMet = (cestasPiqueniqueColetadas >= TOTAL_CESTAS_PIQUENIQUE && bolasFase7Coletadas >= TOTAL_BOLAS_FASE7 && brinquedosParqueColetados >= TOTAL_BRINQUEDOS_PARQUE);
                 } else if (currentPhase === 8) {
                     winConditionMet = (livroAventuraColetados >= TOTAL_LIVRO_AVENTURA && livroAnimaisColetados >= TOTAL_LIVRO_ANIMAIS && livroFabulaColetados >= TOTAL_LIVRO_FABULA);
                 } else if (currentPhase === 9) {
                     winConditionMet = (lixeiraReciclagemColetados >= TOTAL_LIXEIRA_RECICLAGEM && garrafaPlasticoColetados >= TOTAL_GARRAFA_PLASTICO && arvoreMudaColetados >= TOTAL_ARVORE_MUDA);
                 } else if (currentPhase === 10) {
-                    winConditionMet = (plantaNativaColetados >= TOTAL_PLANTAS_NATIVAS && animalSelvagemColetados >= TOTAL_ANIMAIS_SELVAGENS && telescopioColetados >= TOTAL_TELESCOPIO); // Updated win condition
+                    winConditionMet = (plantaNativaColetados >= TOTAL_PLANTAS_NATIVAS && animalSelvagemColetados >= TOTAL_ANIMAIS_SELVAGENS && telescopioColetados >= TOTAL_TELESCOPIO);
                 } else if (currentPhase === 11) {
                     winConditionMet = (pincelColetados >= TOTAL_PINCEL && tintaColetados >= TOTAL_TINTA && argilaColetados >= TOTAL_ARGILA);
                 } else if (currentPhase === 12) {
@@ -1158,20 +1157,22 @@
 
             const placedObjects = []; // Para controlar a sobreposição
 
-            // Define uma área segura no centro para o jogador (35% da menor dimensão do canvas)
-            const safeZoneRadius = Math.min(canvas.width, canvas.height) * 0.35; 
+            // Define uma área segura fixa no centro para o jogador (200x200 pixels)
+            const playerSafeZoneSize = 200; 
             const playerSafeZone = {
-                x: canvas.width / 2 - safeZoneRadius,
-                y: canvas.height / 2 - safeZoneRadius,
-                width: safeZoneRadius * 2,
-                height: safeZoneRadius * 2
+                x: canvas.width / 2 - playerSafeZoneSize / 2,
+                y: canvas.height / 2 - playerSafeZoneSize / 2,
+                width: playerSafeZoneSize,
+                height: playerSafeZoneSize
             };
 
             function getRandomPosition(objSize, isObstacle = false) {
                 let newX, newY, collision;
                 let attempts = 0;
                 const maxAttempts = 1000; // Aumentado para mais chances de posicionamento
-                const exclusionZoneFactor = 15.0; // Aumentado para garantir um espaçamento ainda maior entre os objetos
+                // Define a distância mínima de afastamento para objetos (2 vezes o tamanho de um obstáculo)
+                // Isso garante que mesmo itens pequenos terão um bom espaçamento se colocados perto de obstáculos.
+                const minClearanceBetweenObjects = 2 * OBSTACLE_SIZE; // Use OBSTACLE_SIZE as a reference for spacing
 
                 do {
                     collision = false;
@@ -1182,13 +1183,13 @@
 
                     // Verifica colisão com objetos já posicionados
                     for (const placedObj of placedObjects) {
-                        const expandedRect = {
-                            x: placedObj.x - (objSize * (exclusionZoneFactor - 1) / 2),
-                            y: placedObj.y - (objSize * (exclusionZoneFactor - 1) / 2),
-                            width: placedObj.width * exclusionZoneFactor,
-                            height: placedObj.height * exclusionZoneFactor
-                        };
-                        if (checkCollision(newRect, expandedRect)) {
+                        // Calcula a distância mínima necessária entre os centros dos objetos
+                        const requiredMinDistanceX = (newRect.width / 2) + (placedObj.width / 2) + minClearanceBetweenObjects;
+                        const requiredMinDistanceY = (newRect.height / 2) + (placedObj.height / 2) + minClearanceBetweenObjects;
+
+                        // Verifica se os objetos estão muito próximos
+                        if (Math.abs(newRect.x + newRect.width / 2 - (placedObj.x + placedObj.width / 2)) < requiredMinDistanceX &&
+                            Math.abs(newRect.y + newRect.height / 2 - (placedObj.y + placedObj.height / 2)) < requiredMinDistanceY) {
                             collision = true;
                             break;
                         }
@@ -1203,7 +1204,7 @@
                 } while (collision && attempts < maxAttempts);
 
                 if (attempts === maxAttempts) {
-                    console.warn("AVISO: Não foi possível encontrar uma posição livre para o objeto após ${maxAttempts} tentativas. Pode haver sobreposição.");
+                    console.warn(`AVISO: Não foi possível encontrar uma posição livre para o objeto de tamanho ${objSize} após ${maxAttempts} tentativas. Pode haver sobreposição.`);
                 }
                 return { x: newX, y: newY, width: objSize, height: objSize };
             }
@@ -1426,7 +1427,7 @@
                 }
 
 
-                // Depois verifica itens escolares coletáveis (se houver)
+                // Depois verifica itens escolares não coletáveis (se houver)
                 for (let i = 0; i < schoolItems.length; i++) {
                     if (schoolItems[i].canBeCollected && checkCollision(player, schoolItems[i])) {
                         const collectedItem = schoolItems.splice(i, 1)[0];
@@ -1475,62 +1476,80 @@
 
         // Atualiza a exibição do HUD
         function atualizarHUD() {
-            // As referências aos elementos do HUD são globais e já foram inicializadas.
-            // Não é necessário re-inicializá-las aqui.
+            // Obtenha as referências dos elementos do HUD aqui para garantir que são válidas
+            const currentVidasDisplayElement = document.getElementById('vidasDisplay');
+            const currentHudObjectiveLine1Element = document.getElementById('hudObjectiveLine1');
+            const currentHudObjectiveLine2Element = document.getElementById('hudObjectiveLine2');
+            const currentTotalAllItemsCollectedDisplayElement = document.getElementById('totalAllItemsCollectedDisplay');
+            const currentTempoDisplayElement = document.getElementById('tempo');
 
             let coracao = "❤️".repeat(vidas); // Exibe corações com base nas vidas
-            let hudLeftColumnContent = '';
-            let hudRightColumnContent = '';
+            let objectiveLine1Content = ''; // Conteúdo para a linha 1 do objetivo
+            let objectiveLine2Content = ''; // Conteúdo para a linha 2 do objetivo
             let hudTotalCollectedContent = `Total Coletado: ${totalAllItemsCollected}`;
             let hudTempoContent = `Tempo: ${tempo}s`;
 
             // HUD content for Phase 1
             if (currentPhase === 1) {
-                hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
-                // Atualizado para verificar chest.isOpened
-                hudRightColumnContent = `🔴 Pedras: ${pedrasColetadas} / ${TOTAL_PEDRAS}<br>🔑 Chaves: ${keysColetadas} / ${TOTAL_CHAVES}<br>📦 Baú: ${chest && chest.isOpened ? '1/1 🔓' : '0/1 🔒'}`;
+                objectiveLine1Content = `🔴 Pedras: ${pedrasColetadas} / ${TOTAL_PEDRAS}`;
+                objectiveLine2Content = `🔑 Chave: ${keysColetadas} / ${TOTAL_CHAVES}<br>📦 Baú: ${chest && chest.isOpened ? '1/1 🔓' : '0/1 🔒'}`;
             } else if (currentPhase === 2) {
-                hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
-                hudRightColumnContent = `🎟️ Vales Sorvete: ${valesSorveteColetados} / ${TOTAL_VALES_SORVETE}<br>🍫🍦 Sorvetes: ${sorvetesObjetivoColetados} / ${TOTAL_SORVETES_OBJETIVO}`;
+                objectiveLine1Content = `🎟️ Vales Sorvete: ${valesSorveteColetados} / ${TOTAL_VALES_SORVETE}`;
+                objectiveLine2Content = `🍫🍦 Sorvetes: ${sorvetesObjetivoColetados} / ${TOTAL_SORVETES_OBJETIVO}`;
             } else if (currentPhase === 3) {
-                hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
-                hudRightColumnContent = `🏆 Troféus: ${trofeusColetados} / ${TOTAL_TROFEUS}<br>⚽ Bolas: ${bolasColetadas} / ${TOTAL_BOLAS_FASE3}<br>🪁 Pipas: ${pipasColetadas} / ${TOTAL_PIPAS}`;
+                objectiveLine1Content = `🏆 Troféus: ${trofeusColetados} / ${TOTAL_TROFEUS}`;
+                objectiveLine2Content = `⚽ Bolas: ${bolasColetadas} / ${TOTAL_BOLAS_FASE3}<br>🪁 Pipas: ${pipasColetadas} / ${TOTAL_PIPAS}`;
             } else if (currentPhase === 4) {
-                hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
-                hudRightColumnContent = `🧪 Tubos Ensaio: ${tubosEnsaioColetados} / ${TOTAL_TUBOS_ENSAIO}<br>🧲 Ímãs: ${imasColetados} / ${TOTAL_IMAS}<br>🔬 Microscópios: ${microscopioColetados} / ${TOTAL_MICROSCOPIO}`;
+                objectiveLine1Content = `🧪 Tubos Ensaio: ${tubosEnsaioColetados} / ${TOTAL_TUBOS_ENSAIO}`;
+                objectiveLine2Content = `🧲 Ímãs: ${imasColetados} / ${TOTAL_IMAS}<br>🔬 Microscópios: ${microscopioColetados} / ${TOTAL_MICROSCOPIO}`;
             } else if (currentPhase === 5) {
-                hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
-                hudRightColumnContent = `🐘 Elefantes: ${elefantesColetados} / ${TOTAL_ELEFANTES}<br>🦁 Leões: ${leoesColetados} / ${TOTAL_LEOES}<br>🦜 Aves: ${avesColetadas} / ${TOTAL_AVES}`;
+                objectiveLine1Content = `🐘 Elefantes: ${elefantesColetados} / ${TOTAL_ELEFANTES}`;
+                objectiveLine2Content = `🦁 Leões: ${leoesColetados} / ${TOTAL_LEOES}<br>🦜 Aves: ${avesColetadas} / ${TOTAL_AVES}`;
             } else if (currentPhase === 6) {
-                hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
-                hudRightColumnContent = `🎨 Pinturas: ${pinturasColetadas} / ${TOTAL_PINTURAS}<br>🗿 Esculturas: ${esculturasColetadas} / ${TOTAL_ESCULTURAS}<br>🦴 Fósseis: ${fosseisColetados} / ${TOTAL_FOSSEIS}`;
+                objectiveLine1Content = `🎨 Pinturas: ${pinturasColetadas} / ${TOTAL_PINTURAS}`;
+                objectiveLine2Content = `🗿 Esculturas: ${esculturasColetadas} / ${TOTAL_ESCULTURAS}<br>🦴 Fósseis: ${fosseisColetados} / ${TOTAL_FOSSEIS}`;
             } else if (currentPhase === 7) {
-                hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
-                hudRightColumnContent = `🧺 Cestas Piquenique: ${cestasPiqueniqueColetadas} / ${TOTAL_CESTAS_PIQUENIQUE}<br>⚽ Bolas: ${bolasFase7Coletadas} / ${TOTAL_BOLAS_FASE7}<br>🎠 Brinquedos: ${brinquedosParqueColetados} / ${TOTAL_BRINQUEDOS_PARQUE}`;
+                objectiveLine1Content = `🧺 Cestas Piquenique: ${cestasPiqueniqueColetadas} / ${TOTAL_CESTAS_PIQUENIQUE}`;
+                objectiveLine2Content = `⚽ Bolas: ${bolasFase7Coletadas} / ${TOTAL_BOLAS_FASE7}<br>🎠 Brinquedos: ${brinquedosParqueColetados} / ${TOTAL_BRINQUEDOS_PARQUE}`;
             } else if (currentPhase === 8) {
-                hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
-                hudRightColumnContent = `🗺️ Aventura: ${livroAventuraColetados} / ${TOTAL_LIVRO_AVENTURA}<br>🦁 Animais: ${livroAnimaisColetados} / ${TOTAL_LIVRO_ANIMAIS}<br>📜 Fábula: ${livroFabulaColetados} / ${TOTAL_LIVRO_FABULA}`;
+                objectiveLine1Content = `📖 Aventura: ${livroAventuraColetados} / ${TOTAL_LIVRO_AVENTURA}`;
+                objectiveLine2Content = `🦁 Animais: ${livroAnimaisColetados} / ${TOTAL_LIVRO_ANIMAIS}<br>📜 Fábula: ${livroFabulaColetados} / ${TOTAL_LIVRO_FABULA}`;
             } else if (currentPhase === 9) {
-                hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
-                hudRightColumnContent = `♻️ Reciclagem: ${lixeiraReciclagemColetados} / ${TOTAL_LIXEIRA_RECICLAGEM}<br>🧴 Plástico: ${garrafaPlasticoColetados} / ${TOTAL_GARRAFA_PLASTICO}<br>🌱 Árvore: ${arvoreMudaColetados} / ${TOTAL_ARVORE_MUDA}`;
+                objectiveLine1Content = `♻️ Reciclagem: ${lixeiraReciclagemColetados} / ${TOTAL_LIXEIRA_RECICLAGEM}`;
+                objectiveLine2Content = `🧴 Plástico: ${garrafaPlasticoColetados} / ${TOTAL_GARRAFA_PLASTICO}<br>🌱 Árvore: ${arvoreMudaColetados} / ${TOTAL_ARVORE_MUDA}`;
             } else if (currentPhase === 10) {
-                hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
-                hudRightColumnContent = `🌿 Plantas: ${plantaNativaColetados} / ${TOTAL_PLANTAS_NATIVAS}<br>🦁 Animais: ${animalSelvagemColetados} / ${TOTAL_ANIMAIS_SELVAGENS}<br>🔭 Telescópios: ${telescopioColetados} / ${TOTAL_TELESCOPIO}`;
+                objectiveLine1Content = `🌿 Plantas: ${plantaNativaColetados} / ${TOTAL_PLANTAS_NATIVAS}`;
+                objectiveLine2Content = `🦁 Animais: ${animalSelvagemColetados} / ${TOTAL_ANIMAIS_SELVAGENS}<br>🔭 Telescópios: ${telescopioColetados} / ${TOTAL_TELESCOPIO}`;
             } else if (currentPhase === 11) {
-                hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
-                hudRightColumnContent = `🖌️ Pincéis: ${pincelColetados} / ${TOTAL_PINCEL}<br>🎨 Tintas: ${tintaColetados} / ${TOTAL_TINTA}<br>🏺 Argila: ${argilaColetados} / ${TOTAL_ARGILA}`;
+                objectiveLine1Content = `🖌️ Pincéis: ${pincelColetados} / ${TOTAL_PINCEL}`;
+                objectiveLine2Content = `🎨 Tintas: ${tintaColetados} / ${TOTAL_TINTA}<br>🏺 Argila: ${argilaColetados} / ${TOTAL_ARGILA}`;
             } else if (currentPhase === 12) {
-                hudLeftColumnContent = `Vidas: ${coracao}<br>${hudTotalCollectedContent}<br>${hudTempoContent}`;
-                hudRightColumnContent = `🎸 Violão: ${violaoColetados} / ${TOTAL_VIOLAO}<br>🎹 Piano: ${pianoColetados} / ${TOTAL_PIANO}<br>🎤 Microfone: ${microfoneColetados} / ${TOTAL_MICROFONE}`;
+                objectiveLine1Content = `🎸 Violão: ${violaoColetados} / ${TOTAL_VIOLAO}`;
+                objectiveLine2Content = `🎹 Piano: ${pianoColetados} / ${TOTAL_PIANO}<br>🎤 Microfone: ${microfoneColetados} / ${TOTAL_MICROFONE}`;
             }
 
-            const hudLeftColumnElement = document.querySelector('#hud .hud-column:first-child');
-            const hudRightColumnElement = document.querySelector('#hud .hud-column:last-child');
+            // Atualiza o texto dos elementos do HUD
+            if (currentVidasDisplayElement) currentVidasDisplayElement.innerText = `Vidas: ${coracao}`; // Adiciona o rótulo "Vidas:"
+            if (currentTotalAllItemsCollectedDisplayElement) currentTotalAllItemsCollectedDisplayElement.innerText = `Total Coletado: ${totalAllItemsCollected}`;
+            if (currentTempoDisplayElement) currentTempoDisplayElement.innerText = `Tempo: ${tempo}s`; // Adiciona o rótulo "Tempo:"
 
-            if (hudLeftColumnElement) hudLeftColumnElement.innerHTML = hudLeftColumnContent;
-            if (hudRightColumnElement) hudRightColumnElement.innerHTML = hudRightColumnContent;
+            if (currentHudObjectiveLine1Element) currentHudObjectiveLine1Element.innerHTML = objectiveLine1Content;
+            if (currentHudObjectiveLine2Element) currentHudObjectiveLine2Element.innerHTML = objectiveLine2Content;
         }
 
+        // Exibe a mensagem de fim de jogo em um modal e recarrega
+        function encerrar(msg) {
+            console.log("Encerrar chamado com mensagem:", msg); // Log de depuração
+            clearInterval(gameInterval); // Para o temporador do jogo
+            document.getElementById('llmHintMessage').style.display = 'none'; // Oculta a mensagem de dica LLM
+            if (hintTimeout) clearTimeout(hintTimeout); // Limpa qualquer timeout de dica
+
+            const modal = document.getElementById('gameModal');
+            document.getElementById('modalMessage').innerText = msg;
+            modal.style.display = 'flex'; // Mostra o modal
+        }
+
+        // Exibe uma mensagem temporária no centro da tela
         function showTemporaryMessage(msg, duration) {
             const tempMessageDiv = document.getElementById('temporaryMessage');
             if (tempMessageDiv) {
@@ -1542,6 +1561,7 @@
             }
         }
 
+        // Exibe a tela de continue
         function showContinueScreen() {
             document.getElementById('continueModal').style.display = 'flex';
             continueTime = 10;
@@ -1558,6 +1578,7 @@
             }, 1000);
         }
 
+        // Lida com a escolha do jogador na tela de continue
         function handleContinue(choice) {
             clearInterval(continueCountdownInterval);
             document.getElementById('continueModal').style.display = 'none';
@@ -1737,12 +1758,15 @@
                     title += "Aventura Desconhecida";
             }
             document.title = title;
-            if (chapterTitleDisplayElement) {
-                chapterTitleDisplayElement.innerText = title.split(" - ")[1];
+            // Obtenha a referência ao elemento chapterTitleDisplayElement aqui
+            const currentChapterTitleDisplayElement = document.getElementById('chapterTitleDisplay');
+            if (currentChapterTitleDisplayElement) {
+                currentChapterTitleDisplayElement.innerText = title.split(" - ")[1];
             }
         }
 
         window.onload = function () {
+            // Obtenha as referências globais aos elementos do HUD aqui
             vidasDisplayElement = document.getElementById('vidasDisplay');
             hudObjectiveLine1Element = document.getElementById('hudObjectiveLine1');
             hudObjectiveLine2Element = document.getElementById('hudObjectiveLine2');
