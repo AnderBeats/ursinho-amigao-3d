@@ -537,8 +537,7 @@
 
     <!-- Tags de áudio para as trilhas sonoras -->
     <audio id="introMusic" src="https://raw.githack.com/AnderBeats/ursinho-amigao-3d/main/Ursinho%20Trilha/Abertura_Fim.mp3" preload="auto" loop></audio>
-    <audio id="phaseMusic" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" preload="auto" loop></audio>
-    <!-- Adicione mais tags <audio> para cada fase, se necessário, com IDs como "phase2Music", "phase3Music", etc. -->
+    <!-- Removida a tag de música de fase, pois apenas a música de abertura será utilizada por enquanto. -->
 
     <!-- Script principal do jogo -->
     <script>
@@ -667,18 +666,24 @@
         
         // Variáveis de áudio
         let introMusicElement;
-        let phaseMusicElement; // Uma música genérica para as fases
+        // Removida a variável phaseMusicElement, pois apenas introMusicElement será usada.
         let currentMusic = null; // Para controlar a música que está tocando atualmente
 
         // Função para tocar uma música, pausando a anterior se houver
         function playMusic(musicElement) {
-            if (currentMusic && currentMusic !== musicElement) {
-                currentMusic.pause();
-                currentMusic.currentTime = 0; // Reinicia a música para o começo
-            }
-            if (musicElement) {
-                musicElement.play().catch(e => console.log("Erro ao tocar música (pode precisar de interação do usuário):", e));
+            // Se a música atual não é a que queremos tocar ou se não há música tocando, ajusta.
+            if (currentMusic !== musicElement) {
+                if (currentMusic) {
+                    currentMusic.pause();
+                    currentMusic.currentTime = 0; // Reinicia a música para o começo
+                }
                 currentMusic = musicElement;
+                if (currentMusic) {
+                    currentMusic.play().catch(e => console.log("Erro ao tocar música (pode precisar de interação do usuário):", e));
+                }
+            } else if (currentMusic && currentMusic.paused) {
+                // Se a mesma música já está selecionada mas está pausada, tenta tocar.
+                currentMusic.play().catch(e => console.log("Erro ao retomar música (pode precisar de interação do usuário):", e));
             }
         }
 
@@ -702,9 +707,10 @@
             document.getElementById("personagemSelecao").style.display = 'none'; // Esconde a tela de seleção
             currentPlayerType = tipo; // Armazena o tipo de personagem
 
-            // Parar música de introdução e iniciar música da fase
-            stopAllMusic();
-            playMusic(phaseMusicElement);
+            // A música de introdução deve continuar tocando na fase 1.
+            // Se houvesse músicas diferentes para as fases, a lógica seria aqui.
+            // Por enquanto, apenas garantimos que a introMusic esteja tocando.
+            playMusic(introMusicElement); // Garante que a música de introdução continue tocando
 
             iniciar(tipo, 1); // Inicia o jogo na Fase 1
         }
@@ -1245,12 +1251,13 @@
 
             // Obtenha referências aos elementos de áudio
             introMusicElement = document.getElementById('introMusic');
-            phaseMusicElement = document.getElementById('phaseMusic');
+            // A música de fase não é mais necessária, pois a música de introdução será a única.
             
             // Tentar tocar a música de introdução. Pode falhar devido a políticas de autoplay.
             if (introMusicElement) {
                 introMusicElement.volume = 0.5; // Define um volume padrão
                 introMusicElement.play().catch(e => console.log("Autoplay de música de introdução bloqueado ou erro:", e));
+                currentMusic = introMusicElement; // Define a música de introdução como a música atual
             }
 
             console.log("DEBUG: tempoDisplayElement no onload:", tempoDisplayElement); // Debug: verificar se o elemento é encontrado
@@ -1332,29 +1339,19 @@
 
             if (soundControlBtn && soundOnIcon && soundOffIcon) {
                 soundControlBtn.addEventListener('click', () => {
-                    if (currentMusic) {
-                        currentMusic.muted = !currentMusic.muted; // Alterna o estado mudo
-                        if (currentMusic.muted) {
+                    if (introMusicElement) { // Agora só controlamos introMusicElement
+                        introMusicElement.muted = !introMusicElement.muted; // Alterna o estado mudo
+                        if (introMusicElement.muted) {
                             soundOnIcon.style.display = 'none';
                             soundOffIcon.style.display = 'block';
                         } else {
                             soundOnIcon.style.display = 'block';
                             soundOffIcon.style.display = 'none';
-                            currentMusic.play().catch(e => console.log("Erro ao tentar tocar música após desmutar:", e));
+                            // Tenta tocar apenas se não estiver tocando (para evitar múltiplos play() chamadas)
+                            if (introMusicElement.paused) {
+                                introMusicElement.play().catch(e => console.log("Erro ao tentar tocar música após desmutar:", e));
+                            }
                         }
-                    } else {
-                        // Se não há música tocando, tenta tocar a música da fase (ou introdução)
-                        if (currentPhase === 0 && introMusicElement) { // Assumindo fase 0 para introdução
-                            introMusicElement.muted = false;
-                            introMusicElement.play().catch(e => console.log("Erro ao tentar tocar música de introdução:", e));
-                            currentMusic = introMusicElement;
-                        } else if (phaseMusicElement) { // Ou a música da fase atual
-                            phaseMusicElement.muted = false;
-                            phaseMusicElement.play().catch(e => console.log("Erro ao tentar tocar música da fase:", e));
-                            currentMusic = phaseMusicElement;
-                        }
-                        soundOnIcon.style.display = 'block';
-                        soundOffIcon.style.display = 'none';
                     }
                 });
             }
