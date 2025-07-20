@@ -948,7 +948,7 @@
 
 
             // Gera os obstáculos temáticos da escola (comum para todas as fases)
-            for (let i = 0; i < 2; i++) { // Loop para 2 de cada tipo
+            for (let i = 0; i < 3; i++) { // Loop para 3 de cada tipo
                 obstaculos.push(createGameObject('mesa', '🔲', OBSTACLE_SIZE, false, true)); // Alterado emoji da mesa
                 obstaculos.push(createGameObject('cadeira', '🪑', OBSTACLE_SIZE, false, true));
                 obstaculos.push(createGameObject('armario', '🚪', OBSTACLE_SIZE, false, true));
@@ -968,7 +968,7 @@
 
             atualizarHUD(); // Atualiza o HUD com o novo total e objetivo
 
-            // Limpa qualquer temporizador anterior e inicia o novo
+            // Limpa qualquer temporador anterior e inicia o novo
             if (gameInterval) clearInterval(gameInterval);
             gameInterval = setInterval(() => {
                 // Decrementa o tempo a cada segundo
@@ -977,7 +977,7 @@
                     if (tempoDisplayElement) {
                         tempoDisplayElement.innerText = `Tempo: ${tempo}s`;
                     }
-                    console.log(`DEBUG: Tempo: ${tempo}s`); // Mantido para depuração, pode ser removido
+                    console.log(`DEBUG: Cronômetro rodando. Tempo atual: ${tempo}s. Elemento: `, tempoDisplayElement); // Log de depuração detalhado
                 }
 
                 let winConditionMet = false;
@@ -1171,7 +1171,7 @@
                 let newX, newY, collision;
                 let attempts = 0;
                 const maxAttempts = 1000; // Aumentado para mais chances de posicionamento
-                const exclusionZoneFactor = 7.0; // Aumentado para garantir um espaçamento ainda maior entre os objetos
+                const exclusionZoneFactor = 15.0; // Aumentado para garantir um espaçamento ainda maior entre os objetos
 
                 do {
                     collision = false;
@@ -1203,7 +1203,7 @@
                 } while (collision && attempts < maxAttempts);
 
                 if (attempts === maxAttempts) {
-                    console.warn("Não foi possível encontrar uma posição livre para um objeto. Pode haver sobreposição.");
+                    console.warn("AVISO: Não foi possível encontrar uma posição livre para o objeto após ${maxAttempts} tentativas. Pode haver sobreposição.");
                 }
                 return { x: newX, y: newY, width: objSize, height: objSize };
             }
@@ -1751,6 +1751,8 @@
             chapterTitleDisplayElement = document.getElementById('chapterTitleDisplay');
             objetivoFaseElement = document.getElementById('objetivoFase');
 
+            console.log("DEBUG: tempoDisplayElement no onload:", tempoDisplayElement); // Debug: verificar se o elemento é encontrado
+
             const introScreen = document.getElementById('introScreen');
             const personagemSelecao = document.getElementById('personagemSelecao');
             
@@ -1824,7 +1826,7 @@
             document.getElementById('btnSim').addEventListener('click', () => handleContinue('sim'));
             document.getElementById('btnNao').addEventListener('click', () => handleContinue('nao'));
 
-            atualizarHUD();
+            atualizarHUD(); // Atualiza o HUD com os valores iniciais
         };
     </script>
 </body>
