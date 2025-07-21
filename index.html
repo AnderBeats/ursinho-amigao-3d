@@ -103,17 +103,10 @@
             font-weight: bold;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Sombra suave */
             transition: transform 0.2s, background-color 0.2s; /* Transição suave */
-            text-align: center; /* Adicionado para centralizar o texto dentro da caixinha */
-            font-size: 3em; /* Ajustado o tamanho do emoji para caber na caixa */
         }
         .personagem:hover {
             background-color: #ffd54f; /* Amarelo ao passar o mouse */
             transform: translateY(-5px); /* Efeito de elevação ao passar o mouse */
-        }
-        .personagem span { /* Estilo para o nome do personagem */
-            font-size: 0.3em; /* Reduz o tamanho da fonte para o nome */
-            display: block; /* Garante que o nome fique em uma nova linha */
-            margin-top: 0.2em; /* Ajusta a margem para aproximar o nome do emoji e subir o emoji */
         }
         #hud {
             position: absolute;
@@ -211,8 +204,8 @@
             border-radius: 8px;
             box-shadow: 0 0 15px rgba(0,0,0,0.3);
             display: block; /* Remove espaço extra abaixo do canvas */
-            width: 90%; /* Ocupa 90% da largura da janela */
-            height: 80vh; /* Ocupa 80% da altura da viewport */
+            max-width: 90%; /* Limita a largura para telas grandes */
+            max-height: 80vh; /* Limita a altura para telas grandes */
             margin: 20px auto; /* Centraliza o canvas */
         }
 
@@ -314,37 +307,6 @@
             white-space: nowrap; /* Evita quebra de linha */
         }
 
-        /* Botão de controle de som */
-        #soundControlBtn {
-            position: fixed;
-            bottom: 20px; /* Ajuste conforme necessário para não colidir com outros botões */
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px; /* Tamanho do botão */
-            height: 60px;
-            background: rgba(255, 255, 255, 0.3);
-            border: none;
-            border-radius: 50%; /* Redondo */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px; /* Tamanho do ícone */
-            color: white;
-            box-shadow: 0 3px 5px rgba(0,0,0,0.2);
-            cursor: pointer;
-            z-index: 10;
-            transition: background 0.2s, transform 0.1s;
-        }
-        #soundControlBtn:active {
-            background: rgba(255, 255, 255, 0.5);
-            transform: translateX(-50%) translateY(2px);
-        }
-        #soundControlBtn svg {
-            width: 30px; /* Tamanho do SVG */
-            height: 30px;
-        }
-
-
         /* Media Queries for Mobile Adjustments */
         @media (max-width: 768px) {
             #introImagePlaceholder {
@@ -414,6 +376,12 @@
                 font-size: 0.75em; /* Smaller font for very small screens */
                 flex-direction: column; /* Stack columns vertically on very small screens */
                 align-items: center; /* Center stacked columns */
+                width: 95%; /* Take full width when stacked */
+            }
+            .hud-column {
+                width: 100%; /* Take full width when stacked */
+                align-items: center; /* Center text when stacked */
+                padding: 5px 0; /* Adjust padding */
             }
             .hud-column:last-child {
                 align-items: center; /* Center text when stacked */
@@ -462,10 +430,10 @@
     <div id="personagemSelecao">
         <h2>Escolha seu personagem</h2>
         <div class="personagem-opcoes">
-            <div class="personagem" id="personagemUrso" style="background:#f4c542;">🐻<br><span>URSINHO<br>AMIGÃO</span></div>
-            <div class="personagem" id="personagemGato" style="background:#8bc34a;">🐱<br><span>GATINHO<br>TITO</span></div>
-            <div class="personagem" id="personagemGirafa" style="background:#ffb74d;">🦒<br><span>GIRAFINHA<br>GINA</span></div>
-            <div class="personagem" id="personagemCoelho" style="background:#e91e63;">🐰<br><span>COELHINHA<br>LILI</span></div>
+            <div class="personagem" id="personagemUrso" style="background:#f4c542;">🐻<br>Urso</div>
+            <div class="personagem" id="personagemGato" style="background:#8bc34a;">🐱<br>Gato</div>
+            <div class="personagem" id="personagemGirafa" style="background:#ffb74d;">🦒<br>Girafa</div>
+            <div class="personagem" id="personagemCoelho" style="background:#e91e63;">🐰<br>Coelha</div>
         </div>
     </div>
 
@@ -506,12 +474,6 @@
     <!-- Botão de Ação para Celular -->
     <button id="botao-acao" class="botao-jogo">A</button>
 
-    <!-- Botão de controle de som -->
-    <button id="soundControlBtn" class="botao-jogo">
-        <svg id="soundOnIcon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-volume-2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
-        <svg id="soundOffIcon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-volume-x" style="display: none;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
-    </button>
-
     <!-- Mensagem de Dica LLM -->
     <div id="llmHintMessage" style="display: none;">
         Aguarde a dica...
@@ -530,15 +492,10 @@
         </div>
     </div>
 
-    <!-- Tags de áudio para as trilhas sonoras -->
-    <audio id="introMusic" src="https://raw.githack.com/AnderBeats/ursinho-amigao-3d/main/Ursinho%20Trilha/Abertura_Fim.mp3" preload="auto" loop></audio>
-    <!-- Removida a tag de música de fase, pois apenas a música de introdução será utilizada por enquanto. -->
-
     <!-- Script principal do jogo -->
     <script>
         // Variáveis globais para o canvas 2D e estado do jogo
-        let canvas; 
-        let ctx;    
+        let canvas, ctx;
         let player;
         let teclas = {}; // Armazena o estado das teclas pressionadas
         let itens = []; // Array para todos os itens do tesouro (coletáveis)
@@ -651,7 +608,7 @@
         var frameInterval = 1000 / targetFPS; // Intervalo de tempo entre frames em ms
         var lastFrameTime = 0; // Initialized globally
 
-        // Global references to HUD elements
+        // Global references to HUD elements, initialized in window.onload
         let vidasDisplayElement;
         let hudObjectiveLine1Element;
         let hudObjectiveLine2Element;
@@ -660,47 +617,500 @@
         let chapterTitleDisplayElement;
         let objetivoFaseElement;
         
-        // Variáveis de áudio
-        let introMusicElement;
-        let currentMusic = null; // Para controlar a música que está tocando atualmente
-
-        // Função para tocar uma música, pausando a anterior se houver
-        function playMusic(musicElement) {
-            // Se a música atual não é a que queremos tocar ou se não há música tocando, ajusta.
-            if (currentMusic !== musicElement) {
-                if (currentMusic) {
-                    currentMusic.pause();
-                    currentMusic.currentTime = 0; // Reinicia a música para o começo
-                }
-                currentMusic = musicElement;
-                if (currentMusic) {
-                    currentMusic.play().catch(e => console.log("Erro ao tocar música (pode precisar de interação do usuário):", e));
-                }
-            } else if (currentMusic && currentMusic.paused) {
-                // Se a mesma música já está selecionada mas está pausada, tenta tocar.
-                currentMusic.play().catch(e => console.log("Erro ao retomar música (pode precisar de interação do usuário):", e));
-            }
-        }
-
-        // Função para parar toda a música
-        function stopAllMusic() {
-            if (currentMusic) {
-                currentMusic.pause();
-                currentMusic.currentTime = 0;
-                currentMusic = null;
-            }
-        }
-
         // Função para atualizar o estado da tecla (para teclado e toque)
         function tecla(k, v) {
             teclas[k] = v;
         }
 
+        // Função para selecionar o personagem e iniciar o jogo
+        function selecionar(tipo) {
+            console.log("DEBUG: Selecionar personagem:", tipo); // Log para depuração
+            document.getElementById("personagemSelecao").style.display = 'none'; // Esconde a tela de seleção
+            currentPlayerType = tipo; // Armazena o tipo de personagem
+            iniciar(tipo, 1); // Inicia o jogo na Fase 1
+        }
+
+        // Inicializa o canvas 2D e os elementos do jogo
+        function iniciar(tipo, phase) {
+            console.log(`DEBUG: Iniciando o jogo 2D com personagem: ${tipo}, Fase: ${phase}`); // Log para depuração
+            currentPhase = phase; // Atualiza a fase atual
+
+            // Atualiza o título da página com o nome do capítulo
+            updatePageTitle(currentPhase);
+
+            // Garante que os modais estejam ocultos ao iniciar um novo jogo
+            document.getElementById('llmHintMessage').style.display = 'none';
+            document.getElementById('continueModal').style.display = 'none';
+            document.getElementById('temporaryMessage').style.display = 'none';
+
+            // Torna o HUD visível ao iniciar a fase
+            const hudElementDiv = document.getElementById('hud');
+            if (hudElementDiv) {
+                hudElementDiv.style.display = 'flex'; // Changed to flex for columns
+            }
+
+            // Se for um "continue", reinicia vidas para 3. Se for reinício de fase por tempo, apenas reinicia o tempo e itens.
+            if (continueCountdownInterval) { // Se veio do continue screen
+                clearInterval(continueCountdownInterval);
+                continueCountdownInterval = null;
+                continueTime = 10; // Reseta o contador para a próxima vez
+            } else if (vidas === 0) { // Se vidas chegou a 0 e não é um continue, então é um game over completo
+                vidas = 3; // Reinicia vidas se for um novo jogo após game over
+            }
+            // Se vidas > 0 (reinício de fase por tempo), vidas não é resetada aqui
+
+            canvas = document.getElementById('gameCanvas');
+            ctx = canvas.getContext('2d');
+
+            // Define o tamanho do canvas para preencher a área disponível
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            // Reinicia as variáveis de fase
+            pedrasColetadas = 0;
+            keysColetadas = 0; // Initialize keysColetadas
+            valesSorveteColetados = 0; 
+            sorvetesObjetivoColetados = 0;
+            trofeusColetados = 0; 
+            bolasColetadas = 0; 
+            pipasColetadas = 0; // Reset for new game
+            tubosEnsaioColetados = 0; 
+            imasColetados = 0; 
+            microscopioColetados = 0; // Reset for new game
+            elefantesColetados = 0; 
+            leoesColetados = 0; 
+            avesColetadas = 0; 
+            pinturasColetadas = 0; 
+            esculturasColetadas = 0; 
+            fosseisColetados = 0; 
+            cestasPiqueniqueColetadas = 0; 
+            bolasFase7Coletadas = 0; 
+            brinquedosParqueColetados = 0; 
+            totalAllItemsCollected = 0; // Reinicia a contagem total de itens coletados
+            
+            // Reinicia os contadores de objetivos específicos para cada fase
+            livroAventuraColetados = 0;
+            livroAnimaisColetados = 0;
+            livroFabulaColetados = 0;
+            lixeiraReciclagemColetados = 0;
+            garrafaPlasticoColetados = 0;
+            arvoreMudaColetados = 0;
+            plantaNativaColetados = 0;
+            animalSelvagemColetados = 0;
+            telescopioColetados = 0; // Reset for new game
+            pincelColetados = 0;
+            tintaColetados = 0;
+            argilaColetados = 0;
+            violaoColetados = 0;
+            pianoColetados = 0;
+            microfoneColetados = 0;
+
+            // Ajusta o tempo inicial com base no nível atual
+            tempo = BASE_TIME - (currentLevel - 1) * TIME_DECREMENT_PER_LEVEL;
+            if (tempo < 10) tempo = 10; // Garante que o tempo mínimo seja 10s
+
+            coletando = false;
+            hasKey = false;
+            
+            // Configura o personagem do jogador (posição inicial)
+            player = {
+                x: canvas.width / 2 - PLAYER_SIZE / 2,
+                y: canvas.height / 2 - PLAYER_SIZE / 2,
+                width: PLAYER_SIZE,
+                height: PLAYER_SIZE,
+                emoji: getCharacterEmoji(tipo)
+            };
+
+            itens = [];
+            obstaculos = [];
+            schoolItems = [];
+            
+            // Cria o baú do tesouro para a Fase 1 (com a nova propriedade isOpened)
+            if (currentPhase === 1) {
+                chest = createGameObject('bau', '📦', CHEST_SIZE, false, false);
+                chest.isOpened = false; // Novo: Estado inicial do baú
+            } else {
+                chest = null;
+            }
+
+            // Geração de 2 moedas em cada fase
+            itens.push(createGameObject('moeda', '💰', ITEM_SIZE, true, false, null, false));             // Moeda
+            itens.push(createGameObject('moeda', '💰', ITEM_SIZE, true, false, null, false));             // Outra moeda
+
+            if (currentPhase === 1) {
+                // Itens do objetivo principal da Fase 1: 3 Pedras e 3 Chaves
+                itens.push(createGameObject('pedra', '🔴', ITEM_SIZE, true, false, 'vermelha', true)); // Pedra vermelha (objetivo)
+                itens.push(createGameObject('pedra', '🟢', ITEM_SIZE, true, false, 'verde', true));   // Pedra verde (objetivo)
+                itens.push(createGameObject('pedra', '🔵', ITEM_SIZE, true, false, 'azul', true));    // Pedra azul (objetivo)
+                
+                itens.push(createGameObject('chave', '🔑', ITEM_SIZE, true, false, null, true)); // Chave dourada (objetivo)
+                itens.push(createGameObject('chave', '🔑', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('chave', '🔑', ITEM_SIZE, true, false, null, true));
+
+                // Outros itens coletáveis que não são do objetivo principal da Fase 1
+                itens.push(createGameObject('folha', '🍂', ITEM_SIZE, true, false, null, false));             // Folha encantada
+                itens.push(createGameObject('folha', '🍂', ITEM_SIZE, true, false, null, false));             // Outra folha encantada
+
+            } else if (currentPhase === 2) {
+                // Itens do objetivo principal da Fase 2: 4 Vales Sorvete e 4 Sorvetes de sabores específicos
+                itens.push(createGameObject('vale_sorvete', '🎟️', ITEM_SIZE, true, false, 'ticket', true)); // Ticket
+                itens.push(createGameObject('vale_sorvete', '🎟️', ITEM_SIZE, true, false, 'ticket', true));
+                itens.push(createGameObject('vale_sorvete', '🎟️', ITEM_SIZE, true, false, 'ticket', true));
+                itens.push(createGameObject('vale_sorvete', '🎟️', ITEM_SIZE, true, false, 'ticket', true));
+
+                itens.push(createGameObject('sorvete', '🍫🍦', ITEM_SIZE, true, false, 'chocolate', true)); // Sorvete de Chocolate (objetivo)
+                itens.push(createGameObject('sorvete', '🍓🍦', ITEM_SIZE, true, false, 'morango', true));   // Sorvete de Morango (objetivo)
+                itens.push(createGameObject('sorvete', '🥥🍦', ITEM_SIZE, true, false, 'coco', true));      // Sorvete de Coco (objetivo)
+                itens.push(createGameObject('sorvete', '🍈🍦', ITEM_SIZE, true, false, 'maracuja', true)); // Sorvete de Maracujá (objetivo)
+
+                // Outros itens coletáveis da Fase 2 (sorvetes não-objetivo)
+                itens.push(createGameObject('sorvete', '🥭🍦', ITEM_SIZE, true, false, 'manga', false)); // Sorvete de Manga (não objetivo)
+                itens.push(createGameObject('sorvete', '🍦', ITEM_SIZE, true, false, 'flocos', false)); // Sorvete de Flocos (não objetivo)
+                
+            } else if (currentPhase === 3) {
+                // Itens do objetivo principal da Fase 3: 3 Troféus, 3 Bolas, 3 Pipas
+                itens.push(createGameObject('trofeu', '🏆', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('trofeu', '🏆', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('trofeu', '🏆', ITEM_SIZE, true, false, null, true));
+                
+                itens.push(createGameObject('bola', '⚽', ITEM_SIZE, true, false, null, true)); // Bola (objetivo)
+                itens.push(createGameObject('bola', '⚽', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('bola', '⚽', ITEM_SIZE, true, false, null, true));
+
+                itens.push(createGameObject('pipa', '🪁', ITEM_SIZE, true, false, null, true)); // Novo objetivo
+                itens.push(createGameObject('pipa', '🪁', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('pipa', '🪁', ITEM_SIZE, true, false, null, true));
+
+            } else if (currentPhase === 4) {
+                // Itens do objetivo principal da Fase 4: 3 Tubos de Ensaio, 3 Ímãs, 3 Microscópios
+                itens.push(createGameObject('tubo_ensaio', '🧪', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('tubo_ensaio', '🧪', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('tubo_ensaio', '🧪', ITEM_SIZE, true, false, null, true));
+                
+                itens.push(createGameObject('ima', '🧲', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('ima', '🧲', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('ima', '🧲', ITEM_SIZE, true, false, null, true));
+
+                itens.push(createGameObject('microscopio', '🔬', ITEM_SIZE, true, false, null, true)); // Novo objetivo
+                itens.push(createGameObject('microscopio', '🔬', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('microscopio', '🔬', ITEM_SIZE, true, false, null, true));
+
+                // Outros itens de laboratório (não objetivo)
+                itens.push(createGameObject('bequer', '⚗️', ITEM_SIZE, true, false, null, false));
+                itens.push(createGameObject('pipeta', '💧', ITEM_SIZE, true, false, null, false)); 
+                
+            } else if (currentPhase === 5) {
+                // Itens do objetivo principal da Fase 5: 3 Elefantes, 3 Leões, 3 Aves
+                itens.push(createGameObject('elefante', '🐘', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('elefante', '🐘', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('elefante', '🐘', ITEM_SIZE, true, false, null, true)); // Added one more
+                
+                itens.push(createGameObject('leao', '🦁', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('leao', '🦁', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('leao', '🦁', ITEM_SIZE, true, false, null, true)); // Added one more
+
+                itens.push(createGameObject('ave', '🦜', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('ave', '🦜', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('ave', '🦜', ITEM_SIZE, true, false, null, true)); // Added one more
+
+                // Outros itens de zoológico (não objetivo)
+                itens.push(createGameObject('macaco', '🐒', ITEM_SIZE, true, false, null, false));
+                itens.push(createGameObject('crocodilo', '🐊', ITEM_SIZE, true, false, null, false));
+                itens.push(createGameObject('cobra', '🐍', ITEM_SIZE, true, false, null, false));
+                itens.push(createGameObject('lagarto', '🦎', ITEM_SIZE, true, false, null, false));
+
+            } else if (currentPhase === 6) {
+                // Itens do objetivo principal da Fase 6: 3 Pinturas, 3 Esculturas, 3 Fósseis
+                itens.push(createGameObject('pintura', '🎨', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('pintura', '🎨', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('pintura', '🎨', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('escultura', '🗿', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('escultura', '🗿', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('escultura', '🗿', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('fossil', '🦴', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('fossil', '🦴', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('fossil', '🦴', ITEM_SIZE, true, false, null, true)); // Added one more
+
+                // Outros itens de museu (não objetivo)
+                itens.push(createGameObject('artefato', '🏺', ITEM_SIZE, true, false, null, false));
+                itens.push(createGameObject('pincel', '🖌️', ITEM_SIZE, true, false, null, false));
+                itens.push(createGameObject('livro_arte', '🖼️', ITEM_SIZE, true, false, null, false));
+
+            } else if (currentPhase === 7) {
+                // Itens do objetivo principal da Fase 7: 3 Cestas de Piquenique, 3 Bolas, 3 Brinquedos de Parque
+                itens.push(createGameObject('cesta_piquenique', '🧺', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('cesta_piquenique', '🧺', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('cesta_piquenique', '🧺', ITEM_SIZE, true, false, null, true)); // Added one more
+                
+                itens.push(createGameObject('bola', '⚽', ITEM_SIZE, true, false, null, true)); // Bola (objetivo)
+                itens.push(createGameObject('bola', '⚽', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('bola', '⚽', ITEM_SIZE, true, false, null, true)); // Added one more
+
+                itens.push(createGameObject('brinquedo_parque', '🎠', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('brinquedo_parque', '🎠', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('brinquedo_parque', '🎠', ITEM_SIZE, true, false, null, true)); // Added one more
+
+                // Outros itens de parque (não objetivo)
+                itens.push(createGameObject('balao', '🎈', ITEM_SIZE, true, false, null, false));
+                itens.push(createGameObject('balao', '🎈', ITEM_SIZE, true, false, null, false));
+                itens.push(createGameObject('flor', '🌸', ITEM_SIZE, true, false, null, false));
+                itens.push(createGameObject('flor', '🌸', ITEM_SIZE, true, false, null, false));
+                itens.push(createGameObject('borboleta', '🦋', ITEM_SIZE, true, false, null, false));
+                itens.push(createGameObject('borboleta', '🦋', ITEM_SIZE, true, false, null, false));
+                
+            } else if (currentPhase === 8) { // Capítulo 8: Leiturinhas
+                // Itens para o Capítulo 8: Leiturinhas (3 itens temáticos)
+                itens.push(createGameObject('livro_aventura', '🗺️', ITEM_SIZE, true, false, null, true)); // Livro de Aventura (objetivo)
+                itens.push(createGameObject('livro_aventura', '🗺️', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('livro_aventura', '🗺️', ITEM_SIZE, true, false, null, true));
+                
+                itens.push(createGameObject('livro_animais', '🦁', ITEM_SIZE, true, false, null, true)); // Livro Ilustrado de Animais (objetivo) - Removed 📚 from emoji
+                itens.push(createGameObject('livro_animais', '🦁', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('livro_animais', '🦁', ITEM_SIZE, true, false, null, true));
+
+                itens.push(createGameObject('livro_fabula', '📜', ITEM_SIZE, true, false, null, true));   // Livro de Fábula (objetivo) - Changed emoji
+                itens.push(createGameObject('livro_fabula', '📜', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('livro_fabula', '📜', ITEM_SIZE, true, false, null, true));
+                
+                // Outros itens gerais de leitura (não objetivo)
+                itens.push(createGameObject('oculos', '👓', ITEM_SIZE, true, false, null, false));
+                itens.push(createGameObject('caneta', '🖊️', ITEM_SIZE, true, false, null, false));
+                itens.push(createGameObject('globo', '🌍', ITEM_SIZE, true, false, null, false)); 
+            } else if (currentPhase === 9) {
+                // Itens para o Capítulo 9: Reciclagem e Meio Ambiente (3 itens temáticos)
+                itens.push(createGameObject('lixeira_reciclagem', '♻️', ITEM_SIZE, true, false, null, true)); // isObstacle: false
+                itens.push(createGameObject('lixeira_reciclagem', '♻️', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('lixeira_reciclagem', '♻️', ITEM_SIZE, true, false, null, true));
+
+                itens.push(createGameObject('garrafa_plastico', '🧴', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('garrafa_plastico', '🧴', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('garrafa_plastico', '🧴', ITEM_SIZE, true, false, null, true));
+
+                itens.push(createGameObject('arvore_muda', '🌱', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('arvore_muda', '🌱', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('arvore_muda', '🌱', ITEM_SIZE, true, false, null, true));
+
+                itens.push(createGameObject('saco_lixo', '🗑️', ITEM_SIZE, true, false, null, false)); // Não objetivo
+                itens.push(createGameObject('flor', '🌸', ITEM_SIZE, true, false, null, false)); // Não objetivo
+            } else if (currentPhase === 10) {
+                // Itens para o Capítulo 10: Exploração da Natureza (3 itens temáticos)
+                itens.push(createGameObject('planta_nativa', '🌿', ITEM_SIZE, true, false, null, true)); // isObstacle: false
+                itens.push(createGameObject('planta_nativa', '🌿', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('planta_nativa', '🌿', ITEM_SIZE, true, false, null, true));
+
+                itens.push(createGameObject('animal_selvagem', '🦁', ITEM_SIZE, true, false, null, true)); // Changed to Lion
+                itens.push(createGameObject('animal_selvagem', '🦁', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('animal_selvagem', '🦁', ITEM_SIZE, true, false, null, true));
+
+                itens.push(createGameObject('telescopio', '🔭', ITEM_SIZE, true, false, null, true)); // Changed to Telescope
+                itens.push(createGameObject('telescopio', '🔭', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('telescopio', '🔭', ITEM_SIZE, true, false, null, true));
+
+                itens.push(createGameObject('lupa', '🔎', ITEM_SIZE, true, false, null, false)); // Não objetivo
+            } else if (currentPhase === 11) {
+                // Itens para o Capítulo 11: Oficina de Artes (3 itens temáticos)
+                itens.push(createGameObject('pincel', '🖌️', ITEM_SIZE, true, false, null, true)); // isObstacle: false
+                itens.push(createGameObject('pincel', '🖌️', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('pincel', '🖌️', ITEM_SIZE, true, false, null, true));
+
+                itens.push(createGameObject('tinta', '🎨', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('tinta', '🎨', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('tinta', '🎨', ITEM_SIZE, true, false, null, true));
+
+                itens.push(createGameObject('argila', '🏺', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('argila', '🏺', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('argila', '🏺', ITEM_SIZE, true, false, null, true));
+
+                itens.push(createGameObject('lapis_color', '🖍️', ITEM_SIZE, true, false, null, false)); // Não objetivo
+                itens.push(createGameObject('tela', '🖼️', ITEM_SIZE, true, false, null, false)); // Não objetivo
+            } else if (currentPhase === 12) {
+                // Itens para o Capítulo 12: Música e Dança (3 itens temáticos)
+                itens.push(createGameObject('violao', '🎸', ITEM_SIZE, true, false, null, true)); // isObstacle: false
+                itens.push(createGameObject('violao', '🎸', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('violao', '🎸', ITEM_SIZE, true, false, null, true));
+
+                itens.push(createGameObject('piano', '🎹', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('piano', '🎹', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('piano', '🎹', ITEM_SIZE, true, false, null, true));
+
+                itens.push(createGameObject('microfone', '🎤', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('microfone', '🎤', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('microfone', '🎤', ITEM_SIZE, true, false, null, true));
+
+                itens.push(createGameObject('fones_ouvido', '🎧', ITEM_SIZE, true, false, null, false)); // Não objetivo
+                itens.push(createGameObject('partitura', '🎼', ITEM_SIZE, true, false, null, false)); // Não objetivo
+            }
+
+
+            // Gera os obstáculos temáticos da escola (comum para todas as fases)
+            for (let i = 0; i < 3; i++) { // Loop para 3 de cada tipo
+                obstaculos.push(createGameObject('mesa', '🔲', OBSTACLE_SIZE, false, true)); // Alterado emoji da mesa
+                obstaculos.push(createGameObject('cadeira', '🪑', OBSTACLE_SIZE, false, true));
+                obstaculos.push(createGameObject('armario', '🚪', OBSTACLE_SIZE, false, true));
+            }
+
+            // Gera os itens escolares (não coletáveis, não obstáculos - comum para todas as fases)
+            for (let i = 0; i < 3; i++) { // Loop para 3 de cada
+                schoolItems.push(createGameObject('lapis', '✏️', SCHOOL_ITEM_SIZE, true, false, null, false)); 
+                schoolItems.push(createGameObject('caderno', '📓', SCHOOL_ITEM_SIZE, true, false, null, false)); 
+                schoolItems.push(createGameObject('livro', '📚', SCHOOL_ITEM_SIZE, false, false)); 
+                schoolItems.push(createGameObject('borracha', '🧽', SCHOOL_ITEM_SIZE, false, false)); 
+                schoolItems.push(createGameObject('mochila', '🎒', SCHOOL_ITEM_SIZE, false, false)); 
+            }
+
+            // Posiciona todos os objetos no canvas de forma aleatória, evitando sobreposição inicial
+            placeGameObjectsRandomly();
+
+            atualizarHUD(); // Atualiza o HUD com o novo total e objetivo
+
+            // Limpa qualquer temporador anterior e inicia o novo
+            if (gameInterval) clearInterval(gameInterval);
+            gameInterval = setInterval(() => {
+                // Decrementa o tempo a cada segundo
+                if (tempo > 0) {
+                    tempo--;
+                    // Obtenha a referência ao elemento 'tempo' aqui, dentro do setInterval
+                    const currentTempoElement = document.getElementById('tempo');
+                    if (currentTempoElement) {
+                        currentTempoElement.innerText = `Tempo: ${tempo}s`; // Atualiza o texto do tempo
+                    } else {
+                        console.error("Erro: Elemento 'tempo' não encontrado no DOM (dentro do setInterval).");
+                    }
+                    console.log(`DEBUG: Cronômetro rodando. Tempo atual: ${tempo}s. Elemento: `, currentTempoElement); // Log de depuração detalhado
+                }
+
+                let winConditionMet = false;
+                if (currentPhase === 1) {
+                    winConditionMet = (chest && chest.isOpened); // Condição de vitória para Fase 1: baú aberto
+                } else if (currentPhase === 2) {
+                    winConditionMet = (valesSorveteColetados === TOTAL_VALES_SORVETE && sorvetesObjetivoColetados === TOTAL_SORVETES_OBJETIVO);
+                } else if (currentPhase === 3) {
+                    winConditionMet = (trofeusColetados >= TOTAL_TROFEUS && bolasColetadas >= TOTAL_BOLAS_FASE3 && pipasColetadas >= TOTAL_PIPAS);
+                } else if (currentPhase === 4) {
+                    winConditionMet = (tubosEnsaioColetados >= TOTAL_TUBOS_ENSAIO && imasColetados >= TOTAL_IMAS && microscopioColetados >= TOTAL_MICROSCOPIO);
+                } else if (currentPhase === 5) {
+                    winConditionMet = (elefantesColetados >= TOTAL_ELEFANTES && leoesColetados >= TOTAL_LEOES && avesColetadas >= TOTAL_AVES);
+                } else if (currentPhase === 6) {
+                    winConditionMet = (pinturasColetadas === TOTAL_PINTURAS && esculturasColetadas === TOTAL_ESCULTURAS && fosseisColetados >= TOTAL_FOSSEIS);
+                } else if (currentPhase === 7) {
+                    winConditionMet = (cestasPiqueniqueColetadas >= TOTAL_CESTAS_PIQUENIQUE && bolasFase7Coletadas >= TOTAL_BOLAS_FASE7 && brinquedosParqueColetados >= TOTAL_BRINQUEDOS_PARQUE);
+                } else if (currentPhase === 8) {
+                    winConditionMet = (livroAventuraColetados >= TOTAL_LIVRO_AVENTURA && livroAnimaisColetados >= TOTAL_LIVRO_ANIMAIS && livroFabulaColetados >= TOTAL_LIVRO_FABULA);
+                } else if (currentPhase === 9) {
+                    winConditionMet = (lixeiraReciclagemColetados >= TOTAL_LIXEIRA_RECICLAGEM && garrafaPlasticoColetados >= TOTAL_GARRAFA_PLASTICO && arvoreMudaColetados >= TOTAL_ARVORE_MUDA);
+                } else if (currentPhase === 10) {
+                    winConditionMet = (plantaNativaColetados >= TOTAL_PLANTAS_NATIVAS && animalSelvagemColetados >= TOTAL_ANIMAIS_SELVAGENS && telescopioColetados >= TOTAL_TELESCOPIO);
+                } else if (currentPhase === 11) {
+                    winConditionMet = (pincelColetados >= TOTAL_PINCEL && tintaColetados >= TOTAL_TINTA && argilaColetados >= TOTAL_ARGILA);
+                } else if (currentPhase === 12) {
+                    winConditionMet = (violaoColetados >= TOTAL_VIOLAO && pianoColetados >= TOTAL_PIANO && microfoneColetados >= TOTAL_MICROFONE);
+                }
+
+                if (winConditionMet) {
+                    clearInterval(gameInterval); // Para o temporador do jogo
+                    if (currentPhase < 12) { // Se não é a última fase do nível
+                        showTemporaryMessage(`Capítulo ${currentPhase} Concluído!`, 2000);
+                        setTimeout(() => {
+                            iniciar(currentPlayerType, currentPhase + 1); // Inicia a próxima fase
+                        }, 2000);
+                    } else if (currentPhase === 12 && currentLevel < 6) { // Fim do nível, sobe de nível
+                        currentLevel++;
+                        showTemporaryMessage(`Parabéns, você subiu para o Nível ${currentLevel}! 😊`, 3000);
+                        setTimeout(() => {
+                            iniciar(currentPlayerType, 1); // Reinicia na Fase 1 do novo nível
+                        }, 3000);
+                    } else if (currentPhase === 12 && currentLevel === 6) { // Fim do jogo (Nível 6, Fase 12)
+                        showTemporaryMessage("Fim de Jogo! Obrigado por jogar!", 3000); // Mensagem final
+                        setTimeout(() => {
+                            // Reset game to initial state for replay
+                            currentLevel = 1;
+                            currentPhase = 1;
+                            vidas = 3;
+                            totalAllItemsCollected = 0;
+                            // Reset all specific item counts as well
+                            pedrasColetadas = 0;
+                            keysColetadas = 0;
+                            valesSorveteColetados = 0;
+                            sorvetesObjetivoColetados = 0;
+                            trofeusColetados = 0;
+                            bolasColetadas = 0;
+                            pipasColetadas = 0;
+                            tubosEnsaioColetados = 0;
+                            imasColetados = 0;
+                            microscopioColetados = 0;
+                            elefantesColetados = 0;
+                            leoesColetados = 0;
+                            avesColetadas = 0;
+                            pinturasColetadas = 0;
+                            esculturasColetadas = 0;
+                            fosseisColetados = 0;
+                            cestasPiqueniqueColetadas = 0;
+                            bolasFase7Coletadas = 0;
+                            brinquedosParqueColetados = 0;
+                            livroAventuraColetados = 0;
+                            livroAnimaisColetados = 0;
+                            livroFabulaColetados = 0;
+                            lixeiraReciclagemColetados = 0;
+                            garrafaPlasticoColetados = 0;
+                            arvoreMudaColetados = 0;
+                            plantaNativaColetados = 0;
+                            animalSelvagemColetados = 0;
+                            telescopioColetados = 0;
+                            pincelColetados = 0;
+                            tintaColetados = 0;
+                            argilaColetados = 0;
+                            violaoColetados = 0;
+                            pianoColetados = 0;
+                            microfoneColetados = 0;
+                            tempo = BASE_TIME; // Reset time to base for new game
+                            coletando = false;
+                            hasKey = false;
+                            itens = [];
+                            obstaculos = [];
+                            schoolItems = [];
+                            chest = null; // Reset chest for new game
+
+                            // Go back to intro screen for a full restart
+                            document.getElementById('introScreen').style.display = 'flex';
+                            document.getElementById('personagemSelecao').style.display = 'none';
+                            document.getElementById('hud').style.display = 'none';
+                        }, 3000);
+                    }
+                } else if (tempo === 0 && vidas > 0) { // Tempo esgotado, mas ainda tem vidas
+                    clearInterval(gameInterval); // Para o jogo enquanto a mensagem é exibida
+                    showTemporaryMessage("Perdeu!", 3000); // Exibe "Perdeu!" por 3 segundos
+                    
+                    setTimeout(() => { // Após a mensagem temporária
+                        vidas--; // Consome uma vida
+                        atualizarHUD(); // Atualiza o HUD para mostrar a vida perdida
+
+                        if (vidas > 0) {
+                            // Ainda tem vidas, reinicia a fase
+                            iniciar(currentPlayerType, currentPhase); // Reinicia a fase atual
+                        } else {
+                            // Perdeu a última vida, mostra a tela de continue
+                            showContinueScreen();
+                        }
+                    }, 3000); // Espera a duração da mensagem temporária
+                } else if (vidas <= 0) { // Se vidas chegou a 0, mostra a tela de continue
+                    clearInterval(gameInterval); // Para o jogo
+                    showContinueScreen();
+                }
+            }, 1000); // O intervalo ainda roda, mas não decrementa o tempo
+
+            // Inicia o loop principal de animação
+            lastFrameTime = performance.now();
+            animar();
+            canvas.focus(); // Garante que o canvas tenha foco ao iniciar o jogo
+        }
+
         // Função para redimensionar o canvas
         function resizeCanvas() {
-            // canvas e ctx já são globais e inicializados no topo do script
             canvas.width = window.innerWidth * 0.9; // 90% da largura da janela
-            canvas.height = window.innerHeight * 0.8; // 80% da altura da viewport
+            canvas.height = window.innerHeight * 0.7; // 70% da altura da janela
+            // Garante que o canvas não seja muito pequeno ou muito grande
+            canvas.width = Math.max(300, Math.min(800, canvas.width));
+            canvas.height = Math.max(200, Math.min(600, canvas.height));
             // Reposiciona o jogador no centro se o canvas for redimensionado
             if (player) {
                 player.x = canvas.width / 2 - PLAYER_SIZE / 2;
@@ -747,8 +1157,8 @@
 
             const placedObjects = []; // Para controlar a sobreposição
 
-            // Define uma área segura no centro para o jogador (dinâmica)
-            const playerSafeZoneSize = PLAYER_SIZE + (4 * OBSTACLE_SIZE); // 2x OBSTACLE_SIZE em cada lado do player
+            // Define uma área segura fixa no centro para o jogador (200x200 pixels)
+            const playerSafeZoneSize = 200; 
             const playerSafeZone = {
                 x: canvas.width / 2 - playerSafeZoneSize / 2,
                 y: canvas.height / 2 - playerSafeZoneSize / 2,
@@ -978,7 +1388,7 @@
                                 } else if (collectedItem.type === 'animal_selvagem') {
                                     animalSelvagemColetados++;
                                     console.log(`DEBUG: Animal Selvagem coletado! Total: ${animalSelvagemColetados}/${TOTAL_ANIMAIS_SELVAGENS}`);
-                                } else if (collectedItem.type === 11) {
+                                } else if (collectedItem.type === 'telescopio') {
                                     telescopioColetados++;
                                     console.log(`DEBUG: Telescópio coletado! Total: ${telescopioColetados}/${TOTAL_TELESCOPIO}`);
                                 }
@@ -1063,6 +1473,7 @@
             }
         }
 
+        // Atualiza a exibição do HUD
         function atualizarHUD() {
             // Obtenha as referências dos elementos do HUD aqui para garantir que são válidas
             const currentVidasDisplayElement = document.getElementById('vidasDisplay');
@@ -1125,6 +1536,7 @@
             if (currentHudObjectiveLine2Element) currentHudObjectiveLine2Element.innerHTML = objectiveLine2Content;
         }
 
+        // Exibe a mensagem de fim de jogo em um modal e recarrega
         function encerrar(msg) {
             console.log("Encerrar chamado com mensagem:", msg); // Log de depuração
             clearInterval(gameInterval); // Para o temporador do jogo
@@ -1134,9 +1546,9 @@
             const modal = document.getElementById('gameModal');
             document.getElementById('modalMessage').innerText = msg;
             modal.style.display = 'flex'; // Mostra o modal
-            stopAllMusic(); // Parar música ao encerrar o jogo
         }
 
+        // Exibe uma mensagem temporária no centro da tela
         function showTemporaryMessage(msg, duration) {
             const tempMessageDiv = document.getElementById('temporaryMessage');
             if (tempMessageDiv) {
@@ -1148,6 +1560,7 @@
             }
         }
 
+        // Exibe a tela de continue
         function showContinueScreen() {
             document.getElementById('continueModal').style.display = 'flex';
             continueTime = 10;
@@ -1162,9 +1575,9 @@
                     handleContinue('nao');
                 }
             }, 1000);
-            stopAllMusic(); // Parar música na tela de continue
         }
 
+        // Lida com a escolha do jogador na tela de continue
         function handleContinue(choice) {
             clearInterval(continueCountdownInterval);
             document.getElementById('continueModal').style.display = 'none';
@@ -1209,18 +1622,15 @@
                 violaoColetados = 0;
                 pianoColetados = 0;
                 microfoneColetados = 0;
-                tempo = BASE_TIME; // Reset time to base for new game
+                tempo = BASE_TIME - (currentLevel - 1) * TIME_DECREMENT_PER_LEVEL;
+                if (tempo < 10) tempo = 10;
                 coletando = false;
                 hasKey = false;
                 itens = [];
                 obstaculos = [];
                 schoolItems = [];
-                chest = null; // Reset chest for new game
-
-                // Go back to intro screen for a full restart
-                document.getElementById('introScreen').style.display = 'flex';
-                document.getElementById('personagemSelecao').style.display = 'none';
-                document.getElementById('hud').style.display = 'none';
+                chest = null;
+                currentPhase = 1;
             } else {
                 console.log("DEBUG: Jogador escolheu NÃO ou tempo esgotou. Recarrega a página.");
                 location.reload();
@@ -1354,8 +1764,7 @@
             }
         }
 
-        // Função principal de inicialização do jogo
-        function initGame() {
+        window.onload = function () {
             // Obtenha as referências globais aos elementos do HUD aqui
             vidasDisplayElement = document.getElementById('vidasDisplay');
             hudObjectiveLine1Element = document.getElementById('hudObjectiveLine1');
@@ -1364,21 +1773,6 @@
             tempoDisplayElement = document.getElementById('tempo');
             chapterTitleDisplayElement = document.getElementById('chapterTitleDisplay');
             objetivoFaseElement = document.getElementById('objetivoFase');
-
-            // Atribui canvas e ctx após o DOM estar carregado
-            canvas = document.getElementById('gameCanvas');
-            ctx = canvas.getContext('2d');
-            resizeCanvas(); // Chama resizeCanvas para definir as dimensões iniciais
-            window.addEventListener('resize', resizeCanvas); // Adiciona listener para redimensionar
-
-            // Obtenha referências aos elementos de áudio
-            introMusicElement = document.getElementById('introMusic');
-            
-            // Tentar tocar a música de introdução. Pode falhar devido a políticas de autoplay.
-            // A reprodução será ativada na primeira interação do usuário.
-            if (introMusicElement) {
-                introMusicElement.volume = 0.5; // Define um volume padrão
-            }
 
             console.log("DEBUG: tempoDisplayElement no onload:", tempoDisplayElement); // Debug: verificar se o elemento é encontrado
 
@@ -1397,11 +1791,6 @@
                         console.log("DEBUG: Transição para seleção de personagem.");
                     } else {
                         console.error("ERRO: Elemento 'personagemSelecao' não encontrado no DOM (dentro de dismissIntro).");
-                    }
-                    // Tentar tocar a música aqui, após a interação do usuário
-                    if (introMusicElement && introMusicElement.paused) {
-                        introMusicElement.play().catch(e => console.log("Erro ao tocar música de introdução após interação:", e));
-                        currentMusic = introMusicElement; // Define a música de introdução como a música atual
                     }
                     document.removeEventListener('keydown', dismissIntro);
                     currentIntroScreen.removeEventListener('click', dismissIntro);
@@ -1457,46 +1846,11 @@
             document.getElementById('botao-acao').addEventListener('touchstart', (e) => { e.preventDefault(); coletando = true; });
             document.getElementById('botao-acao').addEventListener('touchend', (e) => { e.preventDefault(); coletando = false; });
 
-            // Lógica do botão de controle de som
-            const soundControlBtn = document.getElementById('soundControlBtn');
-            const soundOnIcon = document.getElementById('soundOnIcon');
-            const soundOffIcon = document.getElementById('soundOffIcon');
-
-            if (soundControlBtn && soundOnIcon && soundOffIcon) {
-                soundControlBtn.addEventListener('click', () => {
-                    // Verifica qual música está atualmente tocando para controlar o mute
-                    const musicToControl = currentMusic; 
-                    if (musicToControl) {
-                        musicToControl.muted = !musicToControl.muted; // Alterna o estado mudo
-                        if (musicToControl.muted) {
-                            soundOnIcon.style.display = 'none';
-                            soundOffIcon.style.display = 'block';
-                        } else {
-                            soundOnIcon.style.display = 'block';
-                            soundOffIcon.style.display = 'none';
-                            // Tenta tocar apenas se não estiver tocando (para evitar múltiplos play() chamadas)
-                            if (musicToControl.paused) {
-                                musicToControl.play().catch(e => console.log("Erro ao tentar tocar música após desmutar:", e));
-                            }
-                        }
-                    }
-                });
-            }
-
+            document.getElementById('btnSim').addEventListener('click', () => handleContinue('sim'));
+            document.getElementById('btnNao').addEventListener('click', () => handleContinue('nao'));
 
             atualizarHUD(); // Atualiza o HUD com os valores iniciais
-        }
-
-        // Chama a função principal de inicialização do jogo quando o DOM estiver completamente carregado
-        document.addEventListener('DOMContentLoaded', initGame);
+        };
     </script>
-
-    <script>
-      function selecionar(tipo) {
-        const intro = document.getElementById("introScreen");
-        if (intro) intro.remove();
-        iniciar(tipo);
-      }
-    </script>
-    </body>
+</body>
 </html>
