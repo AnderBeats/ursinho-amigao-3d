@@ -17,66 +17,12 @@
             min-height: 100vh; /* Garante que o corpo ocupa a altura total da viewport */
             position: relative; /* Para posicionamento absoluto dos elementos */
         }
-        #introScreen {
-            position: absolute;
-            inset: 0;
-            background: #aee1f9; /* Fundo azul claro para a tela de introdução */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 20; /* Acima de tudo, exceto modais */
-            color: #333;
-            text-align: center;
-            padding: 20px;
-            box-sizing: border-box;
-            cursor: pointer; /* Adicionado para indicar que a tela é clicável */
-        }
-        #introImagePlaceholder { /* New style for the image placeholder */
-            width: 400px;
-            height: 300px;
-            background-color: #ffd54f; /* Yellowish background */
-            border-radius: 15px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 8em; /* Increased font size for the emoji */
-            color: #333;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-        }
-        #introScreen h1 {
-            font-size: 2.5em;
-            margin-bottom: 15px;
-            color: #2c3e50;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-            display: flex; /* Use flexbox for centering children */
-            flex-direction: column; /* Stack children vertically */
-            align-items: center; /* Center horizontally */
-            text-align: center; /* Ensure text within spans is centered */
-        }
-        #introScreen h1 span {
-            display: block; /* Ensure spans take full width for line break */
-        }
-        #introScreen p {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #34495e;
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.8; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
         #personagemSelecao {
             position: absolute;
             inset: 0;
             background: rgba(0, 0, 0, 0.8);
             color: white;
-            display: flex; /* Changed from none to flex to ensure it's visible initially */
+            display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
@@ -110,9 +56,8 @@
         }
         #hud {
             position: absolute;
-            top: 80px; /* Adjusted top for desktop */
-            left: 50%;
-            transform: translateX(-50%);
+            top: 10px;
+            left: 10px;
             color: white;
             background: rgba(0,0,0,0.6);
             padding: 10px;
@@ -120,25 +65,6 @@
             z-index: 10;
             font-size: 1.1em;
             display: none; /* Oculta o HUD por padrão */
-            flex-direction: row; /* Use flexbox for columns */
-            justify-content: space-between; /* Distribute space between columns */
-            width: 90%; /* Occupy most of the width */
-            max-width: 700px; /* Limit max width */
-            box-sizing: border-box; /* Include padding in width */
-            align-items: flex-start; /* Align columns to the top */
-        }
-        .hud-column {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start; /* Align text to the left within each column */
-            flex-basis: 48%; /* Give columns a basis to distribute space */
-            padding: 0 5px; /* Reduced internal padding for better fit */
-            box-sizing: border-box; /* Include padding in width */
-            background: rgba(255,255,255,0.2); /* Light background for the "box" effect - Adjusted to 0.2 */
-            border-radius: 5px;
-        }
-        .hud-column:last-child {
-            align-items: flex-end; /* Align right column text to the right */
         }
         #objetivoFase {
             position: absolute;
@@ -178,7 +104,6 @@
             font-size: 24px; /* Fonte maior para ícones */
             box-shadow: 0 3px 5px rgba(0,0,0,0.2);
             transition: background 0.2s, transform 0.1s;
-            z-index: 10; /* Ensure buttons are above canvas */
         }
         .botao-direcional:active, .botao-jogo:active {
             background: rgba(255,255,255,0.5); /* Menos transparente ao clicar */
@@ -197,7 +122,69 @@
             justify-content: center; /* Para centralizar o conteúdo */
             font-size: 30px; /* Ajusta o tamanho da fonte para o 'A' */
         }
+        #botao-dica {
+            position: fixed; /* Fixado na viewport */
+            bottom: 90px; /* Posiciona acima do botão de ação */
+            right: 20px;
+            z-index: 10;
+            background: rgba(33, 150, 243, 0.3); /* Azul com transparência */
+            color: white;
+            font-size: 16px; /* Ajusta o tamanho da fonte para o texto */
+            padding: 5px 10px; /* Ajusta o padding */
+            width: auto; /* Largura automática para o texto */
+            min-width: 50px; /* Garante um tamanho mínimo */
+            height: auto; /* Altura automática */
+            line-height: normal; /* Reseta a altura da linha */
+        }
 
+        /* Modal para mensagens de fim de jogo */
+        .modal {
+            display: none; /* Oculto por padrão */
+            position: fixed; /* Permanece no lugar */
+            z-index: 20; /* Fica no topo */
+            left: 0;
+            top: 0;
+            width: 100%; /* Largura total */
+            height: 100%; /* Altura total */
+            overflow: auto; /* Habilita rolagem se necessário */
+            background-color: rgba(0,0,0,0.7); /* Preto com opacidade */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            text-align: center;
+            font-size: 1.5em;
+            color: #333;
+            max-width: 80%;
+            transform: scale(0.9);
+            animation: pop-in 0.3s forwards;
+        }
+        @keyframes pop-in {
+            from { opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-content button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin-top: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .modal-content button:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
         /* Estilo do Canvas 2D */
         canvas {
             background-color: #8bc34a; /* Cor do chão para 2D */
@@ -239,7 +226,8 @@
             inset: 0;
             background: rgba(0, 0, 0, 0.9);
             color: white;
-            flex-direction: column; /* Changed to flex for centering */
+            display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 30; /* Acima de outros modais */
@@ -260,13 +248,12 @@
         #continueModal .botoes-continue button {
             padding: 15px 30px;
             font-size: 1.5em;
-            border: none;
             border-radius: 10px;
+            border: none;
             cursor: pointer;
             transition: background-color 0.2s, transform 0.1s;
         }
         #continueModal .botoes-continue button:hover {
-            background-color: #45a049;
             transform: translateY(-2px);
         }
         #continueModal #btnSim {
@@ -306,126 +293,9 @@
             text-align: center;
             white-space: nowrap; /* Evita quebra de linha */
         }
-
-        /* Media Queries for Mobile Adjustments */
-        @media (max-width: 768px) {
-            #introImagePlaceholder {
-                width: 80vw;
-                height: 40vh;
-                font-size: 6em;
-            }
-            #introScreen h1 {
-                font-size: 1.8em;
-            }
-            #introScreen p {
-                font-size: 1.2em;
-            }
-            #hud {
-                font-size: 0.9em;
-                padding: 8px;
-                top: 70px; /* Adjusted top for mobile */
-                flex-direction: row; /* Keep columns side-by-side if enough space */
-            }
-            .hud-column {
-                align-items: flex-start; /* Default for both columns */
-            }
-            .hud-column:last-child {
-                align-items: flex-end; /* Keep right column aligned right */
-            }
-            .botao-direcional, .botao-jogo {
-                width: 45px;
-                height: 45px;
-                font-size: 20px;
-            }
-            #botao-acao {
-                width: 60px;
-                height: 60px;
-                font-size: 26px;
-            }
-            #direcional {
-                bottom: 10px;
-                left: 10px;
-            }
-            #botao-acao {
-                bottom: 20px;
-                right: 10px;
-            }
-            .modal-content { /* This rule is now unused as gameModal is removed */
-                padding: 20px;
-                font-size: 1.2em;
-            }
-            .modal-content button { /* This rule is now unused as gameModal is removed */
-                padding: 10px 20px;
-                font-size: 1em;
-            }
-            #continueModal h2 {
-                font-size: 2em;
-            }
-            #continueModal p {
-                font-size: 1.5em;
-            }
-            #continueModal .botoes-continue button {
-                padding: 12px 25px;
-                font-size: 1.2em;
-            }
-        }
-
-        @media (max-width: 360px) { /* Adjusted breakpoint for stacking columns on very small screens */
-            #hud {
-                top: 40px; /* Further adjust top for very small screens */
-                font-size: 0.75em; /* Smaller font for very small screens */
-                flex-direction: column; /* Stack columns vertically on very small screens */
-                align-items: center; /* Center stacked columns */
-                width: 95%; /* Take full width when stacked */
-            }
-            .hud-column {
-                width: 100%; /* Take full width when stacked */
-                align-items: center; /* Center text when stacked */
-                padding: 5px 0; /* Adjust padding */
-            }
-            .hud-column:last-child {
-                align-items: center; /* Center text when stacked */
-            }
-            #introScreen h1 {
-                font-size: 1.3em;
-            }
-            #introScreen p {
-                font-size: 0.9em;
-            }
-            .botao-direcional, .botao-jogo {
-                width: 35px;
-                height: 35px;
-                font-size: 16px;
-            }
-            #botao-acao {
-                width: 50px;
-                height: 50px;
-                font-size: 22px;
-            }
-            #direcional {
-                bottom: 2px;
-                left: 2px;
-            }
-            #botao-acao {
-                bottom: 10px;
-                right: 2px;
-            }
-        }
     </style>
 </head>
 <body>
-    <!-- Tela de Introdução -->
-    <div id="introScreen">
-        <div id="introImagePlaceholder">
-            🐻
-        </div>
-        <h1>
-            <span>Ursinho Amigão e Seus Amigos em:</span><br>
-            <span>Meu Dia na Escola - Parte I</span>
-        </h1>
-        <p>Pressione qualquer botão para começar</p>
-    </div>
-
     <!-- Tela de Seleção de Personagem -->
     <div id="personagemSelecao">
         <h2>Escolha seu personagem</h2>
@@ -439,15 +309,12 @@
 
     <!-- Heads-Up Display (HUD) -->
     <div id="hud">
-        <div class="hud-column">
-            <span id="vidasDisplay"></span>
-            <span id="totalAllItemsCollectedDisplay"></span>
-            <span id="tempo"></span>
-        </div>
-        <div class="hud-column">
-            <span id="hudObjectiveLine1"></span>
-            <span id="hudObjectiveLine2"></span>
-        </div>
+        <span id="vidasDisplay"></span><br>
+        <span id="hudObjectiveLine1"></span><br>
+        <span id="hudObjectiveLine2"></span><br>
+        <span id="totalAllItemsCollectedDisplay"></span><br>
+        <span id="tempo"></span><br> <!-- Corrected id to "tempo" -->
+        <span id="hudKeyStatus"></span>
     </div>
 
     <!-- Título do Capítulo Centralizado -->
@@ -473,6 +340,17 @@
 
     <!-- Botão de Ação para Celular -->
     <button id="botao-acao" class="botao-jogo">A</button>
+
+    <!-- Novo Botão de Dica LLM -->
+    <button id="botao-dica" class="botao-jogo">✨ Pedir Dica</button>
+
+    <!-- Modal de Fim de Jogo/Vitória -->
+    <div id="gameModal" class="modal">
+        <div class="modal-content">
+            <p id="modalMessage"></p>
+            <button onclick="location.reload()">Jogar Novamente</button>
+        </div>
+    </div>
 
     <!-- Mensagem de Dica LLM -->
     <div id="llmHintMessage" style="display: none;">
@@ -504,9 +382,6 @@
         let chest = null; // O baú do tesouro
         let pedrasColetadas = 0; // Contagem de pedras coletadas
         const TOTAL_PEDRAS = 3; // Total de pedras necessárias
-        let keysColetadas = 0; // Novo: Contagem de chaves coletadas
-        const TOTAL_CHAVES = 3; // Novo: Total de chaves necessárias para a Fase 1
-
         let valesSorveteColetados = 0; // Novo: Contagem de vales sorvete coletados
         const TOTAL_VALES_SORVETE = 4; // Novo: Total de vales sorvete necessários para a Fase 2
         let sorvetesObjetivoColetados = 0; // Novo: Contagem de sorvetes objetivo coletados
@@ -515,78 +390,45 @@
         const TOTAL_TROFEUS = 3; // Novo: Total de troféus necessários para a Fase 3
         let bolasColetadas = 0; // Novo: Contagem de bolas coletadas para a Fase 3
         const TOTAL_BOLAS_FASE3 = 3; // Novo: Total de bolas necessárias para a Fase 3
-        let pipasColetadas = 0; // Novo: Contagem de pipas coletadas para a Fase 3
-        const TOTAL_PIPAS = 3; // Novo: Total de pipas necessárias para a Fase 3
-
         let tubosEnsaioColetados = 0; // Novo: Contagem de tubos de ensaio coletados para a Fase 4
         const TOTAL_TUBOS_ENSAIO = 3; // Novo: Total de tubos de ensaio necessários para a Fase 4
         let imasColetados = 0; // Novo: Contagem de ímãs coletados para a Fase 4
         const TOTAL_IMAS = 3; // Novo: Total de ímãs necessários para a Fase 4
-        let microscopioColetados = 0; // Novo: Contagem de microscópios coletados para a Fase 4
-        const TOTAL_MICROSCOPIO = 3; // Novo: Total de microscópios necessários para a Fase 4
         let elefantesColetados = 0; // Novo: Contagem de elefantes coletados para a Fase 5
-        const TOTAL_ELEFANTES = 3; // Novo: Total de elefantes necessários para a Fase 5
+        const TOTAL_ELEFANTES = 2; // Novo: Total de elefantes necessários para a Fase 5
         let leoesColetados = 0; // Novo: Contagem de leões coletados para a Fase 5
-        const TOTAL_LEOES = 3; // Novo: Total de leões necessários para a Fase 5
+        const TOTAL_LEOES = 2; // Novo: Total de leões necessários para a Fase 5
         let avesColetadas = 0; // Novo: Contagem de aves coletadas para a Fase 5
-        const TOTAL_AVES = 3; // Novo: Total de aves necessárias para a Fase 5
+        const TOTAL_AVES = 2; // Novo: Total de aves necessárias para a Fase 5
         let pinturasColetadas = 0; // Novo: Contagem de pinturas coletadas para a Fase 6
         const TOTAL_PINTURAS = 3; // Novo: Total de pinturas necessárias para a Fase 6
         let esculturasColetadas = 0; // Novo: Contagem de esculturas coletadas para a Fase 6
         const TOTAL_ESCULTURAS = 3; // Novo: Total de esculturas necessárias para a Fase 6
         let fosseisColetados = 0; // Novo: Contagem de fósseis coletados para a Fase 6
-        const TOTAL_FOSSEIS = 3; // Novo: Total de fósseis necessários para a Fase 6
+        const TOTAL_FOSSEIS = 2; // Novo: Total de fósseis necessários para a Fase 6
         let cestasPiqueniqueColetadas = 0; // Novo: Contagem de cestas de piquenique coletadas para a Fase 7
-        const TOTAL_CESTAS_PIQUENIQUE = 3; // Novo: Total de cestas de piquenique necessárias para a Fase 7
+        const TOTAL_CESTAS_PIQUENIQUE = 2; // Novo: Total de cestas de piquenique necessárias para a Fase 7
         let bolasFase7Coletadas = 0; // Novo: Contagem de bolas coletadas para a Fase 7
-        const TOTAL_BOLAS_FASE7 = 3; // Novo: Total de bolas necessárias para a Fase 7
+        const TOTAL_BOLAS_FASE7 = 2; // Novo: Total de bolas necessárias para a Fase 7
         let brinquedosParqueColetados = 0; // Novo: Contagem de brinquedos de parque coletados para a Fase 7
-        const TOTAL_BRINQUEDOS_PARQUE = 3; // Novo: Total de brinquedos de parque necessários para a Fase 7
+        const TOTAL_BRINQUEDOS_PARQUE = 2; // Novo: Total de brinquedos de parque necessários para a Fase 7
 
         // Novos contadores para os capítulos 8 a 12
-        let livroAventuraColetados = 0;
-        const TOTAL_LIVRO_AVENTURA = 3;
-        let livroAnimaisColetados = 0;
-        const TOTAL_LIVRO_ANIMAIS = 3;
-        let livroFabulaColetados = 0;
-        const TOTAL_LIVRO_FABULA = 3;
+        let leiturinhasColetadas = 0;
+        const TOTAL_LEITURINHAS = 3;
+        let planetaItemsColetados = 0;
+        const TOTAL_PLANETA_ITEMS = 3;
+        let naturezaExploracaoColetados = 0;
+        const TOTAL_NATUREZA_EXPLORACAO = 3;
+        let artesItemsColetados = 0;
+        const TOTAL_ARTES_ITEMS = 3;
+        let musicaDancaColetados = 0;
+        const TOTAL_MUSICA_DANCA = 3;
 
-        let lixeiraReciclagemColetados = 0;
-        const TOTAL_LIXEIRA_RECICLAGEM = 3;
-        let garrafaPlasticoColetados = 0;
-        const TOTAL_GARRAFA_PLASTICO = 3;
-        let arvoreMudaColetados = 0;
-        const TOTAL_ARVORE_MUDA = 3;
-
-        let plantaNativaColetados = 0;
-        const TOTAL_PLANTAS_NATIVAS = 3;
-        let animalSelvagemColetados = 0;
-        const TOTAL_ANIMAIS_SELVAGENS = 3;
-        let telescopioColetados = 0; // Renamed from binoculosColetados
-        const TOTAL_TELESCOPIO = 3; // Renamed from TOTAL_BINOCULOS
-
-        let pincelColetados = 0;
-        const TOTAL_PINCEL = 3;
-        let tintaColetados = 0;
-        const TOTAL_TINTA = 3;
-        let argilaColetados = 0;
-        const TOTAL_ARGILA = 3;
-
-        let violaoColetados = 0;
-        const TOTAL_VIOLAO = 3;
-        let pianoColetados = 0;
-        const TOTAL_PIANO = 3;
-        let microfoneColetados = 0;
-        const TOTAL_MICROFONE = 3;
-
-        // Variáveis para o sistema de níveis
-        let currentLevel = 1; // Começa no Nível 1
-        const BASE_TIME = 90; // Tempo base em segundos para o Nível 1
-        const TIME_DECREMENT_PER_LEVEL = 10; // Decremento de tempo por nível
 
         let totalAllItemsCollected = 0; // Nova variável para contar TODOS os itens coletados
         let vidas = 3; // Vidas do jogador
-        let tempo = BASE_TIME; // Tempo do jogo em segundos
+        let tempo = 90; // Tempo do jogo em segundos
         let coletando = false; // Flag para ação de coleta (coletar item ou usar chave no baú)
         let gameInterval; // Para o temporador do jogo
         let hintTimeout; // Para esconder a dica LLM
@@ -598,7 +440,7 @@
 
         const PLAYER_SIZE = 40; // Tamanho do personagem
         const ITEM_SIZE = 30; // Tamanho dos itens coletáveis
-        const OBSTACLE_SIZE = 30; // Tamanho dos obstáculos (AUMENTADO PARA 30 PIXELS)
+        const OBSTACLE_SIZE = 40; // Tamanho dos obstáculos que bloqueiam (ligeiramente maior para ser mais visível)
         const SCHOOL_ITEM_SIZE = 25; // Tamanho dos itens escolares não coletáveis
         const CHEST_SIZE = 50; // Tamanho do baú
         const PLAYER_SPEED = 3; // Velocidade do personagem (ajustada para médio)
@@ -608,37 +450,40 @@
         var frameInterval = 1000 / targetFPS; // Intervalo de tempo entre frames em ms
         var lastFrameTime = 0; // Initialized globally
 
-        // Global references to HUD elements, initialized in window.onload
+        // Global references to HUD elements (declared, but initialized in window.onload)
         let vidasDisplayElement;
         let hudObjectiveLine1Element;
         let hudObjectiveLine2Element;
         let totalAllItemsCollectedDisplayElement;
         let tempoDisplayElement;
+        let hudKeyStatusElement;
         let chapterTitleDisplayElement;
-        let objetivoFaseElement;
+        let objetivoFaseElement; // This element is hidden, but still referenced for consistency.
         
         // Função para atualizar o estado da tecla (para teclado e toque)
         function tecla(k, v) {
             teclas[k] = v;
+            // console.log(`DEBUG: Tecla '${k}' set to ${v}. Current teclas:`, teclas); // Depuração
         }
 
         // Função para selecionar o personagem e iniciar o jogo
         function selecionar(tipo) {
-            console.log("DEBUG: Selecionar personagem:", tipo); // Log para depuração
             document.getElementById("personagemSelecao").style.display = 'none'; // Esconde a tela de seleção
             currentPlayerType = tipo; // Armazena o tipo de personagem
+            console.log("Personagem selecionado:", tipo);
             iniciar(tipo, 1); // Inicia o jogo na Fase 1
         }
 
         // Inicializa o canvas 2D e os elementos do jogo
         function iniciar(tipo, phase) {
-            console.log(`DEBUG: Iniciando o jogo 2D com personagem: ${tipo}, Fase: ${phase}`); // Log para depuração
+            console.log(`Iniciando o jogo 2D com personagem: ${tipo}, Fase: ${phase}`);
             currentPhase = phase; // Atualiza a fase atual
 
             // Atualiza o título da página com o nome do capítulo
             updatePageTitle(currentPhase);
 
             // Garante que os modais estejam ocultos ao iniciar um novo jogo
+            document.getElementById('gameModal').style.display = 'none';
             document.getElementById('llmHintMessage').style.display = 'none';
             document.getElementById('continueModal').style.display = 'none';
             document.getElementById('temporaryMessage').style.display = 'none';
@@ -646,8 +491,20 @@
             // Torna o HUD visível ao iniciar a fase
             const hudElementDiv = document.getElementById('hud');
             if (hudElementDiv) {
-                hudElementDiv.style.display = 'flex'; // Changed to flex for columns
+                hudElementDiv.style.display = 'block';
             }
+
+            // Get HUD element references locally within iniciar
+            // This ensures they are always fresh when a new phase starts or restarts.
+            vidasDisplayElement = document.getElementById('vidasDisplay');
+            hudObjectiveLine1Element = document.getElementById('hudObjectiveLine1');
+            hudObjectiveLine2Element = document.getElementById('hudObjectiveLine2');
+            totalAllItemsCollectedDisplayElement = document.getElementById('totalAllItemsCollectedDisplay');
+            tempoDisplayElement = document.getElementById('tempo'); // Correctly referencing the span with id="tempo"
+            hudKeyStatusElement = document.getElementById('hudKeyStatus');
+            chapterTitleDisplayElement = document.getElementById('chapterTitleDisplay');
+            objetivoFaseElement = document.getElementById('objetivoFase'); // This element is hidden, but still referenced for consistency.
+
 
             // Se for um "continue", reinicia vidas para 3. Se for reinício de fase por tempo, apenas reinicia o tempo e itens.
             if (continueCountdownInterval) { // Se veio do continue screen
@@ -668,15 +525,12 @@
 
             // Reinicia as variáveis de fase
             pedrasColetadas = 0;
-            keysColetadas = 0; // Initialize keysColetadas
             valesSorveteColetados = 0; 
             sorvetesObjetivoColetados = 0;
             trofeusColetados = 0; 
             bolasColetadas = 0; 
-            pipasColetadas = 0; // Reset for new game
             tubosEnsaioColetados = 0; 
             imasColetados = 0; 
-            microscopioColetados = 0; // Reset for new game
             elefantesColetados = 0; 
             leoesColetados = 0; 
             avesColetadas = 0; 
@@ -687,28 +541,13 @@
             bolasFase7Coletadas = 0; 
             brinquedosParqueColetados = 0; 
             totalAllItemsCollected = 0; // Reinicia a contagem total de itens coletados
-            
-            // Reinicia os contadores de objetivos específicos para cada fase
-            livroAventuraColetados = 0;
-            livroAnimaisColetados = 0;
-            livroFabulaColetados = 0;
-            lixeiraReciclagemColetados = 0;
-            garrafaPlasticoColetados = 0;
-            arvoreMudaColetados = 0;
-            plantaNativaColetados = 0;
-            animalSelvagemColetados = 0;
-            telescopioColetados = 0; // Reset for new game
-            pincelColetados = 0;
-            tintaColetados = 0;
-            argilaColetados = 0;
-            violaoColetados = 0;
-            pianoColetados = 0;
-            microfoneColetados = 0;
+            leiturinhasColetadas = 0; // Reinicia para a nova fase
+            planetaItemsColetados = 0; // Reinicia para a nova fase
+            naturezaExploracaoColetados = 0; // Reinicia para a nova fase
+            artesItemsColetados = 0; // Reinicia para a nova fase
+            musicaDancaColetados = 0; // Reinicia para a nova fase
 
-            // Ajusta o tempo inicial com base no nível atual
-            tempo = BASE_TIME - (currentLevel - 1) * TIME_DECREMENT_PER_LEVEL;
-            if (tempo < 10) tempo = 10; // Garante que o tempo mínimo seja 10s
-
+            tempo = 90; // RE-ADICIONADO
             coletando = false;
             hasKey = false;
             
@@ -724,32 +563,25 @@
             itens = [];
             obstaculos = [];
             schoolItems = [];
-            
-            // Cria o baú do tesouro para a Fase 1 (com a nova propriedade isOpened)
-            if (currentPhase === 1) {
-                chest = createGameObject('bau', '📦', CHEST_SIZE, false, false);
-                chest.isOpened = false; // Novo: Estado inicial do baú
-            } else {
-                chest = null;
-            }
+            chest = null;
 
             // Geração de 2 moedas em cada fase
             itens.push(createGameObject('moeda', '💰', ITEM_SIZE, true, false, null, false));             // Moeda
             itens.push(createGameObject('moeda', '💰', ITEM_SIZE, true, false, null, false));             // Outra moeda
 
             if (currentPhase === 1) {
-                // Itens do objetivo principal da Fase 1: 3 Pedras e 3 Chaves
+                // Itens do objetivo principal da Fase 1: 3 Pedras e a Chave
                 itens.push(createGameObject('pedra', '🔴', ITEM_SIZE, true, false, 'vermelha', true)); // Pedra vermelha (objetivo)
                 itens.push(createGameObject('pedra', '🟢', ITEM_SIZE, true, false, 'verde', true));   // Pedra verde (objetivo)
                 itens.push(createGameObject('pedra', '🔵', ITEM_SIZE, true, false, 'azul', true));    // Pedra azul (objetivo)
-                
-                itens.push(createGameObject('chave', '🔑', ITEM_SIZE, true, false, null, true)); // Chave dourada (objetivo)
-                itens.push(createGameObject('chave', '🔑', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('chave', '🔑', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('chave', '🔑', ITEM_SIZE, true, false, null, true));             // Chave dourada (objetivo)
 
                 // Outros itens coletáveis que não são do objetivo principal da Fase 1
                 itens.push(createGameObject('folha', '🍂', ITEM_SIZE, true, false, null, false));             // Folha encantada
                 itens.push(createGameObject('folha', '🍂', ITEM_SIZE, true, false, null, false));             // Outra folha encantada
+
+                // Cria o baú do tesouro para a Fase 1
+                chest = createGameObject('bau', '📦', CHEST_SIZE, false, false);
 
             } else if (currentPhase === 2) {
                 // Itens do objetivo principal da Fase 2: 4 Vales Sorvete e 4 Sorvetes de sabores específicos
@@ -766,52 +598,48 @@
                 // Outros itens coletáveis da Fase 2 (sorvetes não-objetivo)
                 itens.push(createGameObject('sorvete', '🥭🍦', ITEM_SIZE, true, false, 'manga', false)); // Sorvete de Manga (não objetivo)
                 itens.push(createGameObject('sorvete', '🍦', ITEM_SIZE, true, false, 'flocos', false)); // Sorvete de Flocos (não objetivo)
-                
+
+                // Não há baú na Fase 2, a vitória é por coletar vales e sorvetes
+                chest = null; 
             } else if (currentPhase === 3) {
-                // Itens do objetivo principal da Fase 3: 3 Troféus, 3 Bolas, 3 Pipas
+                // Itens do objetivo principal da Fase 3: 3 Troféus e 3 Bolas
                 itens.push(createGameObject('trofeu', '🏆', ITEM_SIZE, true, false, null, true));
                 itens.push(createGameObject('trofeu', '🏆', ITEM_SIZE, true, false, null, true));
                 itens.push(createGameObject('trofeu', '🏆', ITEM_SIZE, true, false, null, true));
-                
                 itens.push(createGameObject('bola', '⚽', ITEM_SIZE, true, false, null, true)); // Bola (objetivo)
                 itens.push(createGameObject('bola', '⚽', ITEM_SIZE, true, false, null, true));
                 itens.push(createGameObject('bola', '⚽', ITEM_SIZE, true, false, null, true));
 
-                itens.push(createGameObject('pipa', '🪁', ITEM_SIZE, true, false, null, true)); // Novo objetivo
-                itens.push(createGameObject('pipa', '🪁', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('pipa', '🪁', ITEM_SIZE, true, false, null, true));
+                // Outros itens coletáveis da Fase 3 (pipas)
+                itens.push(createGameObject('pipa', '🪁', ITEM_SIZE, true, false, null, false));
+                itens.push(createGameObject('pipa', '🪁', ITEM_SIZE, true, false, null, false));
 
+                // Não há baú na Fase 3
+                chest = null;
             } else if (currentPhase === 4) {
-                // Itens do objetivo principal da Fase 4: 3 Tubos de Ensaio, 3 Ímãs, 3 Microscópios
+                // Itens do objetivo principal da Fase 4: 3 Tubos de Ensaio e 3 Ímãs
                 itens.push(createGameObject('tubo_ensaio', '🧪', ITEM_SIZE, true, false, null, true));
                 itens.push(createGameObject('tubo_ensaio', '🧪', ITEM_SIZE, true, false, null, true));
                 itens.push(createGameObject('tubo_ensaio', '🧪', ITEM_SIZE, true, false, null, true));
-                
                 itens.push(createGameObject('ima', '🧲', ITEM_SIZE, true, false, null, true));
                 itens.push(createGameObject('ima', '🧲', ITEM_SIZE, true, false, null, true));
                 itens.push(createGameObject('ima', '🧲', ITEM_SIZE, true, false, null, true));
-
-                itens.push(createGameObject('microscopio', '🔬', ITEM_SIZE, true, false, null, true)); // Novo objetivo
-                itens.push(createGameObject('microscopio', '🔬', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('microscopio', '🔬', ITEM_SIZE, true, false, null, true));
 
                 // Outros itens de laboratório (não objetivo)
                 itens.push(createGameObject('bequer', '⚗️', ITEM_SIZE, true, false, null, false));
+                itens.push(createGameObject('microscopio', '🔬', ITEM_SIZE, true, false, null, false));
                 itens.push(createGameObject('pipeta', '💧', ITEM_SIZE, true, false, null, false)); 
                 
+                // Não há baú na Fase 4
+                chest = null;
             } else if (currentPhase === 5) {
-                // Itens do objetivo principal da Fase 5: 3 Elefantes, 3 Leões, 3 Aves
+                // Itens do objetivo principal da Fase 5: 2 Elefantes, 2 Leões, 2 Aves
                 itens.push(createGameObject('elefante', '🐘', ITEM_SIZE, true, false, null, true));
                 itens.push(createGameObject('elefante', '🐘', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('elefante', '🐘', ITEM_SIZE, true, false, null, true)); // Added one more
-                
                 itens.push(createGameObject('leao', '🦁', ITEM_SIZE, true, false, null, true));
                 itens.push(createGameObject('leao', '🦁', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('leao', '🦁', ITEM_SIZE, true, false, null, true)); // Added one more
-
                 itens.push(createGameObject('ave', '🦜', ITEM_SIZE, true, false, null, true));
                 itens.push(createGameObject('ave', '🦜', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('ave', '🦜', ITEM_SIZE, true, false, null, true)); // Added one more
 
                 // Outros itens de zoológico (não objetivo)
                 itens.push(createGameObject('macaco', '🐒', ITEM_SIZE, true, false, null, false));
@@ -819,8 +647,10 @@
                 itens.push(createGameObject('cobra', '🐍', ITEM_SIZE, true, false, null, false));
                 itens.push(createGameObject('lagarto', '🦎', ITEM_SIZE, true, false, null, false));
 
+                // Não há baú na Fase 5
+                chest = null;
             } else if (currentPhase === 6) {
-                // Itens do objetivo principal da Fase 6: 3 Pinturas, 3 Esculturas, 3 Fósseis
+                // Itens do objetivo principal da Fase 6: 3 Pinturas, 3 Esculturas, 2 Fósseis
                 itens.push(createGameObject('pintura', '🎨', ITEM_SIZE, true, false, null, true));
                 itens.push(createGameObject('pintura', '🎨', ITEM_SIZE, true, false, null, true));
                 itens.push(createGameObject('pintura', '🎨', ITEM_SIZE, true, false, null, true));
@@ -829,26 +659,22 @@
                 itens.push(createGameObject('escultura', '🗿', ITEM_SIZE, true, false, null, true));
                 itens.push(createGameObject('fossil', '🦴', ITEM_SIZE, true, false, null, true));
                 itens.push(createGameObject('fossil', '🦴', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('fossil', '🦴', ITEM_SIZE, true, false, null, true)); // Added one more
 
                 // Outros itens de museu (não objetivo)
                 itens.push(createGameObject('artefato', '🏺', ITEM_SIZE, true, false, null, false));
                 itens.push(createGameObject('pincel', '🖌️', ITEM_SIZE, true, false, null, false));
                 itens.push(createGameObject('livro_arte', '🖼️', ITEM_SIZE, true, false, null, false));
 
+                // Não há baú na Fase 6
+                chest = null;
             } else if (currentPhase === 7) {
-                // Itens do objetivo principal da Fase 7: 3 Cestas de Piquenique, 3 Bolas, 3 Brinquedos de Parque
+                // Itens do objetivo principal da Fase 7: 2 Cestas de Piquenique, 2 Bolas, 2 Brinquedos de Parque
                 itens.push(createGameObject('cesta_piquenique', '🧺', ITEM_SIZE, true, false, null, true));
                 itens.push(createGameObject('cesta_piquenique', '🧺', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('cesta_piquenique', '🧺', ITEM_SIZE, true, false, null, true)); // Added one more
-                
                 itens.push(createGameObject('bola', '⚽', ITEM_SIZE, true, false, null, true)); // Bola (objetivo)
                 itens.push(createGameObject('bola', '⚽', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('bola', '⚽', ITEM_SIZE, true, false, null, true)); // Added one more
-
                 itens.push(createGameObject('brinquedo_parque', '🎠', ITEM_SIZE, true, false, null, true));
                 itens.push(createGameObject('brinquedo_parque', '🎠', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('brinquedo_parque', '🎠', ITEM_SIZE, true, false, null, true)); // Added one more
 
                 // Outros itens de parque (não objetivo)
                 itens.push(createGameObject('balao', '🎈', ITEM_SIZE, true, false, null, false));
@@ -858,99 +684,69 @@
                 itens.push(createGameObject('borboleta', '🦋', ITEM_SIZE, true, false, null, false));
                 itens.push(createGameObject('borboleta', '🦋', ITEM_SIZE, true, false, null, false));
                 
+                // Não há baú na Fase 7
+                chest = null;
             } else if (currentPhase === 8) { // Capítulo 8: Leiturinhas
                 // Itens para o Capítulo 8: Leiturinhas (3 itens temáticos)
-                itens.push(createGameObject('livro_aventura', '🗺️', ITEM_SIZE, true, false, null, true)); // Livro de Aventura (objetivo)
-                itens.push(createGameObject('livro_aventura', '🗺️', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('livro_aventura', '🗺️', ITEM_SIZE, true, false, null, true));
-                
-                itens.push(createGameObject('livro_animais', '🦁', ITEM_SIZE, true, false, null, true)); // Livro Ilustrado de Animais (objetivo) - Removed 📚 from emoji
-                itens.push(createGameObject('livro_animais', '🦁', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('livro_animais', '🦁', ITEM_SIZE, true, false, null, true));
-
-                itens.push(createGameObject('livro_fabula', '📜', ITEM_SIZE, true, false, null, true));   // Livro de Fábula (objetivo) - Changed emoji
-                itens.push(createGameObject('livro_fabula', '📜', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('livro_fabula', '📜', ITEM_SIZE, true, false, null, true));
-                
-                // Outros itens gerais de leitura (não objetivo)
-                itens.push(createGameObject('oculos', '👓', ITEM_SIZE, true, false, null, false));
-                itens.push(createGameObject('caneta', '🖊️', ITEM_SIZE, true, false, null, false));
-                itens.push(createGameObject('globo', '🌍', ITEM_SIZE, true, false, null, false)); 
-            } else if (currentPhase === 9) {
+                itens.push(createGameObject('livro_aberto', '📖', ITEM_SIZE, true, false, null, true)); // isObstacle: false
+                itens.push(createGameObject('oculos', '👓', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('caneta', '🖊️', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('globo', '🌍', ITEM_SIZE, true, false, null, false)); // Não objetivo
+                itens.push(createGameObject('moeda', '💰', ITEM_SIZE, true, false, null, false)); // Adiciona moedas também
+                itens.push(createGameObject('moeda', '💰', ITEM_SIZE, true, false, null, false));
+                chest = null; // Não há baú no Capítulo 8
+            } else if (currentPhase === 9) { // Capítulo 9: Planeta
                 // Itens para o Capítulo 9: Reciclagem e Meio Ambiente (3 itens temáticos)
                 itens.push(createGameObject('lixeira_reciclagem', '♻️', ITEM_SIZE, true, false, null, true)); // isObstacle: false
-                itens.push(createGameObject('lixeira_reciclagem', '♻️', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('lixeira_reciclagem', '♻️', ITEM_SIZE, true, false, null, true));
-
                 itens.push(createGameObject('garrafa_plastico', '🧴', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('garrafa_plastico', '🧴', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('garrafa_plastico', '🧴', ITEM_SIZE, true, false, null, true));
-
                 itens.push(createGameObject('arvore_muda', '🌱', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('arvore_muda', '🌱', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('arvore_muda', '🌱', ITEM_SIZE, true, false, null, true));
-
                 itens.push(createGameObject('saco_lixo', '🗑️', ITEM_SIZE, true, false, null, false)); // Não objetivo
                 itens.push(createGameObject('flor', '🌸', ITEM_SIZE, true, false, null, false)); // Não objetivo
-            } else if (currentPhase === 10) {
+                itens.push(createGameObject('moeda', '💰', ITEM_SIZE, true, false, null, false));
+                itens.push(createGameObject('moeda', '💰', ITEM_SIZE, true, false, null, false));
+                chest = null; // Não há baú no Capítulo 9
+            } else if (currentPhase === 10) { // Capítulo 10: Exploração da Natureza
                 // Itens para o Capítulo 10: Exploração da Natureza (3 itens temáticos)
                 itens.push(createGameObject('planta_nativa', '🌿', ITEM_SIZE, true, false, null, true)); // isObstacle: false
-                itens.push(createGameObject('planta_nativa', '🌿', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('planta_nativa', '🌿', ITEM_SIZE, true, false, null, true));
-
-                itens.push(createGameObject('animal_selvagem', '🦁', ITEM_SIZE, true, false, null, true)); // Changed to Lion
-                itens.push(createGameObject('animal_selvagem', '🦁', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('animal_selvagem', '🦁', ITEM_SIZE, true, false, null, true));
-
-                itens.push(createGameObject('telescopio', '🔭', ITEM_SIZE, true, false, null, true)); // Changed to Telescope
-                itens.push(createGameObject('telescopio', '🔭', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('telescopio', '🔭', ITEM_SIZE, true, false, null, true));
-
+                itens.push(createGameObject('animal_selvagem', '🦋', ITEM_SIZE, true, false, null, true));
+                itens.push(createGameObject('binoculos', '🔭', ITEM_SIZE, true, false, null, true));
                 itens.push(createGameObject('lupa', '🔎', ITEM_SIZE, true, false, null, false)); // Não objetivo
-            } else if (currentPhase === 11) {
+                itens.push(createGameObject('moeda', '💰', ITEM_SIZE, true, false, null, false));
+                itens.push(createGameObject('moeda', '💰', ITEM_SIZE, true, false, null, false));
+                chest = null; // Não há baú no Capítulo 10
+            } else if (currentPhase === 11) { // Capítulo 11: Oficina de Artes
                 // Itens para o Capítulo 11: Oficina de Artes (3 itens temáticos)
                 itens.push(createGameObject('pincel', '🖌️', ITEM_SIZE, true, false, null, true)); // isObstacle: false
-                itens.push(createGameObject('pincel', '🖌️', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('pincel', '🖌️', ITEM_SIZE, true, false, null, true));
-
                 itens.push(createGameObject('tinta', '🎨', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('tinta', '🎨', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('tinta', '🎨', ITEM_SIZE, true, false, null, true));
-
                 itens.push(createGameObject('argila', '🏺', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('argila', '🏺', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('argila', '🏺', ITEM_SIZE, true, false, null, true));
-
-                itens.push(createGameObject('lapis_color', '🖍️', ITEM_SIZE, true, false, null, false)); // Não objetivo
+                itens.push(createGameObject('lapis_cor', '🖍️', ITEM_SIZE, true, false, null, false)); // Não objetivo
                 itens.push(createGameObject('tela', '🖼️', ITEM_SIZE, true, false, null, false)); // Não objetivo
-            } else if (currentPhase === 12) {
+                itens.push(createGameObject('moeda', '💰', ITEM_SIZE, true, false, null, false));
+                itens.push(createGameObject('moeda', '💰', ITEM_SIZE, true, false, null, false));
+                chest = null; // Não há baú no Capítulo 11
+            } else if (currentPhase === 12) { // Capítulo 12: Música e Dança
                 // Itens para o Capítulo 12: Música e Dança (3 itens temáticos)
                 itens.push(createGameObject('violao', '🎸', ITEM_SIZE, true, false, null, true)); // isObstacle: false
-                itens.push(createGameObject('violao', '🎸', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('violao', '🎸', ITEM_SIZE, true, false, null, true));
-
                 itens.push(createGameObject('piano', '🎹', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('piano', '🎹', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('piano', '🎹', ITEM_SIZE, true, false, null, true));
-
                 itens.push(createGameObject('microfone', '🎤', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('microfone', '🎤', ITEM_SIZE, true, false, null, true));
-                itens.push(createGameObject('microfone', '🎤', ITEM_SIZE, true, false, null, true));
-
                 itens.push(createGameObject('fones_ouvido', '🎧', ITEM_SIZE, true, false, null, false)); // Não objetivo
                 itens.push(createGameObject('partitura', '🎼', ITEM_SIZE, true, false, null, false)); // Não objetivo
+                itens.push(createGameObject('moeda', '💰', ITEM_SIZE, true, false, null, false));
+                itens.push(createGameObject('moeda', '💰', ITEM_SIZE, true, false, null, false));
+                chest = null; // Não há baú no Capítulo 12
             }
 
 
             // Gera os obstáculos temáticos da escola (comum para todas as fases)
-            for (let i = 0; i < 3; i++) { // Loop para 3 de cada tipo
-                obstaculos.push(createGameObject('mesa', '🔲', OBSTACLE_SIZE, false, true)); // Alterado emoji da mesa
+            for (let i = 0; i < 4; i++) { 
+                obstaculos.push(createGameObject('mesa', '🪑', OBSTACLE_SIZE, false, true)); 
                 obstaculos.push(createGameObject('cadeira', '🪑', OBSTACLE_SIZE, false, true));
                 obstaculos.push(createGameObject('armario', '🚪', OBSTACLE_SIZE, false, true));
+                obstaculos.push(createGameObject('quadro', '🖼️', OBSTACLE_SIZE, false, true));
             }
 
             // Gera os itens escolares (não coletáveis, não obstáculos - comum para todas as fases)
-            for (let i = 0; i < 3; i++) { // Loop para 3 de cada
+            for (let i = 0; i < 5; i++) { 
                 schoolItems.push(createGameObject('lapis', '✏️', SCHOOL_ITEM_SIZE, true, false, null, false)); 
                 schoolItems.push(createGameObject('caderno', '📓', SCHOOL_ITEM_SIZE, true, false, null, false)); 
                 schoolItems.push(createGameObject('livro', '📚', SCHOOL_ITEM_SIZE, false, false)); 
@@ -963,135 +759,125 @@
 
             atualizarHUD(); // Atualiza o HUD com o novo total e objetivo
 
-            // Limpa qualquer temporador anterior e inicia o novo
+            // Limpa qualquer temporizador anterior e inicia o novo
             if (gameInterval) clearInterval(gameInterval);
             gameInterval = setInterval(() => {
-                // Decrementa o tempo a cada segundo
-                if (tempo > 0) {
-                    tempo--;
-                    // Obtenha a referência ao elemento 'tempo' aqui, dentro do setInterval
+                // console.log("DEBUG: setInterval is running. Current tempo:", tempo); // Debugging timer
+                let winConditionMet = false;
+                if (currentPhase === 1) {
+                    winConditionMet = (pedrasColetadas === TOTAL_PEDRAS && hasKey && chest === null);
+                } else if (currentPhase === 2) {
+                    winConditionMet = (valesSorveteColetados === TOTAL_VALES_SORVETE && sorvetesObjetivoColetados === TOTAL_SORVETES_OBJETIVO);
+                } else if (currentPhase === 3) {
+                    winConditionMet = (trofeusColetados === TOTAL_TROFEUS && bolasColetadas === TOTAL_BOLAS_FASE3);
+                } else if (currentPhase === 4) {
+                    winConditionMet = (tubosEnsaioColetados === TOTAL_TUBOS_ENSAIO && imasColetados === TOTAL_IMAS);
+                } else if (currentPhase === 5) {
+                    winConditionMet = (elefantesColetados === TOTAL_ELEFANTES && leoesColetados === TOTAL_LEOES && avesColetadas === TOTAL_AVES);
+                } else if (currentPhase === 6) {
+                    winConditionMet = (pinturasColetadas === TOTAL_PINTURAS && esculturasColetadas === TOTAL_ESCULTURAS && fosseisColetados === TOTAL_FOSSEIS);
+                } else if (currentPhase === 7) {
+                    winConditionMet = (cestasPiqueniqueColetadas === TOTAL_CESTAS_PIQUENIQUE && bolasFase7Coletadas === TOTAL_BOLAS_FASE7 && brinquedosParqueColetados === TOTAL_BRINQUEDOS_PARQUE);
+                } else if (currentPhase === 8) {
+                    winConditionMet = (leiturinhasColetadas >= TOTAL_LEITURINHAS);
+                } else if (currentPhase === 9) {
+                    winConditionMet = (planetaItemsColetados >= TOTAL_PLANETA_ITEMS);
+                } else if (currentPhase === 10) {
+                    winConditionMet = (naturezaExploracaoColetados >= TOTAL_NATUREZA_EXPLORACAO);
+                } else if (currentPhase === 11) {
+                    winConditionMet = (artesItemsColetados >= TOTAL_ARTES_ITEMS);
+                } else if (currentPhase === 12) {
+                    winConditionMet = (musicaDancaColetados >= TOTAL_MUSICA_DANCA);
+                }
+
+                if (tempo > 0 && vidas > 0 && !winConditionMet) {
+                    tempo--; // DECREMENTO DE TEMPO
+                    // Acessa o elemento 'tempo' diretamente aqui para garantir que não seja nulo
                     const currentTempoElement = document.getElementById('tempo');
                     if (currentTempoElement) {
                         currentTempoElement.innerText = `Tempo: ${tempo}s`; // Atualiza o texto do tempo
                     } else {
                         console.error("Erro: Elemento 'tempo' não encontrado no DOM (dentro do setInterval).");
                     }
-                    console.log(`DEBUG: Cronômetro rodando. Tempo atual: ${tempo}s. Elemento: `, currentTempoElement); // Log de depuração detalhado
-                }
-
-                let winConditionMet = false;
-                if (currentPhase === 1) {
-                    winConditionMet = (chest && chest.isOpened); // Condição de vitória para Fase 1: baú aberto
-                } else if (currentPhase === 2) {
-                    winConditionMet = (valesSorveteColetados === TOTAL_VALES_SORVETE && sorvetesObjetivoColetados === TOTAL_SORVETES_OBJETIVO);
-                } else if (currentPhase === 3) {
-                    winConditionMet = (trofeusColetados >= TOTAL_TROFEUS && bolasColetadas >= TOTAL_BOLAS_FASE3 && pipasColetadas >= TOTAL_PIPAS);
-                } else if (currentPhase === 4) {
-                    winConditionMet = (tubosEnsaioColetados >= TOTAL_TUBOS_ENSAIO && imasColetados >= TOTAL_IMAS && microscopioColetados >= TOTAL_MICROSCOPIO);
-                } else if (currentPhase === 5) {
-                    winConditionMet = (elefantesColetados >= TOTAL_ELEFANTES && leoesColetados >= TOTAL_LEOES && avesColetadas >= TOTAL_AVES);
-                } else if (currentPhase === 6) {
-                    winConditionMet = (pinturasColetadas === TOTAL_PINTURAS && esculturasColetadas === TOTAL_ESCULTURAS && fosseisColetados >= TOTAL_FOSSEIS);
-                } else if (currentPhase === 7) {
-                    winConditionMet = (cestasPiqueniqueColetadas >= TOTAL_CESTAS_PIQUENIQUE && bolasFase7Coletadas >= TOTAL_BOLAS_FASE7 && brinquedosParqueColetados >= TOTAL_BRINQUEDOS_PARQUE);
-                } else if (currentPhase === 8) {
-                    winConditionMet = (livroAventuraColetados >= TOTAL_LIVRO_AVENTURA && livroAnimaisColetados >= TOTAL_LIVRO_ANIMAIS && livroFabulaColetados >= TOTAL_LIVRO_FABULA);
-                } else if (currentPhase === 9) {
-                    winConditionMet = (lixeiraReciclagemColetados >= TOTAL_LIXEIRA_RECICLAGEM && garrafaPlasticoColetados >= TOTAL_GARRAFA_PLASTICO && arvoreMudaColetados >= TOTAL_ARVORE_MUDA);
-                } else if (currentPhase === 10) {
-                    winConditionMet = (plantaNativaColetados >= TOTAL_PLANTAS_NATIVAS && animalSelvagemColetados >= TOTAL_ANIMAIS_SELVAGENS && telescopioColetados >= TOTAL_TELESCOPIO);
-                } else if (currentPhase === 11) {
-                    winConditionMet = (pincelColetados >= TOTAL_PINCEL && tintaColetados >= TOTAL_TINTA && argilaColetados >= TOTAL_ARGILA);
-                } else if (currentPhase === 12) {
-                    winConditionMet = (violaoColetados >= TOTAL_VIOLAO && pianoColetados >= TOTAL_PIANO && microfoneColetados >= TOTAL_MICROFONE);
-                }
-
-                if (winConditionMet) {
-                    clearInterval(gameInterval); // Para o temporador do jogo
-                    if (currentPhase < 12) { // Se não é a última fase do nível
-                        showTemporaryMessage(`Capítulo ${currentPhase} Concluído!`, 2000);
-                        setTimeout(() => {
-                            iniciar(currentPlayerType, currentPhase + 1); // Inicia a próxima fase
-                        }, 2000);
-                    } else if (currentPhase === 12 && currentLevel < 6) { // Fim do nível, sobe de nível
-                        currentLevel++;
-                        showTemporaryMessage(`Parabéns, você subiu para o Nível ${currentLevel}! 😊`, 3000);
-                        setTimeout(() => {
-                            iniciar(currentPlayerType, 1); // Reinicia na Fase 1 do novo nível
-                        }, 3000);
-                    } else if (currentPhase === 12 && currentLevel === 6) { // Fim do jogo (Nível 6, Fase 12)
-                        showTemporaryMessage("Fim de Jogo! Obrigado por jogar!", 3000); // Mensagem final
-                        setTimeout(() => {
-                            // Reset game to initial state for replay
-                            currentLevel = 1;
-                            currentPhase = 1;
-                            vidas = 3;
-                            totalAllItemsCollected = 0;
-                            // Reset all specific item counts as well
-                            pedrasColetadas = 0;
-                            keysColetadas = 0;
-                            valesSorveteColetados = 0;
-                            sorvetesObjetivoColetados = 0;
-                            trofeusColetados = 0;
-                            bolasColetadas = 0;
-                            pipasColetadas = 0;
-                            tubosEnsaioColetados = 0;
-                            imasColetados = 0;
-                            microscopioColetados = 0;
-                            elefantesColetados = 0;
-                            leoesColetados = 0;
-                            avesColetadas = 0;
-                            pinturasColetadas = 0;
-                            esculturasColetadas = 0;
-                            fosseisColetados = 0;
-                            cestasPiqueniqueColetadas = 0;
-                            bolasFase7Coletadas = 0;
-                            brinquedosParqueColetados = 0;
-                            livroAventuraColetados = 0;
-                            livroAnimaisColetados = 0;
-                            livroFabulaColetados = 0;
-                            lixeiraReciclagemColetados = 0;
-                            garrafaPlasticoColetados = 0;
-                            arvoreMudaColetados = 0;
-                            plantaNativaColetados = 0;
-                            animalSelvagemColetados = 0;
-                            telescopioColetados = 0;
-                            pincelColetados = 0;
-                            tintaColetados = 0;
-                            argilaColetados = 0;
-                            violaoColetados = 0;
-                            pianoColetados = 0;
-                            microfoneColetados = 0;
-                            tempo = BASE_TIME; // Reset time to base for new game
-                            coletando = false;
-                            hasKey = false;
-                            itens = [];
-                            obstaculos = [];
-                            schoolItems = [];
-                            chest = null; // Reset chest for new game
-
-                            // Go back to intro screen for a full restart
-                            document.getElementById('introScreen').style.display = 'flex';
-                            document.getElementById('personagemSelecao').style.display = 'none';
-                            document.getElementById('hud').style.display = 'none';
-                        }, 3000);
-                    }
-                } else if (tempo === 0 && vidas > 0) { // Tempo esgotado, mas ainda tem vidas
-                    clearInterval(gameInterval); // Para o jogo enquanto a mensagem é exibida
-                    showTemporaryMessage("Perdeu!", 3000); // Exibe "Perdeu!" por 3 segundos
                     
-                    setTimeout(() => { // Após a mensagem temporária
-                        vidas--; // Consome uma vida
-                        atualizarHUD(); // Atualiza o HUD para mostrar a vida perdida
+                    if (tempo === 0) {
+                        // Tempo esgotado, mas ainda tem vidas
+                        clearInterval(gameInterval); // Para o jogo enquanto a mensagem é exibida
+                        showTemporaryMessage("Perdeu!", 3000); // Exibe "Perdeu!" por 3 segundos
+                        
+                        setTimeout(() => { // Após a mensagem temporária
+                            vidas--; // Consome uma vida
+                            atualizarHUD(); // Atualiza o HUD para mostrar a vida perdida
 
-                        if (vidas > 0) {
-                            // Ainda tem vidas, reinicia a fase
-                            iniciar(currentPlayerType, currentPhase); // Reinicia a fase atual
-                        } else {
-                            // Perdeu a última vida, mostra a tela de continue
-                            showContinueScreen();
-                        }
-                    }, 3000); // Espera a duração da mensagem temporária
+                            if (vidas > 0) {
+                                // Ainda tem vidas, reinicia a fase
+                                iniciar(currentPlayerType, currentPhase); // Reinicia a fase atual
+                            } else {
+                                // Perdeu a última vida, mostra a tela de continue
+                                showContinueScreen();
+                            }
+                        }, 3000); // Espera a duração da mensagem temporária
+                    }
+                } else if (winConditionMet) {
+                    clearInterval(gameInterval); // Para o jogo
+                    if (currentPhase === 1) {
+                        showTemporaryMessage("Capítulo 1 Concluído!", 2000);
+                        setTimeout(() => {
+                            iniciar(currentPlayerType, 2); // Inicia a Fase 2
+                        }, 2000);
+                    } else if (currentPhase === 2) {
+                        showTemporaryMessage("Capítulo 2 Concluído!", 2000);
+                        setTimeout(() => {
+                            iniciar(currentPlayerType, 3); // Inicia a Fase 3
+                        }, 2000);
+                    } else if (currentPhase === 3) {
+                        showTemporaryMessage("Capítulo 3 Concluído!", 2000);
+                        setTimeout(() => {
+                            iniciar(currentPlayerType, 4); // Inicia a Fase 4
+                        }, 2000);
+                    } else if (currentPhase === 4) {
+                        showTemporaryMessage("Capítulo 4 Concluído!", 2000);
+                        setTimeout(() => {
+                            iniciar(currentPlayerType, 5); // Inicia a Fase 5
+                        }, 2000);
+                    } else if (currentPhase === 5) {
+                        showTemporaryMessage("Capítulo 5 Concluído!", 2000);
+                        setTimeout(() => {
+                            iniciar(currentPlayerType, 6); // Inicia a Fase 6
+                        }, 2000);
+                    } else if (currentPhase === 6) {
+                        showTemporaryMessage("Capítulo 6 Concluído!", 2000);
+                        setTimeout(() => {
+                            iniciar(currentPlayerType, 7); // Inicia a Fase 7
+                        }, 2000);
+                    } else if (currentPhase === 7) {
+                        showTemporaryMessage("Capítulo 7 Concluído!", 2000);
+                        setTimeout(() => {
+                            iniciar(currentPlayerType, 8); // Inicia a Fase 8 (Capítulo 8)
+                        }, 2000);
+                    } else if (currentPhase === 8) {
+                        showTemporaryMessage("Capítulo 8 Concluído!", 2000);
+                        setTimeout(() => {
+                            iniciar(currentPlayerType, 9); // Inicia a Fase 9 (Capítulo 9)
+                        }, 2000);
+                    } else if (currentPhase === 9) {
+                        showTemporaryMessage("Capítulo 9 Concluído!", 2000);
+                        setTimeout(() => {
+                            iniciar(currentPlayerType, 10); // Inicia a Fase 10 (Capítulo 10)
+                        }, 2000);
+                    } else if (currentPhase === 10) {
+                        showTemporaryMessage("Capítulo 10 Concluído!", 2000);
+                        setTimeout(() => {
+                            iniciar(currentPlayerType, 11); // Inicia a Fase 11 (Capítulo 11)
+                        }, 2000);
+                    } else if (currentPhase === 11) {
+                        showTemporaryMessage("Capítulo 11 Concluído!", 2000);
+                        setTimeout(() => {
+                            iniciar(currentPlayerType, 12); // Inicia a Fase 12 (Capítulo 12)
+                        }, 2000);
+                    } else if (currentPhase === 12) {
+                        encerrar("✅ Parabéns! Você completou todos os capítulos!"); // Vitória final após o Capítulo 12
+                    }
                 } else if (vidas <= 0) { // Se vidas chegou a 0, mostra a tela de continue
                     clearInterval(gameInterval); // Para o jogo
                     showContinueScreen();
@@ -1157,21 +943,21 @@
 
             const placedObjects = []; // Para controlar a sobreposição
 
-            // Define uma área segura fixa no centro para o jogador (200x200 pixels)
-            const playerSafeZoneSize = 200; 
+            // Define uma área segura no centro para o jogador
+            const playerStartX = canvas.width / 2 - PLAYER_SIZE / 2;
+            const playerStartY = canvas.height / 2 - PLAYER_SIZE / 2;
+            // Aumentei a zona segura para 3x o tamanho do jogador (6x PLAYER_SIZE total)
             const playerSafeZone = {
-                x: canvas.width / 2 - playerSafeZoneSize / 2,
-                y: canvas.height / 2 - playerSafeZoneSize / 2,
-                width: playerSafeZoneSize,
-                height: playerSafeZoneSize
+                x: playerStartX - PLAYER_SIZE * 2.5,
+                y: playerStartY - PLAYER_SIZE * 2.5,
+                width: PLAYER_SIZE * 6,
+                height: PLAYER_SIZE * 6
             };
 
             function getRandomPosition(objSize, isObstacle = false) {
                 let newX, newY, collision;
                 let attempts = 0;
-                const maxAttempts = 1000; // Aumentado para mais chances de posicionamento
-                // Define a distância mínima de afastamento para objetos (3 vezes o tamanho de um obstáculo)
-                const minClearanceBetweenObjects = 3 * OBSTACLE_SIZE; 
+                const maxAttempts = 100; // Evita loop infinito
 
                 do {
                     collision = false;
@@ -1182,20 +968,21 @@
 
                     // Verifica colisão com objetos já posicionados
                     for (const placedObj of placedObjects) {
-                        // Calcula a distância mínima necessária entre os centros dos objetos
-                        const requiredMinDistanceX = (newRect.width / 2) + (placedObj.width / 2) + minClearanceBetweenObjects;
-                        const requiredMinDistanceY = (newRect.height / 2) + (placedObj.height / 2) + minClearanceBetweenObjects;
-
-                        // Verifica se os objetos estão muito próximos
-                        if (Math.abs(newRect.x + newRect.width / 2 - (placedObj.x + placedObj.width / 2)) < requiredMinDistanceX &&
-                            Math.abs(newRect.y + newRect.height / 2 - (placedObj.y + placedObj.height / 2)) < requiredMinDistanceY) {
+                        const exclusionZone = 5.0; // Aumentado para 5.0 para mais dispersão
+                        const expandedRect = {
+                            x: placedObj.x - (objSize * (exclusionZone - 1) / 2),
+                            y: placedObj.y - (objSize * (exclusionZone - 1) / 2),
+                            width: placedObj.width * exclusionZone,
+                            height: placedObj.height * exclusionZone
+                        };
+                        if (checkCollision(newRect, expandedRect)) {
                             collision = true;
                             break;
                         }
                     }
 
-                    // Se for um obstáculo ou um item coletável, verifica também colisão com a zona segura do jogador
-                    if (!collision && (isObstacle || newRect.canBeCollected) && checkCollision(newRect, playerSafeZone)) {
+                    // Se for um obstáculo, verifica também colisão com a zona segura do jogador
+                    if (!collision && isObstacle && checkCollision(newRect, playerSafeZone)) {
                         collision = true;
                     }
 
@@ -1203,25 +990,9 @@
                 } while (collision && attempts < maxAttempts);
 
                 if (attempts === maxAttempts) {
-                    console.warn(`AVISO: Não foi possível encontrar uma posição livre para o objeto de tamanho ${objSize} após ${maxAttempts} tentativas. Pode haver sobreposição.`);
+                    console.warn("Não foi possível encontrar uma posição livre para um objeto. Pode haver sobreposição.");
                 }
                 return { x: newX, y: newY, width: objSize, height: objSize };
-            }
-
-            // Posicionar obstáculos primeiro para garantir o espaçamento
-            obstaculos.forEach(obstacle => {
-                const pos = getRandomPosition(obstacle.size, true); // Passa true para isObstacle
-                obstacle.x = pos.x;
-                obstacle.y = pos.y;
-                placedObjects.push(obstacle);
-            });
-
-            // Posicionar o baú (apenas na Fase 1)
-            if (chest && currentPhase === 1) {
-                const pos = getRandomPosition(chest.size);
-                chest.x = pos.x;
-                chest.y = pos.y;
-                placedObjects.push(chest);
             }
 
             // Posicionar itens
@@ -1232,6 +1003,14 @@
                 placedObjects.push(item);
             });
 
+            // Posicionar obstáculos
+            obstaculos.forEach(obstacle => {
+                const pos = getRandomPosition(obstacle.size, true); // Passa true para isObstacle
+                obstacle.x = pos.x;
+                obstacle.y = pos.y;
+                placedObjects.push(obstacle);
+            });
+
             // Posicionar itens escolares
             schoolItems.forEach(sItem => {
                 const pos = getRandomPosition(sItem.size);
@@ -1239,6 +1018,14 @@
                 sItem.y = pos.y;
                 placedObjects.push(sItem);
             });
+
+            // Posicionar o baú (apenas na Fase 1)
+            if (chest && currentPhase === 1) {
+                const pos = getRandomPosition(chest.size);
+                chest.x = pos.x;
+                chest.y = pos.y;
+                placedObjects.push(chest);
+            }
         }
 
         // Desenha um objeto no canvas
@@ -1270,10 +1057,7 @@
         // Lógica de interações (coleta de itens, colisão com obstáculos, interação com o baú)
         function handleInteractions() {
             // Oculta qualquer dica LLM ativa ao interagir
-            const hintMessageDiv = document.getElementById('llmHintMessage');
-            if (hintMessageDiv) {
-                hintMessageDiv.style.display = 'none';
-            }
+            document.getElementById('llmHintMessage').style.display = 'none';
             if (hintTimeout) clearTimeout(hintTimeout);
 
             // 1. Coleta de Itens (se o botão de ação estiver pressionado)
@@ -1290,8 +1074,8 @@
                                     pedrasColetadas++;
                                     console.log(`DEBUG: Pedra coletada! Total de pedras: ${pedrasColetadas}/${TOTAL_PEDRAS}`);
                                 } else if (collectedItem.type === 'chave') {
-                                    keysColetadas++; // Incrementa o contador de chaves
-                                    console.log(`DEBUG: Chave coletada! Total de chaves: ${keysColetadas}/${TOTAL_CHAVES}`); // Log para a nova lógica de chaves
+                                    hasKey = true;
+                                    console.log("DEBUG: Chave dourada coletada!");
                                 }
                             } else if (currentPhase === 2) { // Lógica de objetivo da Fase 2
                                 if (collectedItem.type === 'vale_sorvete') {
@@ -1308,9 +1092,6 @@
                                 } else if (collectedItem.type === 'bola' && collectedItem.isObjective) { // Bolas objetivo na Fase 3
                                     bolasColetadas++;
                                     console.log(`DEBUG: Bola coletada! Total de bolas: ${bolasColetadas}/${TOTAL_BOLAS_FASE3}`);
-                                } else if (collectedItem.type === 'pipa') { // Novo objetivo
-                                    pipasColetadas++;
-                                    console.log(`DEBUG: Pipa coletada! Total: ${pipasColetadas}/${TOTAL_PIPAS}`);
                                 }
                             } else if (currentPhase === 4) { // Lógica de objetivo da Fase 4
                                 if (collectedItem.type === 'tubo_ensaio') {
@@ -1319,12 +1100,8 @@
                                 } else if (collectedItem.type === 'ima') {
                                     imasColetados++;
                                     console.log(`DEBUG: Ímã coletado! Total: ${imasColetados}/${TOTAL_IMAS}`);
-                                } else if (collectedItem.type === 'microscopio') { // Novo objetivo
-                                    microscopioColetados++;
-                                    console.log(`DEBUG: Microscópio coletado! Total: ${microscopioColetados}/${TOTAL_MICROSCOPIO}`);
                                 }
-                            } else if (currentPhase === 5) {
-                                // Itens do objetivo principal da Fase 5: 3 Elefantes, 3 Leões, 3 Aves
+                            } else if (currentPhase === 5) { // Lógica de objetivo da Fase 5
                                 if (collectedItem.type === 'elefante') {
                                     elefantesColetados++;
                                     console.log(`DEBUG: Elefante coletado! Total: ${elefantesColetados}/${TOTAL_ELEFANTES}`);
@@ -1335,8 +1112,7 @@
                                     avesColetadas++;
                                     console.log(`DEBUG: Ave coletada! Total: ${avesColetadas}/${TOTAL_AVES}`);
                                 }
-                            } else if (currentPhase === 6) {
-                                // Itens do objetivo principal da Fase 6: 3 Pinturas, 3 Esculturas, 3 Fósseis
+                            } else if (currentPhase === 6) { // Lógica de objetivo da Fase 6
                                 if (collectedItem.type === 'pintura') {
                                     pinturasColetadas++;
                                     console.log(`DEBUG: Pintura coletada! Total: ${pinturasColetadas}/${TOTAL_PINTURAS}`);
@@ -1347,8 +1123,7 @@
                                     fosseisColetados++;
                                     console.log(`DEBUG: Fóssil coletado! Total: ${fosseisColetados}/${TOTAL_FOSSEIS}`);
                                 }
-                            } else if (currentPhase === 7) {
-                                // Itens do objetivo principal da Fase 7: 3 Cestas de Piquenique, 3 Bolas, 3 Brinquedos de Parque
+                            } else if (currentPhase === 7) { // Lógica de objetivo da Fase 7
                                 if (collectedItem.type === 'cesta_piquenique') {
                                     cestasPiqueniqueColetadas++;
                                     console.log(`DEBUG: Cesta de Piquenique coletada! Total: ${cestasPiqueniqueColetadas}/${TOTAL_CESTAS_PIQUENIQUE}`);
@@ -1359,79 +1134,50 @@
                                     brinquedosParqueColetados++;
                                     console.log(`DEBUG: Brinquedo de Parque coletado! Total: ${brinquedosParqueColetados}/${TOTAL_BRINQUEDOS_PARQUE}`);
                                 }
-                            } else if (currentPhase === 8) { // Capítulo 8: Leiturinhas
-                                if (collectedItem.type === 'livro_aventura') {
-                                    livroAventuraColetados++;
-                                    console.log(`DEBUG: Livro de Aventura coletado! Total: ${livroAventuraColetados}/${TOTAL_LIVRO_AVENTURA}`);
-                                } else if (collectedItem.type === 'livro_animais') {
-                                    livroAnimaisColetados++;
-                                    console.log(`DEBUG: Livro de Animais coletado! Total: ${livroAnimaisColetados}/${TOTAL_LIVRO_ANIMAIS}`);
-                                } else if (collectedItem.type === 'livro_fabula') {
-                                    livroFabulaColetados++;
-                                    console.log(`DEBUG: Livro de Fábula coletado! Total: ${livroFabulaColetados}/${TOTAL_LIVRO_FABULA}`);
+                            } else if (currentPhase === 8) { // Lógica de objetivo da Fase 8
+                                if (collectedItem.type === 'livro_aberto' || collectedItem.type === 'oculos' || collectedItem.type === 'caneta') {
+                                    leiturinhasColetadas++;
+                                    console.log(`DEBUG: Item de Leiturinhas coletado! Total: ${leiturinhasColetadas}/${TOTAL_LEITURINHAS}`);
                                 }
-                            } else if (currentPhase === 9) {
-                                if (collectedItem.type === 'lixeira_reciclagem') {
-                                    lixeiraReciclagemColetados++;
-                                    console.log(`DEBUG: Lixeira de Reciclagem coletada! Total: ${lixeiraReciclagemColetados}/${TOTAL_LIXEIRA_RECICLAGEM}`);
-                                } else if (collectedItem.type === 'garrafa_plastico') {
-                                    garrafaPlasticoColetados++;
-                                    console.log(`DEBUG: Garrafa Plástica coletada! Total: ${garrafaPlasticoColetados}/${TOTAL_GARRAFA_PLASTICO}`);
-                                } else if (collectedItem.type === 'arvore_muda') {
-                                    arvoreMudaColetados++;
-                                    console.log(`DEBUG: Muda de Árvore coletada! Total: ${arvoreMudaColetados}/${TOTAL_ARVORE_MUDA}`);
+                            } else if (currentPhase === 9) { // Lógica de objetivo da Fase 9
+                                if (collectedItem.type === 'lixeira_reciclagem' || collectedItem.type === 'garrafa_plastico' || collectedItem.type === 'arvore_muda') {
+                                    planetaItemsColetados++;
+                                    console.log(`DEBUG: Item do Planeta coletado! Total: ${planetaItemsColetados}/${TOTAL_PLANETA_ITEMS}`);
                                 }
-                            } else if (currentPhase === 10) {
-                                if (collectedItem.type === 'planta_nativa') {
-                                    plantaNativaColetados++;
-                                    console.log(`DEBUG: Planta Nativa coletada! Total: ${plantaNativaColetados}/${TOTAL_PLANTAS_NATIVAS}`);
-                                } else if (collectedItem.type === 'animal_selvagem') {
-                                    animalSelvagemColetados++;
-                                    console.log(`DEBUG: Animal Selvagem coletado! Total: ${animalSelvagemColetados}/${TOTAL_ANIMAIS_SELVAGENS}`);
-                                } else if (collectedItem.type === 'telescopio') {
-                                    telescopioColetados++;
-                                    console.log(`DEBUG: Telescópio coletado! Total: ${telescopioColetados}/${TOTAL_TELESCOPIO}`);
+                            } else if (currentPhase === 10) { // Lógica de objetivo da Fase 10
+                                if (collectedItem.type === 'planta_nativa' || collectedItem.type === 'animal_selvagem' || collectedItem.type === 'binoculos') {
+                                    naturezaExploracaoColetados++;
+                                    console.log(`DEBUG: Item de Exploração da Natureza coletado! Total: ${naturezaExploracaoColetados}/${TOTAL_NATUREZA_EXPLORACAO}`);
                                 }
-                            } else if (currentPhase === 11) {
-                                if (collectedItem.type === 'pincel') {
-                                    pincelColetados++;
-                                    console.log(`DEBUG: Pincel coletado! Total: ${pincelColetados}/${TOTAL_PINCEL}`);
-                                } else if (collectedItem.type === 'tinta') {
-                                    tintaColetados++;
-                                    console.log(`DEBUG: Tinta coletada! Total: ${tintaColetados}/${TOTAL_TINTA}`);
-                                } else if (collectedItem.type === 'argila') {
-                                    argilaColetados++;
-                                    console.log(`DEBUG: Argila coletada! Total: ${argilaColetados}/${TOTAL_ARGILA}`);
+                            } else if (currentPhase === 11) { // Lógica de objetivo da Fase 11
+                                if (collectedItem.type === 'pincel' || collectedItem.type === 'tinta' || collectedItem.type === 'argila') {
+                                    artesItemsColetados++;
+                                    console.log(`DEBUG: Item de Artes coletado! Total: ${artesItemsColetados}/${TOTAL_ARTES_ITEMS}`);
                                 }
-                            } else if (currentPhase === 12) {
-                                if (collectedItem.type === 'violao') {
-                                    violaoColetados++;
-                                    console.log(`DEBUG: Violão coletado! Total: ${violaoColetados}/${TOTAL_VIOLAO}`);
-                                } else if (collectedItem.type === 'piano') {
-                                    pianoColetados++;
-                                    console.log(`DEBUG: Piano coletado! Total: ${pianoColetados}/${TOTAL_PIANO}`);
-                                } else if (collectedItem.type === 'microfone') {
-                                    microfoneColetados++;
-                                    console.log(`DEBUG: Microfone coletado! Total: ${microfoneColetados}/${TOTAL_MICROFONE}`);
+                            } else if (currentPhase === 12) { // Lógica de objetivo da Fase 12
+                                if (collectedItem.type === 'violao' || collectedItem.type === 'piano' || collectedItem.type === 'microfone') {
+                                    musicaDancaColetados++;
+                                    console.log(`DEBUG: Item de Música e Dança coletado! Total: ${musicaDancaColetados}/${TOTAL_MUSICA_DANCA}`);
                                 }
                             }
-                        } else if (collectedItem.type === 'moeda') {
-                            tempo += 5;
-                            console.log(`DEBUG: Moeda coletada! Tempo +5s. Tempo atual: ${tempo}`);
+                        } else if (collectedItem.type === 'moeda') { // Moedas aumentam o tempo
+                            tempo += 5; // RE-ADICIONADO
+                            console.log(`DEBUG: Moeda coletada! Tempo +5s. Tempo atual: ${tempo}`); // RE-ADICIONADO
                         }
                         atualizarHUD();
-                        coletando = false;
-                        return;
+                        // console.log(`DEBUG: Item coletado: ${collectedItem.type}. Total Coletado: ${totalAllItemsCollected}`);
+                        coletando = false; 
+                        return; 
                     }
                 }
-
-
-                // Depois verifica itens escolares não coletáveis (se houver)
+                
+                // Depois verifica itens escolares coletáveis (se houver)
                 for (let i = 0; i < schoolItems.length; i++) {
                     if (schoolItems[i].canBeCollected && checkCollision(player, schoolItems[i])) {
                         const collectedItem = schoolItems.splice(i, 1)[0];
                         totalAllItemsCollected++; // Incrementa a contagem total
                         atualizarHUD();
+                        // console.log(`DEBUG: Item escolar coletado: ${collectedItem.type}. Total Coletado: ${totalAllItemsCollected}`);
                         coletando = false;
                         return;
                     }
@@ -1439,101 +1185,418 @@
 
 
                 // 2. Interação com o Baú (apenas na Fase 1)
-                if (currentPhase === 1 && chest && checkCollision(player, chest)) { // Only check collision if chest exists
-                    if (pedrasColetadas === TOTAL_PEDRAS && keysColetadas === TOTAL_CHAVES) { // Updated condition
-                        chest.isOpened = true; // Marca o baú como aberto
-                        chest.emoji = '🗃️'; // Muda o emoji do baú para aberto
+                if (currentPhase === 1 && chest && hasKey && checkCollision(player, chest)) {
+                    // Verifica se TODOS os itens do OBJETIVO da Fase 1 foram coletados antes de abrir o baú
+                    if (pedrasColetadas === TOTAL_PEDRAS && hasKey) {
+                        chest = null; // Remove o baú após ser usado
                         console.log("DEBUG: Baú aberto com sucesso!");
                         coletando = false;
-                        atualizarHUD(); // Atualiza o HUD para mostrar o baú aberto
-                        // A transição de fase é tratada no setInterval principal, que agora verifica chest.isOpened
-                        return;
-                    } else { // If trying to open but not all collected
+                        // A transição de fase é tratada no setInterval principal
+                        return; 
+                    } else {
+                        // Mensagem para o jogador se não coletou todos os itens do objetivo da Fase 1
                         const hintMessageDiv = document.getElementById('llmHintMessage');
                         let msg = "Você precisa coletar todos os itens do objetivo antes de abrir o baú!";
                         if (pedrasColetadas < TOTAL_PEDRAS) {
                             msg += ` Faltam ${TOTAL_PEDRAS - pedrasColetadas} pedras.`;
                         }
-                        if (keysColetadas < TOTAL_CHAVES) {
-                            msg += ` Faltam ${TOTAL_CHAVES - keysColetadas} chaves.`;
+                        if (!hasKey) { 
+                            msg += ` Você não tem a chave.`; 
                         }
-                        if (hintMessageDiv) { // Check if element exists before setting innerText
-                           hintMessageDiv.innerText = msg;
-                           hintMessageDiv.style.display = 'block';
-                        }
+                        hintMessageDiv.innerText = msg;
+                        hintMessageDiv.style.display = 'block';
                         if (hintTimeout) clearTimeout(hintTimeout);
-                        hintTimeout = setTimeout(() => {
-                            if (hintMessageDiv) { // Check again before hiding
-                                hintMessageDiv.style.display = 'none';
-                            }
-                        }, 5000);
-                        coletando = false;
+                        hintTimeout = setTimeout(() => hintMessageDiv.style.display = 'none', 5000);
+                        coletando = false; 
                     }
                 }
             }
         }
 
+        // Função para pedir uma dica ao LLM
+        async function askForHint() {
+            const hintMessageDiv = document.getElementById('llmHintMessage');
+            hintMessageDiv.innerText = "Aguarde a dica...";
+            hintMessageDiv.style.display = 'block'; // Mostra a mensagem de carregamento
+
+            if (hintTimeout) clearTimeout(hintTimeout); // Limpa qualquer timeout anterior
+
+            let objectFound = false;
+            let promptText = "";
+            let nearestObject = null; // Pode ser item, obstáculo, baú ou item escolar
+
+            // Encontra o objeto mais próximo para dar a dica
+            let minDistance = Infinity;
+            const allGameObjects = [...itens, ...obstaculos, ...schoolItems]; // Inclui todos os tipos de objetos
+            if (chest && currentPhase === 1) allGameObjects.push(chest); // Adiciona o baú se existir e for Fase 1
+
+            for (const obj of allGameObjects) {
+                const objCenter = { x: obj.x + obj.size / 2, y: obj.y + obj.size / 2 }; 
+                const playerCenter = { x: player.x + player.width / 2, y: player.y + player.height / 2 };
+                const distance = Math.sqrt(
+                    Math.pow(objCenter.x - playerCenter.x, 2) +
+                    Math.pow(objCenter.y - playerCenter.y, 2)
+                );
+
+                // Define um raio de proximidade para a dica
+                const HINT_RADIUS = 100; 
+                if (distance < HINT_RADIUS) {
+                    minDistance = distance;
+                    nearestObject = obj;
+                    break; // Corrigido: 'break' deve estar aqui para sair do loop
+                }
+            }
+
+            if (nearestObject) { // Se o jogador estiver perto de algum objeto
+                objectFound = true;
+                if (nearestObject.canBeCollected) { // Se o item pode ser coletado
+                    if (nearestObject.isObjective) {
+                        if (currentPhase === 1) {
+                            switch (nearestObject.type) {
+                                case 'pedra':
+                                    promptText = `Você é uma pedra ${nearestObject.color} vibrante, um dos itens essenciais para o tesouro. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e misterioso.`;
+                                    break;
+                                case 'chave':
+                                    promptText = `Você é a chave dourada, crucial para o tesouro. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e indique sua importância.`;
+                                    break;
+                            }
+                        } else if (currentPhase === 2) {
+                            switch (nearestObject.type) {
+                                case 'vale_sorvete':
+                                    promptText = `Você é um vale sorvete, muito desejado na Festa do Sorvete. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e alegre.`;
+                                    break;
+                                case 'sorvete':
+                                    promptText = `Você é um sorvete de ${nearestObject.color}, um dos sabores que o Ursinho Amigão precisa para o objetivo da festa. O que você diria para ele? Seja breve e convidativo.`;
+                                    break;
+                            }
+                        } else if (currentPhase === 3) {
+                            switch (nearestObject.type) {
+                                case 'trofeu':
+                                    promptText = `Você é um troféu brilhante, um dos prêmios das brincadeiras do parque. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e inspirador.`;
+                                    break;
+                                case 'bola':
+                                    promptText = `Você é uma bola, usada para brincadeiras no parque. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e divertido.`;
+                                    break;
+                            }
+                        } else if (currentPhase === 4) {
+                            switch (nearestObject.type) {
+                                case 'tubo_ensaio':
+                                    promptText = `Você é um tubo de ensaio, essencial para as experiências no laboratório. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e curioso.`;
+                                    break;
+                                case 'ima':
+                                    promptText = `Você é um ímã, parte das experiências de força magnética. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e atraente.`;
+                                    break;
+                            }
+                        } else if (currentPhase === 5) {
+                            switch (nearestObject.type) {
+                                case 'elefante':
+                                    promptText = `Você é um elefante, um dos animais majestosos do zoológico. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e imponente.`;
+                                    break;
+                                case 'leao':
+                                    promptText = `Você é um leão, o rei da selva! O que você diria para o Ursinho Amigão que se aproxima? Seja breve e régio.`;
+                                    break;
+                                case 'ave':
+                                    promptText = `Você é uma ave exótica, com cores vibrantes. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e melódico.`;
+                                    break;
+                            }
+                        } else if (currentPhase === 6) {
+                            switch (nearestObject.type) {
+                                case 'pintura':
+                                    promptText = `Você é uma pintura, uma obra de arte no museu. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e artístico.`;
+                                    break;
+                                case 'escultura':
+                                    promptText = `Você é uma escultura, uma obra de arte tridimensional. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e imponente.`;
+                                    break;
+                                case 'fossil':
+                                    promptText = `Você é um fóssil de dinossauro, um vestígio da pré-história. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e misterioso.`;
+                                    break;
+                            }
+                        } else if (currentPhase === 7) {
+                            switch (nearestObject.type) {
+                                case 'cesta_piquenique':
+                                    promptText = `Você é uma cesta de piquenique, cheia de delícias para compartilhar no parque. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e convidativo.`;
+                                    break;
+                                case 'bola':
+                                    promptText = `Você é uma bola de futebol, pronta para um jogo divertido no parque. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e enérgico.`;
+                                    break;
+                                case 'brinquedo_parque':
+                                    promptText = `Você é um brinquedo do parque, que traz muita alegria. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e divertido.`;
+                                    break;
+                            }
+                        } else if (currentPhase === 8) { // Dicas para o Capítulo 8
+                            switch (nearestObject.type) {
+                                case 'livro_aberto':
+                                    promptText = `Você é um livro aberto, cheio de histórias. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e convide-o para ler.`;
+                                    break;
+                                case 'oculos':
+                                    promptText = `Você é um par de óculos de leitura. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e sugira que eles ajudam a ver melhor as palavras.`;
+                                    break;
+                                case 'caneta':
+                                    promptText = `Você é uma caneta, pronta para escrever. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e inspire-o a criar suas próprias histórias.`;
+                                    break;
+                                case 'globo':
+                                    promptText = `Você é um globo terrestre. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e sugira que há muitas histórias para descobrir ao redor do mundo.`;
+                                    break;
+                                default:
+                                    promptText = `Você é um item da sala de leitura. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e relacionado à leitura.`;
+                            }
+                        } else if (currentPhase === 9) { // Dicas para o Capítulo 9
+                            switch (nearestObject.type) {
+                                case 'lixeira_reciclagem':
+                                    promptText = `Você é uma lixeira de reciclagem. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e incentive a separação do lixo.`;
+                                    break;
+                                case 'garrafa_plastico':
+                                    promptText = `Você é uma garrafa de plástico. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e sugira que você pode ser reciclada.`;
+                                    break;
+                                case 'arvore_muda':
+                                    promptText = `Você é uma muda de árvore. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e convide-o a te plantar para um futuro verde.`;
+                                    break;
+                                case 'saco_lixo':
+                                    promptText = `Você é um saco de lixo. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e sugira que você precisa ser descartado corretamente.`;
+                                    break;
+                                default:
+                                    promptText = `Você é um item relacionado ao meio ambiente. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e incentive o cuidado com o planeta.`;
+                            }
+                        } else if (currentPhase === 10) { // Dicas para o Capítulo 10
+                            switch (nearestObject.type) {
+                                case 'planta_nativa':
+                                    promptText = `Você é uma planta nativa da reserva. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e fale sobre a sua importância no ecossistema.`;
+                                    break;
+                                case 'animal_selvagem':
+                                    promptText = `Você é um animal selvagem. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e fale sobre a importância de proteger seu habitat.`;
+                                    break;
+                                case 'binoculos':
+                                    promptText = `Você é um binóculo. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e sugira que você ajuda a observar a natureza de perto.`;
+                                    break;
+                                case 'lupa':
+                                    promptText = `Você é uma lupa. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e sugira que você ajuda a ver os pequenos detalhes da natureza.`;
+                                    break;
+                                default:
+                                    promptText = `Você é um item da reserva natural. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e incentive a exploração e o respeito pela natureza.`;
+                            }
+                        } else if (currentPhase === 11) { // Dicas para o Capítulo 11
+                            switch (nearestObject.type) {
+                                case 'pincel':
+                                    promptText = `Você é um pincel, pronto para criar uma obra de arte. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e convide-o a pintar.`;
+                                    break;
+                                case 'tinta':
+                                    promptText = `Você é uma tinta colorida. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e sugira que você pode dar vida aos desenhos.`;
+                                    break;
+                                case 'argila':
+                                    promptText = `Você é um pedaço de argila, esperando para ser moldado. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e inspire-o a criar uma escultura.`;
+                                    break;
+                                case 'lapis_cor':
+                                    promptText = `Você é um lápis de cor vibrante. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e convide-o a colorir o mundo.`;
+                                    break;
+                                case 'tela':
+                                    promptText = `Você é uma tela em branco, esperando por uma obra-prima. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e incentive-o a expressar sua criatividade.`;
+                                    break;
+                                default:
+                                    promptText = `Você é um material de arte. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e incentive a criatividade.`;
+                            }
+                        } else if (currentPhase === 12) { // Dicas para o Capítulo 12
+                            switch (nearestObject.type) {
+                                case 'violao':
+                                    promptText = `Você é um violão. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e convide-o a tocar uma melodia.`;
+                                    break;
+                                case 'piano':
+                                    promptText = `Você é um piano. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e sugira que ele explore as teclas.`;
+                                    break;
+                                case 'microfone':
+                                    promptText = `Você é um microfone. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e convide-o a cantar.`;
+                                    break;
+                                case 'fones_ouvido':
+                                    promptText = `Você é um par de fones de ouvido. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e sugira que ele ouça a música com atenção.`;
+                                    break;
+                                case 'partitura':
+                                    promptText = `Você é uma partitura musical. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e sugira que você contém os segredos da música.`;
+                                    break;
+                                default:
+                                    promptText = `Você é um item musical. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e incentive a música e a dança.`;
+                            }
+                        }
+                    } else { // Itens coletáveis não-objetivo
+                        switch (nearestObject.type) {
+                            case 'moeda':
+                                promptText = `Você é uma moeda brilhante. O que você diria para o Ursinho Amigão que se aproxima? Dê uma dica sutil sobre sua utilidade, mas que não é crucial para o objetivo principal.`;
+                                break;
+                            case 'folha':
+                                promptText = `Você é uma folha encantada. O que você diria para o Ursinho Amigão que se aproxima? Dê uma dica sutil sobre sua beleza, mas que não é crucial para o objetivo principal.`;
+                                break;
+                            case 'lapis':
+                                promptText = `Você é um lápis. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e descreva sua função na escola.`;
+                                break;
+                            case 'caderno':
+                                promptText = `Você é um caderno. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e descreva sua função na escola.`;
+                                break;
+                            case 'sorvete': // Sorvetes não-objetivo
+                                promptText = `Você é um delicioso sorvete de sabor ${nearestObject.color}. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e convidativo.`;
+                                break;
+                            case 'bola':
+                                promptText = `Você é uma bola de futebol. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e convide-o para brincar.`;
+                                break;
+                            case 'pipa':
+                                promptText = `Você é uma pipa colorida. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e convide-o para te empinar no céu.`;
+                                break;
+                            case 'bequer':
+                                promptText = `Você é um béquer, usado para misturar líquidos no laboratório. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e científico.`;
+                                break;
+                            case 'microscopio':
+                                promptText = `Você é um microscópio, que ajuda a ver coisas muito pequenas. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e curioso.`;
+                                break;
+                            case 'pipeta':
+                                promptText = `Você é uma pipeta, usada para medir líquidos com precisão. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e exato.`;
+                                break;
+                            case 'macaco':
+                                promptText = `Você é um macaco travesso. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e brincalhão.`;
+                                break;
+                            case 'crocodilo':
+                                promptText = `Você é um crocodilo. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e um pouco assustador.`;
+                                break;
+                            case 'cobra':
+                                promptText = `Você é uma cobra. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e sutil.`;
+                                break;
+                            case 'lagarto':
+                                promptText = `Você é um lagarto. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e rápido.`;
+                                break;
+                            case 'artefato':
+                                promptText = `Você é um artefato antigo. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e misterioso, sobre sua história.`;
+                                break;
+                            case 'pincel':
+                                promptText = `Você é um pincel. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e descreva sua função na arte.`;
+                                break;
+                            case 'livro_arte':
+                                promptText = `Você é um livro de arte. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e inspire-o com a beleza da arte.`;
+                                break;
+                            case 'balao':
+                                promptText = `Você é um balão colorido, flutuando levemente. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e alegre.`;
+                                break;
+                            case 'flor':
+                                promptText = `Você é uma flor do parque, exalando um perfume suave. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e convidativo.`;
+                                break;
+                            case 'borboleta':
+                                promptText = `Você é uma borboleta, voando livremente pelo parque. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e encantador.`;
+                                break;
+                            default:
+                                promptText = `Você é um item coletável. O que você diria para o Ursinho Amigão que se aproxima? Dê uma dica sutil sobre sua utilidade, mas que não é crucial para o objetivo principal.`; // Mensagem mais genérica
+                        }
+                    }
+                } else if (nearestObject.type === 'bau') {
+                    if (hasKey && pedrasColetadas === TOTAL_PEDRAS) {
+                        promptText = `Você é um baú de tesouros. O que você diria para o Ursinho Amigão que se aproxima com todos os itens do objetivo? Seja breve e indique que a aventura está prestes a ser concluída.`;
+                    } else if (hasKey) {
+                        promptText = `Você é um baú de tesouros. O que você diria para o Ursinho Amigão que se aproxima com a chave, mas sem todos os outros itens do objetivo? Seja breve e indique que algo importante está faltando.`;
+                    } else {
+                        promptText = `Você é um baú de tesouros. O que você diria para o Ursinho Amigão que se aproxima sem a chave? Seja breve e indique que a chave é necessária.`;
+                    }
+                } else { // Itens escolares não coletáveis
+                    switch (nearestObject.type) {
+                        case 'livro':
+                            promptText = `Você é um livro. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e descreva sua função na escola.`;
+                            break;
+                        case 'borracha':
+                            promptText = `Você é uma borracha. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e descreva sua função na escola.`;
+                            break;
+                        case 'mochila':
+                            promptText = `Você é uma mochila. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e descreva sua função na escola.`;
+                            break;
+                        default:
+                            promptText = `Você é um item comum da escola. O que você diria para o Ursinho Amigão que se aproxima? Seja breve e descreva sua função na escola.`;
+                    }
+                }
+            }
+
+            if (!objectFound) {
+                hintMessageDiv.innerText = "Não há objetos por perto para pedir uma dica.";
+                hintTimeout = setTimeout(() => hintMessageDiv.style.display = 'none', 3000); // Esconde após 3 segundos
+                return;
+            }
+
+            try {
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: promptText }] });
+                const payload = { contents: chatHistory };
+                const apiKey = ""; // Deixe como está, a Canvas fornecerá em tempo de execução
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json(); // AWAIT AQUI
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    hintMessageDiv.innerText = text; // Exibe a dica gerada
+                } else {
+                    hintMessageDiv.innerText = "Não foi possível obter a dica. Tente novamente.";
+                    console.error("Estrutura de resposta LLM inesperada:", result);
+                }
+            } catch (error) {
+                hintMessageDiv.innerText = "Erro ao conectar com a API de dicas. Tente novamente.";
+                    console.error("Erro ao chamar a API Gemini para dica:", error);
+            } finally {
+                hintTimeout = setTimeout(() => hintMessageDiv.style.display = 'none', 5000); // Esconde a dica após 5 segundos
+            }
+        }
+
         // Atualiza a exibição do HUD
         function atualizarHUD() {
-            // Obtenha as referências dos elementos do HUD aqui para garantir que são válidas
-            const currentVidasDisplayElement = document.getElementById('vidasDisplay');
-            const currentHudObjectiveLine1Element = document.getElementById('hudObjectiveLine1');
-            const currentHudObjectiveLine2Element = document.getElementById('hudObjectiveLine2');
-            const currentTotalAllItemsCollectedDisplayElement = document.getElementById('totalAllItemsCollectedDisplay');
-            const currentTempoDisplayElement = document.getElementById('tempo');
-
             let coracao = "❤️".repeat(vidas); // Exibe corações com base nas vidas
-            let objectiveLine1Content = ''; // Conteúdo para a linha 1 do objetivo
-            let objectiveLine2Content = ''; // Conteúdo para a linha 2 do objetivo
-            let hudTotalCollectedContent = `Total Coletado: ${totalAllItemsCollected}`;
-            let hudTempoContent = `Tempo: ${tempo}s`;
+            let hudObjectiveLine1Content = '';
+            let hudObjectiveLine2Content = ''; // Para objetivos com duas linhas no HUD
 
-            // HUD content for Phase 1
+            // Conteúdo do HUD principal (canto superior esquerdo)
             if (currentPhase === 1) {
-                objectiveLine1Content = `🔴 Pedras: ${pedrasColetadas} / ${TOTAL_PEDRAS}`;
-                objectiveLine2Content = `🔑 Chave: ${keysColetadas} / ${TOTAL_CHAVES}<br>📦 Baú: ${chest && chest.isOpened ? '1/1 🔓' : '0/1 🔒'}`;
+                hudObjectiveLine1Content = `🔴 Pedras: ${pedrasColetadas} / ${TOTAL_PEDRAS}`;
+                hudObjectiveLine2Content = `🔑 Chave: ${hasKey ? '1/1' : '0/1'}`; // Always show 0/1 or 1/1 for objective
             } else if (currentPhase === 2) {
-                objectiveLine1Content = `🎟️ Vales Sorvete: ${valesSorveteColetados} / ${TOTAL_VALES_SORVETE}`;
-                objectiveLine2Content = `🍫🍦 Sorvetes: ${sorvetesObjetivoColetados} / ${TOTAL_SORVETES_OBJETIVO}`;
+                hudObjectiveLine1Content = `🎟️ Vales Sorvete: ${valesSorveteColetados} / ${TOTAL_VALES_SORVETE}`;
+                hudObjectiveLine2Content = `🍫🍦 Sorvetes: ${sorvetesObjetivoColetados} / ${TOTAL_SORVETES_OBJETIVO}`;
             } else if (currentPhase === 3) {
-                objectiveLine1Content = `🏆 Troféus: ${trofeusColetados} / ${TOTAL_TROFEUS}`;
-                objectiveLine2Content = `⚽ Bolas: ${bolasColetadas} / ${TOTAL_BOLAS_FASE3}<br>🪁 Pipas: ${pipasColetadas} / ${TOTAL_PIPAS}`;
+                hudObjectiveLine1Content = `🏆 Troféus: ${trofeusColetados} / ${TOTAL_TROFEUS}`;
+                hudObjectiveLine2Content = `⚽ Bolas: ${bolasColetadas} / ${TOTAL_BOLAS_FASE3}`;
             } else if (currentPhase === 4) {
-                objectiveLine1Content = `🧪 Tubos Ensaio: ${tubosEnsaioColetados} / ${TOTAL_TUBOS_ENSAIO}`;
-                objectiveLine2Content = `🧲 Ímãs: ${imasColetados} / ${TOTAL_IMAS}<br>🔬 Microscópios: ${microscopioColetados} / ${TOTAL_MICROSCOPIO}`;
+                hudObjectiveLine1Content = `🧪 Tubos Ensaio: ${tubosEnsaioColetados} / ${TOTAL_TUBOS_ENSAIO}`;
+                hudObjectiveLine2Content = `🧲 Ímãs: ${imasColetados} / ${TOTAL_IMAS}`;
             } else if (currentPhase === 5) {
-                objectiveLine1Content = `🐘 Elefantes: ${elefantesColetados} / ${TOTAL_ELEFANTES}`;
-                objectiveLine2Content = `🦁 Leões: ${leoesColetados} / ${TOTAL_LEOES}<br>🦜 Aves: ${avesColetadas} / ${TOTAL_AVES}`;
+                hudObjectiveLine1Content = `🐘 Elefantes: ${elefantesColetados} / ${TOTAL_ELEFANTES}`;
+                hudObjectiveLine2Content = `🦁 Leões: ${leoesColetados} / ${TOTAL_LEOES}<br>🦜 Aves: ${avesColetadas} / ${TOTAL_AVES}`;
             } else if (currentPhase === 6) {
-                objectiveLine1Content = `🎨 Pinturas: ${pinturasColetadas} / ${TOTAL_PINTURAS}`;
-                objectiveLine2Content = `🗿 Esculturas: ${esculturasColetadas} / ${TOTAL_ESCULTURAS}<br>🦴 Fósseis: ${fosseisColetados} / ${TOTAL_FOSSEIS}`;
+                hudObjectiveLine1Content = `🎨 Pinturas: ${pinturasColetadas} / ${TOTAL_PINTURAS}`;
+                hudObjectiveLine2Content = `🗿 Esculturas: ${esculturasColetadas} / ${TOTAL_ESCULTURAS}<br>🦴 Fósseis: ${fosseisColetados} / ${TOTAL_FOSSEIS}`;
             } else if (currentPhase === 7) {
-                objectiveLine1Content = `🧺 Cestas Piquenique: ${cestasPiqueniqueColetadas} / ${TOTAL_CESTAS_PIQUENIQUE}`;
-                objectiveLine2Content = `⚽ Bolas: ${bolasFase7Coletadas} / ${TOTAL_BOLAS_FASE7}<br>🎠 Brinquedos: ${brinquedosParqueColetados} / ${TOTAL_BRINQUEDOS_PARQUE}`;
+                hudObjectiveLine1Content = `🧺 Cestas Piquenique: ${cestasPiqueniqueColetadas} / ${TOTAL_CESTAS_PIQUENIQUE}`;
+                hudObjectiveLine2Content = `⚽ Bolas: ${bolasFase7Coletadas} / ${TOTAL_BOLAS_FASE7}<br>🎠 Brinquedos: ${brinquedosParqueColetados} / ${TOTAL_BRINQUEDOS_PARQUE}`;
             } else if (currentPhase === 8) {
-                objectiveLine1Content = `📖 Aventura: ${livroAventuraColetados} / ${TOTAL_LIVRO_AVENTURA}`;
-                objectiveLine2Content = `🦁 Animais: ${livroAnimaisColetados} / ${TOTAL_LIVRO_ANIMAIS}<br>📜 Fábula: ${livroFabulaColetados} / ${TOTAL_LIVRO_FABULA}`;
+                hudObjectiveLine1Content = `📖 Leitura: ${leiturinhasColetadas} / ${TOTAL_LEITURINHAS}`;
+                hudObjectiveLine2Content = ``; // Sem segundo objetivo explícito para esta fase
             } else if (currentPhase === 9) {
-                objectiveLine1Content = `♻️ Reciclagem: ${lixeiraReciclagemColetados} / ${TOTAL_LIXEIRA_RECICLAGEM}`;
-                objectiveLine2Content = `🧴 Plástico: ${garrafaPlasticoColetados} / ${TOTAL_GARRAFA_PLASTICO}<br>🌱 Árvore: ${arvoreMudaColetados} / ${TOTAL_ARVORE_MUDA}`;
+                hudObjectiveLine1Content = `♻️ Planeta: ${planetaItemsColetados} / ${TOTAL_PLANETA_ITEMS}`;
+                hudObjectiveLine2Content = ``; // Sem segundo objetivo explícito para esta fase
             } else if (currentPhase === 10) {
-                objectiveLine1Content = `🌿 Plantas: ${plantaNativaColetados} / ${TOTAL_PLANTAS_NATIVAS}`;
-                objectiveLine2Content = `🦁 Animais: ${animalSelvagemColetados} / ${TOTAL_ANIMAIS_SELVAGENS}<br>🔭 Telescópios: ${telescopioColetados} / ${TOTAL_TELESCOPIO}`;
+                hudObjectiveLine1Content = `🌿 Natureza: ${naturezaExploracaoColetados} / ${TOTAL_NATUREZA_EXPLORACAO}`;
+                hudObjectiveLine2Content = ``; // Sem segundo objetivo explícito para esta fase
             } else if (currentPhase === 11) {
-                objectiveLine1Content = `🖌️ Pincéis: ${pincelColetados} / ${TOTAL_PINCEL}`;
-                objectiveLine2Content = `🎨 Tintas: ${tintaColetados} / ${TOTAL_TINTA}<br>🏺 Argila: ${argilaColetados} / ${TOTAL_ARGILA}`;
+                hudObjectiveLine1Content = `🎨 Artes: ${artesItemsColetados} / ${TOTAL_ARTES_ITEMS}`;
+                hudObjectiveLine2Content = ``; // Sem segundo objetivo explícito para esta fase
             } else if (currentPhase === 12) {
-                objectiveLine1Content = `🎸 Violão: ${violaoColetados} / ${TOTAL_VIOLAO}`;
-                objectiveLine2Content = `🎹 Piano: ${pianoColetados} / ${TOTAL_PIANO}<br>🎤 Microfone: ${microfoneColetados} / ${TOTAL_MICROFONE}`;
+                hudObjectiveLine1Content = `🎵 Música: ${musicaDancaColetados} / ${TOTAL_MUSICA_DANCA}`;
+                hudObjectiveLine2Content = ``; // Sem segundo objetivo explícito para esta fase
             }
 
             // Atualiza o texto dos elementos do HUD
-            if (currentVidasDisplayElement) currentVidasDisplayElement.innerText = `Vidas: ${coracao}`; // Adiciona o rótulo "Vidas:"
-            if (currentTotalAllItemsCollectedDisplayElement) currentTotalAllItemsCollectedDisplayElement.innerText = `Total Coletado: ${totalAllItemsCollected}`;
-            if (currentTempoDisplayElement) currentTempoDisplayElement.innerText = `Tempo: ${tempo}s`; // Adiciona o rótulo "Tempo:"
-
-            if (currentHudObjectiveLine1Element) currentHudObjectiveLine1Element.innerHTML = objectiveLine1Content;
-            if (currentHudObjectiveLine2Element) currentHudObjectiveLine2Element.innerHTML = objectiveLine2Content;
+            if (vidasDisplayElement) vidasDisplayElement.innerText = `Vidas: ${coracao}`; // Adiciona o rótulo "Vidas:"
+            if (hudObjectiveLine1Element) hudObjectiveLine1Element.innerHTML = hudObjectiveLine1Content;
+            if (hudObjectiveLine2Element) hudObjectiveLine2Element.innerHTML = hudObjectiveLine2Content;
+            if (totalAllItemsCollectedDisplayElement) totalAllItemsCollectedDisplayElement.innerText = `Total Coletado: ${totalAllItemsCollected}`;
+            if (tempoDisplayElement) tempoDisplayElement.innerText = `Tempo: ${tempo}s`; // Adiciona o rótulo "Tempo:"
+            // Removido: hudKeyStatusElement.innerText = (currentPhase === 1 && hasKey) ? `Chave: Sim` : '';
+            // A linha da chave é agora parte de hudObjectiveLine2Content na Fase 1
         }
 
         // Exibe a mensagem de fim de jogo em um modal e recarrega
@@ -1551,19 +1614,17 @@
         // Exibe uma mensagem temporária no centro da tela
         function showTemporaryMessage(msg, duration) {
             const tempMessageDiv = document.getElementById('temporaryMessage');
-            if (tempMessageDiv) {
-                tempMessageDiv.innerText = msg;
-                tempMessageDiv.style.display = 'block';
-                setTimeout(() => {
-                    tempMessageDiv.style.display = 'none';
-                }, duration);
-            }
+            tempMessageDiv.innerText = msg;
+            tempMessageDiv.style.display = 'block';
+            setTimeout(() => {
+                tempMessageDiv.style.display = 'none';
+            }, duration);
         }
 
         // Exibe a tela de continue
         function showContinueScreen() {
             document.getElementById('continueModal').style.display = 'flex';
-            continueTime = 10;
+            continueTime = 10; // Reinicia o contador
             document.getElementById('continueCountdown').innerText = continueTime;
 
             if (continueCountdownInterval) clearInterval(continueCountdownInterval);
@@ -1572,7 +1633,7 @@
                 document.getElementById('continueCountdown').innerText = continueTime;
                 if (continueTime <= 0) {
                     clearInterval(continueCountdownInterval);
-                    handleContinue('nao');
+                    handleContinue('nao'); // Se o tempo acabar, é como se clicasse em "Não"
                 }
             }, 1000);
         }
@@ -1584,19 +1645,19 @@
 
             if (choice === 'sim') {
                 console.log("DEBUG: Jogador escolheu SIM. Reiniciando para seleção de personagem.");
-                vidas = 3;
+                vidas = 3; // Restaura vidas
+                // Mostra a tela de seleção de personagem
                 document.getElementById('personagemSelecao').style.display = 'flex';
-                if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+                // Limpa o canvas para a próxima inicialização
+                if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpa o canvas se já foi inicializado
+                // Reinicia todas as variáveis do jogo para um novo começo
                 pedrasColetadas = 0;
-                keysColetadas = 0;
                 valesSorveteColetados = 0;
                 sorvetesObjetivoColetados = 0;
                 trofeusColetados = 0;
                 bolasColetadas = 0;
-                pipasColetadas = 0;
                 tubosEnsaioColetados = 0;
                 imasColetados = 0;
-                microscopioColetados = 0;
                 elefantesColetados = 0;
                 leoesColetados = 0;
                 avesColetadas = 0;
@@ -1607,113 +1668,117 @@
                 bolasFase7Coletadas = 0;
                 brinquedosParqueColetados = 0;
                 totalAllItemsCollected = 0;
-                livroAventuraColetados = 0;
-                livroAnimaisColetados = 0;
-                livroFabulaColetados = 0;
-                lixeiraReciclagemColetados = 0;
-                garrafaPlasticoColetados = 0;
-                arvoreMudaColetados = 0;
-                plantaNativaColetados = 0;
-                animalSelvagemColetados = 0;
-                telescopioColetados = 0;
-                pincelColetados = 0;
-                tintaColetados = 0;
-                argilaColetados = 0;
-                violaoColetados = 0;
-                pianoColetados = 0;
-                microfoneColetados = 0;
-                tempo = BASE_TIME - (currentLevel - 1) * TIME_DECREMENT_PER_LEVEL;
-                if (tempo < 10) tempo = 10;
+                leiturinhasColetadas = 0; // Reinicia para a nova fase
+                planetaItemsColetados = 0; // Reinicia para a nova fase
+                naturezaExploracaoColetados = 0; // Reinicia para a nova fase
+                artesItemsColetados = 0; // Reinicia para a nova fase
+                musicaDancaColetados = 0; // Reinicia para a nova fase
+                tempo = 90; // RE-ADICIONADO
                 coletando = false;
                 hasKey = false;
                 itens = [];
                 obstaculos = [];
                 schoolItems = [];
                 chest = null;
-                currentPhase = 1;
+                currentPhase = 1; // Reseta para a Fase 1
+                // O iniciar será chamado novamente quando o personagem for selecionado
             } else {
                 console.log("DEBUG: Jogador escolheu NÃO ou tempo esgotou. Recarrega a página.");
-                location.reload();
+                location.reload(); // Recarrega a página para reiniciar completamente
             }
         }
 
+        // Loop principal de animação do jogo 2D
         function animar(currentTime) {
             requestAnimationFrame(animar);
 
+            // Limitar FPS
             if (currentTime < lastFrameTime + frameInterval) {
                 return;
             }
             lastFrameTime = currentTime;
 
+            // A condição de parada agora é mais complexa, então a verificamos no início
             let winConditionMet = false;
             if (currentPhase === 1) {
-                winConditionMet = (chest && chest.isOpened);
+                winConditionMet = (pedrasColetadas === TOTAL_PEDRAS && hasKey && chest === null);
             } else if (currentPhase === 2) {
                 winConditionMet = (valesSorveteColetados === TOTAL_VALES_SORVETE && sorvetesObjetivoColetados === TOTAL_SORVETES_OBJETIVO);
             } else if (currentPhase === 3) {
-                winConditionMet = (trofeusColetados >= TOTAL_TROFEUS && bolasColetadas >= TOTAL_BOLAS_FASE3 && pipasColetadas >= TOTAL_PIPAS);
+                winConditionMet = (trofeusColetados === TOTAL_TROFEUS && bolasColetadas === TOTAL_BOLAS_FASE3);
             } else if (currentPhase === 4) {
-                winConditionMet = (tubosEnsaioColetados >= TOTAL_TUBOS_ENSAIO && imasColetados >= TOTAL_IMAS && microscopioColetados >= TOTAL_MICROSCOPIO);
+                winConditionMet = (tubosEnsaioColetados === TOTAL_TUBOS_ENSAIO && imasColetados === TOTAL_IMAS);
             } else if (currentPhase === 5) {
-                winConditionMet = (elefantesColetados >= TOTAL_ELEFANTES && leoesColetados >= TOTAL_LEOES && avesColetadas >= TOTAL_AVES);
+                winConditionMet = (elefantesColetados === TOTAL_ELEFANTES && leoesColetados === TOTAL_LEOES && avesColetadas === TOTAL_AVES);
             } else if (currentPhase === 6) {
-                winConditionMet = (pinturasColetadas === TOTAL_PINTURAS && esculturasColetadas === TOTAL_ESCULTURAS && fosseisColetados >= TOTAL_FOSSEIS);
+                winConditionMet = (pinturasColetadas === TOTAL_PINTURAS && esculturasColetadas === TOTAL_ESCULTURAS && fosseisColetados === TOTAL_FOSSEIS);
             } else if (currentPhase === 7) {
-                winConditionMet = (cestasPiqueniqueColetadas >= TOTAL_CESTAS_PIQUENIQUE && bolasFase7Coletadas >= TOTAL_BOLAS_FASE7 && brinquedosParqueColetados >= TOTAL_BRINQUEDOS_PARQUE);
+                winConditionMet = (cestasPiqueniqueColetadas === TOTAL_CESTAS_PIQUENIQUE && bolasFase7Coletadas === TOTAL_BOLAS_FASE7 && brinquedosParqueColetados === TOTAL_BRINQUEDOS_PARQUE);
             } else if (currentPhase === 8) {
-                winConditionMet = (livroAventuraColetados >= TOTAL_LIVRO_AVENTURA && livroAnimaisColetados >= TOTAL_LIVRO_ANIMAIS && livroFabulaColetados >= TOTAL_LIVRO_FABULA);
+                winConditionMet = (leiturinhasColetadas >= TOTAL_LEITURINHAS);
             } else if (currentPhase === 9) {
-                winConditionMet = (lixeiraReciclagemColetados >= TOTAL_LIXEIRA_RECICLAGEM && garrafaPlasticoColetados >= TOTAL_GARRAFA_PLASTICO && arvoreMudaColetados >= TOTAL_ARVORE_MUDA);
+                winConditionMet = (planetaItemsColetados >= TOTAL_PLANETA_ITEMS);
             } else if (currentPhase === 10) {
-                winConditionMet = (plantaNativaColetados >= TOTAL_PLANTAS_NATIVAS && animalSelvagemColetados >= TOTAL_ANIMAIS_SELVAGENS && telescopioColetados >= TOTAL_TELESCOPIO);
+                winConditionMet = (naturezaExploracaoColetados >= TOTAL_NATUREZA_EXPLORACAO);
             } else if (currentPhase === 11) {
-                winConditionMet = (pincelColetados >= TOTAL_PINCEL && tintaColetados >= TOTAL_TINTA && argilaColetados >= TOTAL_ARGILA);
+                winConditionMet = (artesItemsColetados >= TOTAL_ARTES_ITEMS);
             } else if (currentPhase === 12) {
-                winConditionMet = (violaoColetados >= TOTAL_VIOLAO && pianoColetados >= TOTAL_PIANO && microfoneColetados >= TOTAL_MICROFONE);
+                winConditionMet = (musicaDancaColetados >= TOTAL_MUSICA_DANCA);
             }
 
-            if (vidas <= 0 || tempo <= 0 || winConditionMet) {
+            if (vidas <= 0 || tempo <= 0 || winConditionMet) { // Condição de tempo RE-ADICIONADA
+                // A lógica de encerramento/transição de fase é tratada no setInterval
                 return;
             }
 
+            // Limpa o canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+            // Guarda a posição anterior do jogador para reverter em caso de colisão com obstáculo
             const prevX = player.x;
             const prevY = player.y;
 
+            // Atualiza a posição do jogador com base nas teclas pressionadas
             if (teclas["w"]) player.y -= PLAYER_SPEED;
             if (teclas["s"]) player.y += PLAYER_SPEED;
             if (teclas["a"]) player.x -= PLAYER_SPEED;
             if (teclas["d"]) player.x += PLAYER_SPEED;
 
+            // Limita a posição do jogador para permanecer dentro dos limites do canvas
             player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
             player.y = Math.max(0, Math.min(canvas.height - player.height, player.y));
 
+            // Verifica colisão com obstáculos e reverte a posição se houver colisão
             obstaculos.forEach(obstacle => {
-                const exclusionZone = 1.0;
-                const expandedObstacleRect = {
-                    x: obstacle.x - (obstacle.size * (exclusionZone - 1) / 2),
-                    y: obstacle.y - (obstacle.size * (exclusionZone - 1) / 2),
-                    width: obstacle.width * exclusionZone,
-                    height: obstacle.height * exclusionZone
-                };
-                if (obstacle.isObstacle && checkCollision(player, expandedObstacleRect)) {
+                if (obstacle.isObstacle && checkCollision(player, obstacle)) { // Verifica se é um obstáculo real
+                    // Reverte a posição do jogador
                     player.x = prevX;
                     player.y = prevY;
                 }
             });
 
+            // Realiza as interações (coleta, baú)
             handleInteractions();
 
+            // Ordem de desenho para simular profundidade:
+            // 1. Baú (fundo - apenas na Fase 1)
             if (chest && currentPhase === 1) {
                 drawItem(chest);
             }
+            // 2. Itens escolares (fundo)
             schoolItems.forEach(drawItem);
+            // 3. Obstáculos (fundo)
             obstaculos.forEach(drawItem);
+            // 4. Itens coletáveis (para que o jogador possa passar "por cima" deles)
             itens.forEach(drawItem);
+            // 5. Jogador (sempre por cima)
             drawPlayer();
+
+            // Depuração: Log da posição do jogador e estado das teclas
+            // console.log(`DEBUG: Player Pos: (${player.x.toFixed(0)}, ${player.y.toFixed(0)}) | Teclas: W:${teclas.w} A:${teclas.a} S:${teclas.s} D:${teclas.d} | Speed: ${PLAYER_SPEED} | Phase: ${currentPhase}`);
         }
 
+        // Função para atualizar o título da página com base na fase atual
         function updatePageTitle(phase) {
             let title = "Ursinho Amigão 2D - ";
             switch (phase) {
@@ -1736,120 +1801,117 @@
                     title += "Capítulo 6: Aprender é uma Arte";
                     break;
                 case 7:
-                    title += "Capítulo 7: Lazer no Parque";
+                    title += "Capítulo 7: Lazer no Parque"; // Novo título para Fase 7
                     break;
                 case 8:
-                    title += "Capítulo 8: Leiturinhas";
+                    title += "Capítulo 8: Leiturinhas"; // Novo título para Fase 8
                     break;
                 case 9:
-                    title += "Capítulo 9: Planeta";
+                    title += "Capítulo 9: Planeta"; // Novo título para Fase 9
                     break;
                 case 10:
-                    title += "Capítulo 10: Exploração da Natureza";
+                    title += "Capítulo 10: Exploração da Natureza"; // Novo título para Fase 10
                     break;
                 case 11:
-                    title += "Capítulo 11: Oficina de Artes";
+                    title += "Capítulo 11: Oficina de Artes"; // Novo título para Fase 11
                     break;
                 case 12:
-                    title += "Capítulo 12: Música e Dança";
+                    title += "Capítulo 12: Música e Dança"; // Novo título para Fase 12
                     break;
                 default:
                     title += "Aventura Desconhecida";
             }
             document.title = title;
-            // Obtenha a referência ao elemento chapterTitleDisplayElement aqui
-            const currentChapterTitleDisplayElement = document.getElementById('chapterTitleDisplay');
-            if (currentChapterTitleDisplayElement) {
-                currentChapterTitleDisplayElement.innerText = title.split(" - ")[1];
+            if (chapterTitleDisplayElement) {
+                chapterTitleDisplayElement.innerText = title.split(" - ")[1]; // Exibe apenas o nome do capítulo
             }
         }
 
+        // Inicia o loop de animação quando a janela carrega
         window.onload = function () {
-            // Obtenha as referências globais aos elementos do HUD aqui
+            // Get global references to HUD elements
             vidasDisplayElement = document.getElementById('vidasDisplay');
             hudObjectiveLine1Element = document.getElementById('hudObjectiveLine1');
             hudObjectiveLine2Element = document.getElementById('hudObjectiveLine2');
             totalAllItemsCollectedDisplayElement = document.getElementById('totalAllItemsCollectedDisplay');
             tempoDisplayElement = document.getElementById('tempo');
+            hudKeyStatusElement = document.getElementById('hudKeyStatus');
             chapterTitleDisplayElement = document.getElementById('chapterTitleDisplay');
-            objetivoFaseElement = document.getElementById('objetivoFase');
+            objetivoFaseElement = document.getElementById('objetivoFase'); // This element is hidden, but still referenced for consistency.
 
-            console.log("DEBUG: tempoDisplayElement no onload:", tempoDisplayElement); // Debug: verificar se o elemento é encontrado
-
-            const introScreen = document.getElementById('introScreen');
-            const personagemSelecao = document.getElementById('personagemSelecao');
-            
-            const dismissIntro = () => {
-                console.log("DEBUG: dismissIntro called.");
-                const currentIntroScreen = document.getElementById('introScreen');
-                const currentPersonagemSelecao = document.getElementById('personagemSelecao');
-
-                if (currentIntroScreen && currentIntroScreen.style.display !== 'none') {
-                    currentIntroScreen.style.display = 'none';
-                    if (currentPersonagemSelecao) {
-                        currentPersonagemSelecao.style.display = 'flex';
-                        console.log("DEBUG: Transição para seleção de personagem.");
-                    } else {
-                        console.error("ERRO: Elemento 'personagemSelecao' não encontrado no DOM (dentro de dismissIntro).");
-                    }
-                    document.removeEventListener('keydown', dismissIntro);
-                    currentIntroScreen.removeEventListener('click', dismissIntro);
-                    currentIntroScreen.removeEventListener('touchstart', dismissIntro);
-                }
-            };
-
-            if (introScreen) {
-                introScreen.addEventListener('click', dismissIntro);
-                introScreen.addEventListener('touchstart', dismissIntro);
-            } else {
-                console.error("ERRO: Elemento 'introScreen' não encontrado no DOM (no window.onload).");
+            // Garante que os modais estejam ocultos ao carregar
+            document.getElementById('gameModal').style.display = 'none';
+            document.getElementById('llmHintMessage').style.display = 'none';
+            document.getElementById('continueModal').style.display = 'none';
+            document.getElementById('temporaryMessage').style.display = 'none';
+            // Oculta o HUD inicialmente na tela de seleção de personagem
+            if (document.getElementById('hud')) {
+                document.getElementById('hud').style.display = 'none';
             }
-            document.addEventListener('keydown', dismissIntro);
+            console.log("DEBUG: Modais ocultados ao carregar. HUD oculto.");
 
+            // Adiciona ouvintes de eventos para a seleção de personagem
             document.getElementById('personagemUrso').addEventListener('click', () => selecionar('urso'));
             document.getElementById('personagemGato').addEventListener('click', () => selecionar('gato'));
             document.getElementById('personagemGirafa').addEventListener('click', () => selecionar('girafa'));
             document.getElementById('personagemCoelho').addEventListener('click', () => selecionar('coelho'));
 
-            document.getElementById('btnUp').addEventListener('touchstart', (e) => { e.preventDefault(); tecla('w', true); });
-            document.getElementById('btnUp').addEventListener('touchend', (e) => { e.preventDefault(); tecla('w', false); });
-            document.getElementById('btnLeft').addEventListener('touchstart', (e) => { e.preventDefault(); tecla('a', true); });
-            document.getElementById('btnLeft').addEventListener('touchend', (e) => { e.preventDefault(); tecla('a', false); });
-            document.getElementById('btnDown').addEventListener('touchstart', (e) => { e.preventDefault(); tecla('s', true); });
-            document.getElementById('btnDown').addEventListener('touchend', (e) => { e.preventDefault(); tecla('s', false); });
-            document.getElementById('btnRight').addEventListener('touchstart', (e) => { e.preventDefault(); tecla('d', true); });
-            document.getElementById('btnRight').addEventListener('touchend', (e) => { e.preventDefault(); tecla('d', false); });
+            // Adiciona ouvintes de eventos para os botões direcionais (toque)
+            document.getElementById('btnUp').addEventListener('touchstart', (e) => { e.preventDefault(); tecla('w', true); /* console.log("DEBUG: Touch Up START"); */ });
+            document.getElementById('btnUp').addEventListener('touchend', (e) => { e.preventDefault(); tecla('w', false); /* console.log("DEBUG: Touch Up END"); */ });
+            document.getElementById('btnLeft').addEventListener('touchstart', (e) => { e.preventDefault(); tecla('a', true); /* console.log("DEBUG: Touch Left START"); */ });
+            document.getElementById('btnLeft').addEventListener('touchend', (e) => { e.preventDefault(); tecla('a', false); /* console.log("DEBUG: Touch Left END"); */ });
+            document.getElementById('btnDown').addEventListener('touchstart', (e) => { e.preventDefault(); tecla('s', true); /* console.log("DEBUG: Touch Down START"); */ });
+            document.getElementById('btnDown').addEventListener('touchend', (e) => { e.preventDefault(); tecla('s', false); /* console.log("DEBUG: Touch Down END"); */ });
+            document.getElementById('btnRight').addEventListener('touchstart', (e) => { e.preventDefault(); tecla('d', true); /* console.log("DEBUG: Touch Right START"); */ });
+            document.getElementById('btnRight').addEventListener('touchend', (e) => { e.preventDefault(); tecla('d', false); /* console.log("DEBUG: Touch Right END"); */ });
 
+            // Adiciona ouvintes de eventos para o teclado (W, A, S, D)
             document.addEventListener('keydown', (e) => {
                 const key = e.key.toLowerCase();
+                // Verifica se a tecla é uma das direcionais ou espaço
                 if (['w', 'a', 's', 'd', ' '].includes(key)) {
-                    e.preventDefault();
-                    if (key === ' ') {
+                    e.preventDefault(); // Previne o comportamento padrão do navegador (ex: rolagem)
+                    if (key === ' ') { // Se for espaço, ativa/desativa a coleta
                         coletando = true;
-                    } else {
+                        // console.log("DEBUG: Tecla Espaço DOWN. Coletando:", coletando);
+                    } else { // Caso contrário, é uma tecla direcional
                         tecla(key, true);
                     }
                 }
             });
             document.addEventListener('keyup', (e) => {
                 const key = e.key.toLowerCase();
+                // Verifica se a tecla é uma das direcionais ou espaço
                 if (['w', 'a', 's', 'd', ' '].includes(key)) {
-                    e.preventDefault();
-                    if (key === ' ') {
+                    e.preventDefault(); // Previne o comportamento padrão do navegador
+                    if (key === ' ') { // Se for espaço, desativa a coleta
                         coletando = false;
-                    } else {
+                        // console.log("DEBUG: Tecla Espaço UP. Coletando:", coletando);
+                    } else { // Caso contrário, é uma tecla direcional
                         tecla(key, false);
                     }
                 }
             });
 
-            document.getElementById('botao-acao').addEventListener('touchstart', (e) => { e.preventDefault(); coletando = true; });
-            document.getElementById('botao-acao').addEventListener('touchend', (e) => { e.preventDefault(); coletando = false; });
+            // Adiciona o listener para o botão de ação (toque)
+            document.getElementById('botao-acao').addEventListener('touchstart', (e) => { e.preventDefault(); coletando = true; /* console.log("DEBUG: Botão Ação START. Coletando:", coletando); */ });
+            document.getElementById('botao-acao').addEventListener('touchend', (e) => { e.preventDefault(); coletando = false; /* console.log("DEBUG: Botão Ação END. Coletando:", coletando); */ });
 
+            // Adiciona o listener para o novo botão de dica
+            document.getElementById('botao-dica').addEventListener('click', askForHint);
+
+            // Adiciona listeners para os botões do modal de continue
             document.getElementById('btnSim').addEventListener('click', () => handleContinue('sim'));
             document.getElementById('btnNao').addEventListener('click', () => handleContinue('nao'));
 
-            atualizarHUD(); // Atualiza o HUD com os valores iniciais
+            console.log("DEBUG: Ouvintes de seleção de personagem, botões direcionais, botão de dica e botões de continue adicionados.");
+            // Foca o canvas para garantir que ele receba eventos de teclado
+            document.getElementById('gameCanvas').focus();
+
+            // Chamar atualizarHUD() aqui para garantir que o HUD seja populado com os valores iniciais
+            // antes mesmo de uma fase ser iniciada, mas ele estará oculto pelo CSS.
+            atualizarHUD();
         };
     </script>
 </body>
