@@ -111,30 +111,30 @@
         }
 
         /* Main game content container */
-        #mainGameContent {
+        #mainGameContainer {
             display: flex;
             flex-direction: column;
             align-items: center;
             width: 100%;
             flex-grow: 1; /* Allow it to take available vertical space */
-            padding-top: 100px; /* Space for chapter title and HUD */
+            padding-top: 60px; /* Space for chapter title (approx height of title) */
             box-sizing: border-box;
-            position: relative; /* For HUD positioning */
         }
 
         #chapterTitleDisplay {
-            position: absolute;
-            top: 10px;
+            position: fixed; /* Keep it fixed at the top */
+            top: 0; /* Align to the very top */
             left: 50%;
             transform: translateX(-50%);
             color: white;
             background: rgba(0, 0, 0, 0.6);
             padding: 10px 20px;
-            border-radius: 8px;
+            border-radius: 0 0 8px 8px; /* Rounded corners only at the bottom */
             font-size: 1.2em;
             z-index: 10;
             text-align: center;
             white-space: nowrap;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
         #hud {
@@ -150,7 +150,8 @@
             justify-content: space-between;
             align-items: flex-start;
             box-sizing: border-box;
-            margin-top: 10px; /* Space below chapter title */
+            margin-top: 10px; /* Space from chapter title */
+            margin-bottom: 10px; /* Space to canvas */
         }
         .hud-column {
             display: flex;
@@ -171,11 +172,10 @@
             border-radius: 8px;
             box-shadow: 0 0 15px rgba(0,0,0,0.3);
             display: block;
-            width: 72vw; /* Reduced by 20% */
-            height: 64vh; /* Reduced by 20% */
-            margin: 10px auto; /* Adjusted margin to be responsive */
-            flex-grow: 1; /* Allow canvas to expand vertically */
-            max-height: calc(100vh - 200px); /* Limit max height to leave space for controls/header */
+            margin: 0 auto; /* Center horizontally */
+            flex-grow: 1; /* Allow to take vertical space */
+            width: 100%; /* Will be overridden by JS attributes, but good fallback */
+            height: auto; /* Will be overridden by JS attributes, but good fallback */
         }
 
         /* Controls positioned fixed relative to viewport */
@@ -304,14 +304,14 @@
             #introScreen p {
                 font-size: 1.2em;
             }
-            #mainGameContent {
-                padding-top: 80px; /* Adjusted padding-top for mobile */
+            #mainGameContainer {
+                padding-top: 60px; /* Adjusted padding-top for mobile */
             }
             #hud {
                 font-size: 0.9em;
                 padding: 8px;
-                margin-top: 10px; /* Reduced margin for mobile */
-                top: 60px; /* Adjusted top for mobile */
+                margin-top: 5px; /* Reduced margin for mobile */
+                margin-bottom: 5px; /* Reduced margin for mobile */
             }
             .hud-column {
                 align-items: flex-start;
@@ -348,21 +348,15 @@
                 padding: 12px 25px;
                 font-size: 1.2em;
             }
-            canvas {
-                width: 90vw; /* Make canvas wider on mobile */
-                height: 75vh; /* Give canvas more vertical space on mobile */
-                margin: 5px auto; /* Reduced margin for mobile canvas */
-                max-height: calc(100vh - 180px); /* Adjusted max height for mobile */
-            }
         }
 
         @media (max-width: 360px) {
-            #mainGameContent {
-                padding-top: 70px; /* Further adjusted padding-top for very small screens */
+            #mainGameContainer {
+                padding-top: 50px; /* Further adjusted padding-top for very small screens */
             }
             #hud {
-                margin-top: 5px; /* Even less margin for very small screens */
-                top: 40px; /* Adjusted top for very small mobile screens */
+                margin-top: 5px;
+                margin-bottom: 5px;
             }
             .hud-column:last-child {
                 align-items: center; /* Center text when stacked */
@@ -390,10 +384,6 @@
             #botao-acao {
                 bottom: 10px;
                 right: 2px;
-            }
-            canvas {
-                height: 80vh; /* Even more vertical space for very small screens */
-                max-height: calc(100vh - 160px);
             }
         }
     </style>
@@ -426,7 +416,7 @@
     <div id="chapterTitleDisplay"></div>
 
     <!-- Main Game Content Container -->
-    <div id="mainGameContent">
+    <div id="mainGameContainer">
         <!-- Heads-Up Display (HUD) -->
         <div id="hud">
             <div class="hud-column">
@@ -461,7 +451,7 @@
 
     <!-- Botão de controle de som -->
     <button id="soundControlBtn" class="botao-jogo">
-        <svg id="soundOnIcon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-volume-2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+        <svg id="soundOnIcon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-volume-2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
         <svg id="soundOffIcon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-volume-x" style="display: none;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
     </button>
 
@@ -602,7 +592,7 @@
             currentPlayerType: '', // Armazena o tipo de personagem selecionado para reinícios
             currentPhase: 1, // Inicia na Fase 1
 
-            PLAYER_SIZE: 37, // Tamanho do personagem (AJUSTADO)
+            PLAYER_SIZE: 35, // Tamanho do personagem (AJUSTADO)
             ITEM_SIZE: 25, // Tamanho dos itens coletáveis (AJUSTADO)
             OBSTACLE_SIZE: 25, // Tamanho dos obstáculos (AJUSTADO)
             SCHOOL_ITEM_SIZE: 25, // Tamanho dos itens escolares não coletáveis (AJUSTADO)
@@ -661,11 +651,61 @@
 
             // Método para redimensionar o canvas
             resizeCanvas: function() {
-                if (!this.canvas) return; // Adicionado null check
-                // Reduzindo em 20% o tamanho original (90% * 0.8 = 72%, 80vh * 0.8 = 64vh)
-                this.canvas.width = window.innerWidth * 0.72; // 72% da largura da janela
-                this.canvas.height = window.innerHeight * 0.64; // 64% da altura da viewport
-                // Reposiciona o jogador no centro se o canvas for redimensionado
+                if (!this.canvas) return;
+
+                const chapterTitleHeight = document.getElementById('chapterTitleDisplay').offsetHeight;
+                const hudElement = document.getElementById('hud');
+                const hudHeight = hudElement ? hudElement.offsetHeight : 0;
+                const hudMarginBottom = hudElement ? parseFloat(getComputedStyle(hudElement).marginBottom) : 0;
+
+                const controlsHeight = 100; // Approximate height of bottom controls (direcional, action, sound)
+                const verticalPaddingBuffer = 20; // Extra buffer for spacing
+
+                // Calculate available height for the canvas
+                const availableHeight = window.innerHeight - chapterTitleHeight - hudHeight - hudMarginBottom - controlsHeight - verticalPaddingBuffer;
+                let availableWidth = window.innerWidth * 0.90; // Start with 90vw for desktop
+
+                // Adjust available width for mobile
+                if (window.innerWidth <= 768) {
+                    availableWidth = window.innerWidth * 0.95; // 95vw for tablets/larger phones
+                }
+                if (window.innerWidth <= 360) {
+                    availableWidth = window.innerWidth * 0.98; // 98vw for very small phones
+                }
+
+                const aspectRatio = 4 / 3; // Desired width / height
+
+                let newCanvasWidth;
+                let newCanvasHeight;
+
+                // Prioritize width to fill horizontal space, then check height constraint
+                newCanvasWidth = availableWidth;
+                newCanvasHeight = newCanvasWidth / aspectRatio;
+
+                if (newCanvasHeight > availableHeight) {
+                    // If height is too much, scale based on height instead
+                    newCanvasHeight = availableHeight;
+                    newCanvasWidth = newCanvasHeight * aspectRatio;
+                }
+
+                // Apply a maximum width to prevent it from getting too wide on very large screens
+                const maxWidthLimit = 720;
+                if (newCanvasWidth > maxWidthLimit) {
+                    newCanvasWidth = maxWidthLimit;
+                    newCanvasHeight = maxWidthLimit / aspectRatio;
+                }
+
+                // Set the canvas element's attributes (drawing buffer size)
+                this.canvas.width = newCanvasWidth;
+                this.canvas.height = newCanvasHeight;
+
+                // Set the CSS dimensions to match the attributes, ensuring it fits the container
+                this.canvas.style.width = `${newCanvasWidth}px`;
+                this.canvas.style.height = `${newCanvasHeight}px`;
+
+                console.log(`DEBUG: Canvas resized to Width: ${newCanvasWidth.toFixed(2)}px, Height: ${newCanvasHeight.toFixed(2)}px`);
+
+                // Reposition player
                 if (this.player) {
                     this.player.x = this.canvas.width / 2 - this.PLAYER_SIZE / 2;
                     this.player.y = this.canvas.height / 2 - this.PLAYER_SIZE / 2;
@@ -1742,11 +1782,13 @@
                 this.canvas = document.getElementById('gameCanvas');
                 if (this.canvas) {
                     this.ctx = this.canvas.getContext('2d');
-                    this.resizeCanvas(); // Chama resizeCanvas para definir as dimensões iniciais
-                    window.addEventListener('resize', this.resizeCanvas.bind(this)); // Adiciona listener para redimensionar
+                    // Initial call to resizeCanvas to set initial dimensions
+                    this.resizeCanvas();
+                    // Add listener for window resize events
+                    window.addEventListener('resize', this.resizeCanvas.bind(this));
                 } else {
                     console.error("Erro: Elemento 'gameCanvas' não encontrado no DOM.");
-                    return; // Impede que o jogo continue se o canvas não for encontrado
+                    return;
                 }
 
                 this.introMusicElement = document.getElementById('introMusic');
