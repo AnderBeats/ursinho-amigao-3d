@@ -117,11 +117,11 @@
         }
         #hud {
             position: absolute;
-            top: 80px; /* Adjusted top for desktop */
+            top: 60px; /* Adjusted to be closer to the top, below chapter title */
             left: 50%;
             transform: translateX(-50%);
             color: white;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0,0,0,0.4); /* Ajustado para mais transparente */
             padding: 10px;
             border-radius: 8px;
             z-index: 10;
@@ -214,7 +214,7 @@
             /* Ajustado para 80% do tamanho anterior (90% * 0.8 = 72%, 80vh * 0.8 = 64vh) */
             width: 72vw; /* Reduzido em 20% */
             height: 64vh; /* Reduzido em 20% */
-            margin: 20px auto; /* Centraliza o canvas */
+            margin: 5vh auto 2vh auto; /* Adjusted margins to be responsive */
         }
 
         /* Mensagem de dica LLM */
@@ -362,8 +362,7 @@
             #hud {
                 font-size: 0.9em;
                 padding: 8px;
-                top: 70px; /* Adjusted top for mobile */
-                flex-direction: row; /* Keep columns side-by-side if enough space */
+                top: 20px; /* Adjusted top for mobile */
             }
             .hud-column {
                 align-items: flex-start; /* Default for both columns */
@@ -400,14 +399,14 @@
                 padding: 12px 25px;
                 font-size: 1.2em;
             }
+            canvas {
+                margin: 8vh auto 2vh auto; /* Slightly more top margin for mobile canvas */
+            }
         }
 
         @media (max-width: 360px) { /* Adjusted breakpoint for stacking columns on very small screens */
             #hud {
-                top: 40px; /* Further adjust top for very small screens */
-                font-size: 0.75em; /* Smaller font for very small screens */
-                flex-direction: column; /* Stack columns vertically on very small screens */
-                align-items: center; /* Center stacked columns */
+                top: 20px; /* Consistent with desktop now */
             }
             .hud-column:last-child {
                 align-items: center; /* Center text when stacked */
@@ -643,11 +642,11 @@
             currentPlayerType: '', // Armazena o tipo de personagem selecionado para reinícios
             currentPhase: 1, // Inicia na Fase 1
 
-            PLAYER_SIZE: 40, // Tamanho do personagem
-            ITEM_SIZE: 30, // Tamanho dos itens coletáveis
-            OBSTACLE_SIZE: 30, // Tamanho dos obstáculos (AUMENTADO PARA 30 PIXELS)
-            SCHOOL_ITEM_SIZE: 25, // Tamanho dos itens escolares não coletáveis
-            CHEST_SIZE: 50, // Tamanho do baú
+            PLAYER_SIZE: 37, // Tamanho do personagem (AJUSTADO)
+            ITEM_SIZE: 25, // Tamanho dos itens coletáveis (AJUSTADO)
+            OBSTACLE_SIZE: 25, // Tamanho dos obstáculos (AJUSTADO)
+            SCHOOL_ITEM_SIZE: 25, // Tamanho dos itens escolares não coletáveis (AJUSTADO)
+            CHEST_SIZE: 45, // Tamanho do baú (AJUSTADO)
             PLAYER_SPEED: 3, // Velocidade do personagem (ajustada para médio)
 
             // Variáveis para o limitador de FPS
@@ -1408,8 +1407,8 @@
                 }
 
                 // Gera os obstáculos temáticos da escola (comum para todas as fases)
-                for (let i = 0; i < 3; i++) { // Alterado de 4 para 3
-                    this.obstaculos.push(this.createGameObject('mesa', '🟫', this.OBSTACLE_SIZE, false, true)); // Alterado de 🪚 para 🟫
+                for (let i = 0; i < 3; i++) {
+                    this.obstaculos.push(this.createGameObject('mesa', '🟫', this.OBSTACLE_SIZE, false, true));
                     this.obstaculos.push(this.createGameObject('cadeira', '🪑', this.OBSTACLE_SIZE, false, true));
                     this.obstaculos.push(this.createGameObject('armario', '🚪', this.OBSTACLE_SIZE, false, true));
                 }
