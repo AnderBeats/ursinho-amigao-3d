@@ -653,46 +653,50 @@
             resizeCanvas: function() {
                 if (!this.canvas) return;
 
+                // Get heights of fixed elements
                 const chapterTitleHeight = document.getElementById('chapterTitleDisplay').offsetHeight;
                 const hudElement = document.getElementById('hud');
                 const hudHeight = hudElement ? hudElement.offsetHeight : 0;
                 const hudMarginBottom = hudElement ? parseFloat(getComputedStyle(hudElement).marginBottom) : 0;
-
                 const controlsHeight = 100; // Approximate height of bottom controls (direcional, action, sound)
                 const verticalPaddingBuffer = 20; // Extra buffer for spacing
 
                 // Calculate available height for the canvas
-                const availableHeight = window.innerHeight - chapterTitleHeight - hudHeight - hudMarginBottom - controlsHeight - verticalPaddingBuffer;
-                let availableWidth = window.innerWidth * 0.90; // Start with 90vw for desktop
+                const availableHeightForCanvasArea = window.innerHeight - chapterTitleHeight - hudHeight - hudMarginBottom - controlsHeight - verticalPaddingBuffer;
 
-                // Adjust available width for mobile
+                // User explicitly requested 70% of screen height for the canvas height
+                let newCanvasHeight = window.innerHeight * 0.70;
+                const aspectRatio = 4 / 3; // Desired width / height ratio for the game content
+
+                // Calculate width based on the new fixed height and desired aspect ratio
+                let newCanvasWidth = newCanvasHeight * aspectRatio;
+
+                // Ensure the calculated width does not exceed the available horizontal space
+                // and apply max width limit
+                let maxAllowedWidth = window.innerWidth * 0.90; // Default for desktop
                 if (window.innerWidth <= 768) {
-                    availableWidth = window.innerWidth * 0.95; // 95vw for tablets/larger phones
+                    maxAllowedWidth = window.innerWidth * 0.95; // 95vw for tablets/larger phones
                 }
                 if (window.innerWidth <= 360) {
-                    availableWidth = window.innerWidth * 0.98; // 98vw for very small phones
+                    maxAllowedWidth = window.innerWidth * 0.98; // 98vw for very small phones
                 }
 
-                const aspectRatio = 4 / 3; // Desired width / height
+                const maxWidthLimit = 720; // Absolute max width for desktop
 
-                let newCanvasWidth;
-                let newCanvasHeight;
-
-                // Prioritize width to fill horizontal space, then check height constraint
-                newCanvasWidth = availableWidth;
-                newCanvasHeight = newCanvasWidth / aspectRatio;
-
-                if (newCanvasHeight > availableHeight) {
-                    // If height is too much, scale based on height instead
-                    newCanvasHeight = availableHeight;
-                    newCanvasWidth = newCanvasHeight * aspectRatio;
+                if (newCanvasWidth > maxAllowedWidth) {
+                    newCanvasWidth = maxAllowedWidth;
+                    newCanvasHeight = newCanvasWidth / aspectRatio; // Recalculate height to fit width
                 }
 
-                // Apply a maximum width to prevent it from getting too wide on very large screens
-                const maxWidthLimit = 720;
                 if (newCanvasWidth > maxWidthLimit) {
                     newCanvasWidth = maxWidthLimit;
-                    newCanvasHeight = maxWidthLimit / aspectRatio;
+                    newCanvasHeight = maxWidthLimit / aspectRatio; // Recalculate height to fit max desktop width
+                }
+                
+                // Ensure the newCanvasHeight doesn't exceed the available space if other elements unexpectedly grow
+                if (newCanvasHeight > availableHeightForCanvasArea) {
+                    newCanvasHeight = availableHeightForCanvasArea;
+                    newCanvasWidth = newCanvasHeight * aspectRatio;
                 }
 
                 // Set the canvas element's attributes (drawing buffer size)
