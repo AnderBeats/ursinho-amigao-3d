@@ -13,36 +13,41 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start; /* Align items to the top initially */
             min-height: 100vh; /* Garante que o corpo ocupa a altura total da viewport */
-            position: relative; /* Para posicionamento absoluto dos elementos */
+            position: relative; /* For absolute positioning of intro/selection screens */
         }
-        #introScreen {
+        #introScreen, #personagemSelecao {
             position: absolute;
             inset: 0;
-            background: #aee1f9; /* Fundo azul claro para a tela de introdução */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 20; /* Acima de tudo, exceto modais */
+            z-index: 20;
+            background: #aee1f9;
             color: #333;
             text-align: center;
             padding: 20px;
             box-sizing: border-box;
-            cursor: pointer; /* Adicionado para indicar que a tela é clicável */
+            cursor: pointer;
         }
-        #introImagePlaceholder { /* New style for the image placeholder */
+        #personagemSelecao {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            display: none; /* Hidden by default */
+        }
+        #introImagePlaceholder {
             width: 400px;
             height: 300px;
-            background-color: #ffd54f; /* Yellowish background */
+            background-color: #ffd54f;
             border-radius: 15px;
             box-shadow: 0 8px 16px rgba(0,0,0,0.2);
             margin-bottom: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 8em; /* Increased font size for the emoji */
+            font-size: 8em;
             color: #333;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
@@ -51,13 +56,13 @@
             margin-bottom: 15px;
             color: #2c3e50;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-            display: flex; /* Use flexbox for centering children */
-            flex-direction: column; /* Stack children vertically */
-            align-items: center; /* Center horizontally */
-            text-align: center; /* Ensure text within spans is centered */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
         }
         #introScreen h1 span {
-            display: block; /* Ensure spans take full width for line break */
+            display: block;
         }
         #introScreen p {
             font-size: 1.5em;
@@ -71,22 +76,11 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
-        #personagemSelecao {
-            position: absolute;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            display: none; /* Changed from none to flex to ensure it's visible initially */
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-        }
         .personagem-opcoes {
             display: flex;
             gap: 30px;
             margin-top: 20px;
-            flex-wrap: wrap; /* Permite quebrar linha em telas menores */
+            flex-wrap: wrap;
             justify-content: center;
         }
         .personagem {
@@ -101,205 +95,33 @@
             flex-direction: column;
             color: #333;
             font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Sombra suave */
-            transition: transform 0.2s, background-color 0.2s; /* Transição suave */
-            text-align: center; /* Adicionado para centralizar o texto dentro da caixinha */
-            font-size: 3em; /* Ajustado o tamanho do emoji para caber na caixa */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s, background-color 0.2s;
+            text-align: center;
+            font-size: 3em;
         }
         .personagem:hover {
-            background-color: #ffd54f; /* Amarelo ao passar o mouse */
-            transform: translateY(-5px); /* Efeito de elevação ao passar o mouse */
+            background-color: #ffd54f;
+            transform: translateY(-5px);
         }
-        .personagem span { /* Estilo para o nome do personagem */
-            font-size: 0.3em; /* Reduz o tamanho da fonte para o nome */
-            display: block; /* Garante que o nome fique em uma nova linha */
-            margin-top: 0.2em; /* Ajusta a margem para aproximar o nome do emoji e subir o emoji */
+        .personagem span {
+            font-size: 0.3em;
+            display: block;
+            margin-top: 0.2em;
         }
-        #hud {
-            position: absolute;
-            top: 60px; /* Adjusted to be closer to the top, below chapter title */
-            left: 50%;
-            transform: translateX(-50%);
-            color: white;
-            background: rgba(0,0,0,0.4); /* Ajustado para mais transparente */
-            padding: 10px;
-            border-radius: 8px;
-            z-index: 10;
-            font-size: 1.1em;
-            display: none; /* Oculta o HUD por padrão */
-            flex-direction: row; /* Use flexbox for columns */
-            justify-content: space-between; /* Distribute space between columns */
-            width: 90%; /* Occupy most of the width */
-            max-width: 700px; /* Limit max width */
-            box-sizing: border-box; /* Include padding in width */
-            align-items: flex-start; /* Align columns to the top */
-        }
-        .hud-column {
+
+        /* Main game content container */
+        #mainGameContent {
             display: flex;
             flex-direction: column;
-            align-items: flex-start; /* Align text to the left within each column */
-            flex-basis: 48%; /* Give columns a basis to distribute space */
-            padding: 0 5px; /* Reduced internal padding for better fit */
-            box-sizing: border-box; /* Include padding in width */
-            background: rgba(255,255,255,0.2); /* Light background for the "box" effect - Adjusted to 0.2 */
-            border-radius: 5px;
-        }
-        .hud-column:last-child {
-            align-items: flex-end; /* Align right column text to the right */
-        }
-        #objetivoFase {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            color: white;
-            background: rgba(0,0,0,0.6);
-            padding: 10px;
-            border-radius: 8px;
-            z-index: 10;
-            font-size: 1.1em;
-            text-align: right;
-            display: none; /* Adicionado para ocultar o painel de objetivo da fase */
-        }
-        /* Controles posicionados sobre o canvas */
-        #direcional {
-            position: fixed; /* Fixado na viewport */
-            bottom: 20px;
-            left: 20px; /* Canto inferior esquerdo */
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        .linha {
-            display: flex;
-            justify-content: center;
-            gap: 5px;
-        }
-        .botao-direcional, .botao-jogo { /* Classe geral para botões de jogo */
-            width: 50px; /* Botões ligeiramente maiores */
-            height: 50px;
-            background: rgba(255,255,255,0.3); /* Transparência */
-            border: none;
-            border-radius: 12px; /* Cantos mais arredondados */
-            font-weight: bold;
-            font-size: 24px; /* Fonte maior para ícones */
-            box-shadow: 0 3px 5px rgba(0,0,0,0.2);
-            transition: background 0.2s, transform 0.1s;
-            z-index: 10; /* Ensure buttons are above canvas */
-        }
-        .botao-direcional:active, .botao-jogo:active {
-            background: rgba(255,255,255,0.5); /* Menos transparente ao clicar */
-            transform: translateY(2px); /* Efeito de clique */
-        }
-        #botao-acao {
-            position: fixed; /* Fixado na viewport */
-            bottom: 30px;
-            right: 20px; /* Canto inferior direito */
-            z-index: 10;
-            background: rgba(76, 175, 80, 0.3); /* Verde com transparência */
-            color: white;
-            border-radius: 50%; /* Torna o botão redondo */
-            display: flex; /* Para centralizar o conteúdo */
-            align-items: center; /* Para centralizar o conteúdo */
-            justify-content: center; /* Para centralizar o conteúdo */
-            font-size: 30px; /* Ajusta o tamanho da fonte para o 'A' */
-        }
-
-        /* Estilo do Canvas 2D */
-        canvas {
-            background-color: #8bc34a; /* Cor do chão para 2D, revertido para o original */
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.3);
-            display: block; /* Remove espaço extra abaixo do canvas */
-            /* Ajustado para 80% do tamanho anterior (90% * 0.8 = 72%, 80vh * 0.8 = 64vh) */
-            width: 72vw; /* Reduzido em 20% */
-            height: 64vh; /* Reduzido em 20% */
-            margin: 130px auto 2vh auto; /* Margin top to push it below HUD and chapter title */
-        }
-
-        /* Mensagem de dica LLM */
-        #llmHintMessage {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.75);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 10px;
-            text-align: center;
-            font-size: 1.2em;
-            z-index: 15;
-            display: none; /* Oculto por padrão */
-            max-width: 70%;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            animation: fadeIn 0.3s forwards;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* Novo Modal de Continue */
-        #continueModal {
-            display: none; /* Oculto por padrão */
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.9);
-            color: white;
-            flex-direction: column; /* Changed to flex for centering */
             align-items: center;
-            justify-content: center;
-            z-index: 30; /* Acima de outros modais */
-            text-align: center;
-        }
-        #continueModal h2 {
-            font-size: 2.5em;
-            margin-bottom: 20px;
-        }
-        #continueModal p {
-            font-size: 1.8em;
-            margin-bottom: 30px;
-        }
-        #continueModal .botoes-continue {
-            display: flex;
-            gap: 20px;
-        }
-        #continueModal .botoes-continue button {
-            padding: 15px 30px;
-            font-size: 1.5em;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s;
-        }
-        #continueModal .botoes-continue button:hover {
-            background-color: #45a049;
-            transform: translateY(-2px);
-        }
-        #continueModal #btnSim {
-            background-color: #4CAF50;
-            color: white;
-        }
-        #continueModal #btnNao {
-            background-color: #f44336;
-            color: white;
-        }
-        #temporaryMessage {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            font-size: 1.5em;
-            z-index: 25;
-            display: none;
+            width: 100%;
+            flex-grow: 1; /* Allow it to take available vertical space */
+            padding-top: 100px; /* Space for chapter title and HUD */
+            box-sizing: border-box;
+            position: relative; /* For HUD positioning */
         }
 
-        /* Estilo para o título do capítulo */
         #chapterTitleDisplay {
             position: absolute;
             top: 10px;
@@ -312,24 +134,109 @@
             font-size: 1.2em;
             z-index: 10;
             text-align: center;
-            white-space: nowrap; /* Evita quebra de linha */
+            white-space: nowrap;
         }
 
-        /* Botão de controle de som */
-        #soundControlBtn {
+        #hud {
+            width: 90%;
+            max-width: 700px;
+            background: rgba(0,0,0,0.4);
+            padding: 10px;
+            border-radius: 8px;
+            z-index: 10;
+            font-size: 1.1em;
+            display: flex; /* Always flex when visible */
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: flex-start;
+            box-sizing: border-box;
+            margin-top: 10px; /* Space below chapter title */
+        }
+        .hud-column {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            flex-basis: 48%;
+            padding: 0 5px;
+            box-sizing: border-box;
+            background: rgba(255,255,255,0.2);
+            border-radius: 5px;
+        }
+        .hud-column:last-child {
+            align-items: flex-end;
+        }
+
+        canvas {
+            background-color: #8bc34a;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+            display: block;
+            width: 72vw; /* Reduced by 20% */
+            height: 64vh; /* Reduced by 20% */
+            margin: 10px auto; /* Adjusted margin to be responsive */
+            flex-grow: 1; /* Allow canvas to expand vertically */
+            max-height: calc(100vh - 200px); /* Limit max height to leave space for controls/header */
+        }
+
+        /* Controls positioned fixed relative to viewport */
+        #direcional {
             position: fixed;
-            bottom: 20px; /* Ajuste conforme necessário para não colidir com outros botões */
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px; /* Tamanho do botão */
-            height: 60px;
-            background: rgba(255, 255, 255, 0.3);
+            bottom: 20px;
+            left: 20px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .linha {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+        .botao-direcional, .botao-jogo {
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.3);
             border: none;
-            border-radius: 50%; /* Redondo */
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 24px;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+            transition: background 0.2s, transform 0.1s;
+            z-index: 10;
+        }
+        .botao-direcional:active, .botao-jogo:active {
+            background: rgba(255,255,255,0.5);
+            transform: translateY(2px);
+        }
+        #botao-acao {
+            position: fixed;
+            bottom: 30px;
+            right: 20px;
+            z-index: 10;
+            background: rgba(76, 175, 80, 0.3);
+            color: white;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px; /* Tamanho do ícone */
+            font-size: 30px;
+        }
+
+        #soundControlBtn {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.3);
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
             color: white;
             box-shadow: 0 3px 5px rgba(0,0,0,0.2);
             cursor: pointer;
@@ -341,9 +248,47 @@
             transform: translateX(-50%) translateY(2px);
         }
         #soundControlBtn svg {
-            width: 30px; /* Tamanho do SVG */
+            width: 30px;
             height: 30px;
         }
+
+        /* Overlays/Modals */
+        #llmHintMessage, #temporaryMessage, #gameModal, #continueModal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.5em;
+            z-index: 25;
+            display: none;
+            max-width: 70%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        #continueModal {
+            z-index: 30;
+            background: rgba(0, 0, 0, 0.9);
+            flex-direction: column;
+        }
+        #continueModal h2 { font-size: 2.5em; margin-bottom: 20px; }
+        #continueModal p { font-size: 1.8em; margin-bottom: 30px; }
+        #continueModal .botoes-continue { display: flex; gap: 20px; }
+        #continueModal .botoes-continue button {
+            padding: 15px 30px; font-size: 1.5em; border: none; border-radius: 10px;
+            cursor: pointer; transition: background-color 0.2s, transform 0.1s;
+        }
+        #continueModal .botoes-continue button:hover { background-color: #45a049; transform: translateY(-2px); }
+        #continueModal #btnSim { background-color: #4CAF50; color: white; }
+        #continueModal #btnNao { background-color: #f44336; color: white; }
 
 
         /* Media Queries for Mobile Adjustments */
@@ -359,16 +304,20 @@
             #introScreen p {
                 font-size: 1.2em;
             }
+            #mainGameContent {
+                padding-top: 80px; /* Adjusted padding-top for mobile */
+            }
             #hud {
                 font-size: 0.9em;
                 padding: 8px;
-                top: 40px; /* Adjusted top for mobile */
+                margin-top: 10px; /* Reduced margin for mobile */
+                top: 60px; /* Adjusted top for mobile */
             }
             .hud-column {
-                align-items: flex-start; /* Default for both columns */
+                align-items: flex-start;
             }
             .hud-column:last-child {
-                align-items: flex-end; /* Keep right column aligned right */
+                align-items: flex-end;
             }
             .botao-direcional, .botao-jogo {
                 width: 45px;
@@ -400,13 +349,20 @@
                 font-size: 1.2em;
             }
             canvas {
-                margin: 100px auto 2vh auto; /* Adjusted margin for mobile */
+                width: 90vw; /* Make canvas wider on mobile */
+                height: 75vh; /* Give canvas more vertical space on mobile */
+                margin: 5px auto; /* Reduced margin for mobile canvas */
+                max-height: calc(100vh - 180px); /* Adjusted max height for mobile */
             }
         }
 
-        @media (max-width: 360px) { /* Adjusted breakpoint for stacking columns on very small screens */
+        @media (max-width: 360px) {
+            #mainGameContent {
+                padding-top: 70px; /* Further adjusted padding-top for very small screens */
+            }
             #hud {
-                top: 40px; /* Consistent with desktop now */
+                margin-top: 5px; /* Even less margin for very small screens */
+                top: 40px; /* Adjusted top for very small mobile screens */
             }
             .hud-column:last-child {
                 align-items: center; /* Center text when stacked */
@@ -435,6 +391,10 @@
                 bottom: 10px;
                 right: 2px;
             }
+            canvas {
+                height: 80vh; /* Even more vertical space for very small screens */
+                max-height: calc(100vh - 160px);
+            }
         }
     </style>
 </head>
@@ -462,27 +422,27 @@
         </div>
     </div>
 
-    <!-- Heads-Up Display (HUD) -->
-    <div id="hud">
-        <div class="hud-column">
-            <span id="vidasDisplay"></span>
-            <span id="totalAllItemsCollectedDisplay"></span>
-            <span id="tempo"></span>
-        </div>
-        <div class="hud-column">
-            <span id="hudObjectiveLine1"></span>
-            <span id="hudObjectiveLine2"></span>
-        </div>
-    </div>
-
     <!-- Título do Capítulo Centralizado -->
     <div id="chapterTitleDisplay"></div>
 
-    <!-- Painel de Objetivo da Fase (canto superior direito) -->
-    <div id="objetivoFase" style="display: none;"></div>
+    <!-- Main Game Content Container -->
+    <div id="mainGameContent">
+        <!-- Heads-Up Display (HUD) -->
+        <div id="hud">
+            <div class="hud-column">
+                <span id="vidasDisplay"></span>
+                <span id="totalAllItemsCollectedDisplay"></span>
+                <span id="tempo"></span>
+            </div>
+            <div class="hud-column">
+                <span id="hudObjectiveLine1"></span>
+                <span id="hudObjectiveLine2"></span>
+            </div>
+        </div>
 
-    <!-- Canvas para o jogo 2D -->
-    <canvas id="gameCanvas" tabindex="0"></canvas>
+        <!-- Canvas para o jogo 2D -->
+        <canvas id="gameCanvas" tabindex="0"></canvas>
+    </div>
 
     <!-- Controles Direcionais para Celular -->
     <div id="direcional">
