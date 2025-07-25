@@ -657,57 +657,36 @@
                 const chapterTitleHeight = document.getElementById('chapterTitleDisplay').offsetHeight;
                 const hudElement = document.getElementById('hud');
                 const hudHeight = hudElement ? hudElement.offsetHeight : 0;
+                const hudMarginTop = hudElement ? parseFloat(getComputedStyle(hudElement).marginTop) : 0;
                 const hudMarginBottom = hudElement ? parseFloat(getComputedStyle(hudElement).marginBottom) : 0;
                 const controlsHeight = 100; // Approximate height of bottom controls (direcional, action, sound)
                 const verticalPaddingBuffer = 20; // Extra buffer for spacing
 
                 // Calculate available height for the canvas
-                const availableHeightForCanvasArea = window.innerHeight - chapterTitleHeight - hudHeight - hudMarginBottom - controlsHeight - verticalPaddingBuffer;
+                const availableHeightForCanvasArea = window.innerHeight - chapterTitleHeight - hudHeight - hudMarginTop - hudMarginBottom - controlsHeight - verticalPaddingBuffer;
 
-                // User explicitly requested 70% of screen height for the canvas height
-                let newCanvasHeight = window.innerHeight * 0.70;
-                const aspectRatio = 4 / 3; // Desired width / height ratio for the game content
+                // User explicitly requested a square canvas (1:1 aspect ratio)
+                const aspectRatio = 1; // Desired 1:1 aspect ratio (width / height)
 
-                // Calculate width based on the new fixed height and desired aspect ratio
-                let newCanvasWidth = newCanvasHeight * aspectRatio;
+                // Determine the maximum possible size for the square canvas
+                // It should be limited by both available width and available height
+                let newCanvasSize = Math.min(window.innerWidth * 0.95, availableHeightForCanvasArea); // Start with 95vw for mobile, or available height
 
-                // Ensure the calculated width does not exceed the available horizontal space
-                // and apply max width limit
-                let maxAllowedWidth = window.innerWidth * 0.90; // Default for desktop
-                if (window.innerWidth <= 768) {
-                    maxAllowedWidth = window.innerWidth * 0.95; // 95vw for tablets/larger phones
-                }
-                if (window.innerWidth <= 360) {
-                    maxAllowedWidth = window.innerWidth * 0.98; // 98vw for very small phones
-                }
-
-                const maxWidthLimit = 720; // Absolute max width for desktop
-
-                if (newCanvasWidth > maxAllowedWidth) {
-                    newCanvasWidth = maxAllowedWidth;
-                    newCanvasHeight = newCanvasWidth / aspectRatio; // Recalculate height to fit width
-                }
-
-                if (newCanvasWidth > maxWidthLimit) {
-                    newCanvasWidth = maxWidthLimit;
-                    newCanvasHeight = maxWidthLimit / aspectRatio; // Recalculate height to fit max desktop width
+                // Apply max width limit for desktop
+                const maxWidthLimit = 720;
+                if (newCanvasSize > maxWidthLimit) {
+                    newCanvasSize = maxWidthLimit;
                 }
                 
-                // Ensure the newCanvasHeight doesn't exceed the available space if other elements unexpectedly grow
-                if (newCanvasHeight > availableHeightForCanvasArea) {
-                    newCanvasHeight = availableHeightForCanvasArea;
-                    newCanvasWidth = newCanvasHeight * aspectRatio;
-                }
-
                 // Set the canvas element's attributes (drawing buffer size)
-                this.canvas.width = newCanvasWidth;
-                this.canvas.height = newCanvasHeight;
+                this.canvas.width = newCanvasSize;
+                this.canvas.height = newCanvasSize;
 
                 // Set the CSS dimensions to match the attributes, ensuring it fits the container
-                this.canvas.style.width = `${newCanvasWidth}px`;
-                this.canvas.style.height = `${newCanvasHeight}px`;
+                this.canvas.style.width = `${newCanvasSize}px`;
+                this.canvas.style.height = `${newCanvasSize}px`;
 
-                console.log(`DEBUG: Canvas resized to Width: ${newCanvasWidth.toFixed(2)}px, Height: ${newCanvasHeight.toFixed(2)}px`);
+                console.log(`DEBUG: Canvas resized to Width: ${newCanvasSize.toFixed(2)}px, Height: ${newCanvasSize.toFixed(2)}px (1:1 aspect ratio)`);
 
                 // Reposition player
                 if (this.player) {
@@ -1237,178 +1216,6 @@
                 this.obstaculos = [];
                 this.schoolItems = [];
                 this.chest = null;
-
-                // Geração de 2 moedas em cada fase
-                this.itens.push(this.createGameObject('moeda', '💰', this.ITEM_SIZE, true, false, null, false));             // Moeda
-                this.itens.push(this.createGameObject('moeda', '💰', this.ITEM_SIZE, true, false, null, false));             // Outra moeda
-
-                if (this.currentPhase === 1) {
-                    // Itens do objetivo principal da Fase 1: 3 Pedras e 3 Chaves
-                    this.itens.push(this.createGameObject('pedra', '🔴', this.ITEM_SIZE, true, false, 'vermelha', true)); // Pedra vermelha (objetivo)
-                    this.itens.push(this.createGameObject('pedra', '🟢', this.ITEM_SIZE, true, false, 'verde', true));    // Pedra verde (objetivo)
-                    this.itens.push(this.createGameObject('pedra', '🔵', this.ITEM_SIZE, true, false, 'azul', true));    // Pedra azul (objetivo)
-                    this.itens.push(this.createGameObject('chave', '🔑', this.ITEM_SIZE, true, false, null, true));             // Chave dourada (objetivo)
-                    this.itens.push(this.createGameObject('chave', '🔑', this.ITEM_SIZE, true, false, null, true));             // Chave dourada (objetivo)
-                    this.itens.push(this.createGameObject('chave', '🔑', this.ITEM_SIZE, true, false, null, true));             // Chave dourada (objetivo)
-
-                    // Outros itens coletáveis que não são do objetivo principal da Fase 1
-                    this.itens.push(this.createGameObject('folha', '🍂', this.ITEM_SIZE, true, false, null, false));             // Folha encantada
-                    this.itens.push(this.createGameObject('folha', '🍂', this.ITEM_SIZE, true, false, null, false));             // Outra folha encantada
-
-                    // Cria o baú do tesouro para a Fase 1
-                    this.chest = this.createGameObject('bau', '📦', this.CHEST_SIZE, false, false);
-                    this.chest.isOpened = false; // Garante que o baú começa fechado
-
-                } else if (this.currentPhase === 2) {
-                    // Itens do objetivo principal da Fase 2: 4 Vales Sorvete e 4 Sorvetes de sabores específicos
-                    this.itens.push(this.createGameObject('vale_sorvete', '🎟️', this.ITEM_SIZE, true, false, 'ticket', true)); // Ticket
-                    this.itens.push(this.createGameObject('vale_sorvete', '🎟️', this.ITEM_SIZE, true, false, 'ticket', true));
-                    this.itens.push(this.createGameObject('vale_sorvete', '🎟️', this.ITEM_SIZE, true, false, 'ticket', true));
-                    this.itens.push(this.createGameObject('vale_sorvete', '🎟️', this.ITEM_SIZE, true, false, 'ticket', true));
-
-                    this.itens.push(this.createGameObject('sorvete', '🍫🍦', this.ITEM_SIZE, true, false, 'chocolate', true)); // Sorvete de Chocolate (objetivo)
-                    this.itens.push(this.createGameObject('sorvete', '🍓🍦', this.ITEM_SIZE, true, false, 'morango', true));    // Sorvete de Morango (objetivo)
-                    this.itens.push(this.createGameObject('sorvete', '🥥🍦', this.ITEM_SIZE, true, false, 'coco', true));       // Sorvete de Coco (objetivo)
-                    this.itens.push(this.createGameObject('sorvete', '🍈🍦', this.ITEM_SIZE, true, false, 'maracuja', true)); // Sorvete de Maracujá (objetivo)
-
-                    // Outros itens coletáveis da Fase 2 (sorvetes não-objetivo)
-                    this.itens.push(this.createGameObject('sorvete', '🥭🍦', this.ITEM_SIZE, true, false, 'manga', false)); // Sorvete de Manga (não objetivo)
-                    this.itens.push(this.createGameObject('sorvete', '🍦', this.ITEM_SIZE, true, false, 'flocos', false)); // Sorvete de Flocos (não objetivo)
-
-                    // Não há baú na Fase 2, a vitória é por coletar vales e sorvetes
-                    this.chest = null; 
-                } else if (this.currentPhase === 3) {
-                    // Itens do objetivo principal da Fase 3: 3 Troféus, 3 Bolas e 3 Pipas
-                    this.itens.push(this.createGameObject('trofeu', '🏆', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('trofeu', '🏆', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('trofeu', '🏆', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('bola', '⚽', this.ITEM_SIZE, true, false, null, true)); // Bola (objetivo)
-                    this.itens.push(this.createGameObject('bola', '⚽', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('bola', '⚽', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('pipa', '🪁', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('pipa', '🪁', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('pipa', '🪁', this.ITEM_SIZE, true, false, null, true));
-
-                    // Não há baú na Fase 3
-                    this.chest = null;
-                } else if (this.currentPhase === 4) {
-                    // Itens do objetivo principal da Fase 4: 3 Tubos de Ensaio, 3 Ímãs e 3 Microscópios
-                    this.itens.push(this.createGameObject('tubo_ensaio', '🧪', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('tubo_ensaio', '🧪', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('tubo_ensaio', '🧪', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('ima', '🧲', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('ima', '🧲', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('ima', '🧲', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('microscopio', '🔬', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('microscopio', '🔬', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('microscopio', '🔬', this.ITEM_SIZE, true, false, null, true));
-
-                    // Outros itens de laboratório (não objetivo)
-                    this.itens.push(this.createGameObject('bequer', '⚗️', this.ITEM_SIZE, true, false, null, false));
-                    this.itens.push(this.createGameObject('pipeta', '💧', this.ITEM_SIZE, true, false, null, false)); 
-                    
-                    // Não há baú na Fase 4
-                    this.chest = null;
-                } else if (this.currentPhase === 5) {
-                    // Itens do objetivo principal da Fase 5: 3 Elefantes, 3 Leões, 3 Aves
-                    this.itens.push(this.createGameObject('elefante', '🐘', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('elefante', '🐘', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('elefante', '🐘', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('leao', '🦁', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('leao', '🦁', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('leao', '🦁', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('ave', '🦜', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('ave', '🦜', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('ave', '🦜', this.ITEM_SIZE, true, false, null, true));
-
-                    // Outros itens de zoológico (não objetivo)
-                    this.itens.push(this.createGameObject('macaco', '🐒', this.ITEM_SIZE, true, false, null, false));
-                    this.itens.push(this.createGameObject('crocodilo', '🐊', this.ITEM_SIZE, true, false, null, false));
-                    this.itens.push(this.createGameObject('cobra', '🐍', this.ITEM_SIZE, true, false, null, false));
-                    this.itens.push(this.createGameObject('lagarto', '🦎', this.ITEM_SIZE, true, false, null, false));
-
-                    // Não há baú na Fase 5
-                    this.chest = null;
-                } else if (this.currentPhase === 6) {
-                    // Itens do objetivo principal da Fase 6: 3 Pinturas, 3 Esculturas, 3 Fósseis
-                    this.itens.push(this.createGameObject('pintura', '🎨', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('pintura', '🎨', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('pintura', '🎨', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('escultura', '🗿', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('escultura', '🗿', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('escultura', '🗿', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('fossil', '🦴', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('fossil', '🦴', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('fossil', '🦴', this.ITEM_SIZE, true, false, null, true));
-
-                    // Outros itens de museu (não objetivo)
-                    this.itens.push(this.createGameObject('artefato', '🏺', this.ITEM_SIZE, true, false, null, false));
-                    this.itens.push(this.createGameObject('pincel', '🖌️', this.ITEM_SIZE, true, false, null, false));
-                    this.itens.push(this.createGameObject('livro_arte', '🖼️', this.ITEM_SIZE, true, false, null, false));
-
-                    // Não há baú na Fase 6
-                    this.chest = null;
-                } else if (this.currentPhase === 7) {
-                    // Itens do objetivo principal da Fase 7: 3 Cestas de Piquenique, 3 Bolas, 3 Brinquedos de Parque
-                    this.itens.push(this.createGameObject('cesta_piquenique', '🧺', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('cesta_piquenique', '🧺', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('cesta_piquenique', '🧺', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('bola', '⚽', this.ITEM_SIZE, true, false, null, true)); // Bola (objetivo)
-                    this.itens.push(this.createGameObject('bola', '⚽', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('bola', '⚽', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('brinquedo_parque', '🎠', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('brinquedo_parque', '🎠', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('brinquedo_parque', '🎠', this.ITEM_SIZE, true, false, null, true));
-
-                    // Outros itens de parque (não objetivo)
-                    this.itens.push(this.createGameObject('balao', '🎈', this.ITEM_SIZE, true, false, null, false));
-                    this.itens.push(this.createGameObject('balao', '🎈', this.ITEM_SIZE, true, false, null, false));
-                    this.itens.push(this.createGameObject('flor', '🌸', this.ITEM_SIZE, true, false, null, false));
-                    this.itens.push(this.createGameObject('flor', '🌸', this.ITEM_SIZE, true, false, null, false));
-                    this.itens.push(this.createGameObject('borboleta', '🦋', this.ITEM_SIZE, true, false, null, false));
-                    this.itens.push(this.createGameObject('borboleta', '🦋', this.ITEM_SIZE, true, false, null, false));
-                    
-                    // Não há baú na Fase 7
-                    this.chest = null;
-                } else if (this.currentPhase === 8) { // Capítulo 8: Leiturinhas
-                    // Itens para o Capítulo 8: Leiturinhas (3 itens temáticos)
-                    this.itens.push(this.createGameObject('livro_aventura', '📖', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('livro_animais', '🦁', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('livro_fabula', '📜', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('globo', '🌍', this.ITEM_SIZE, true, false, null, false)); // Não objetivo
-                    this.chest = null; // Não há baú no Capítulo 8
-                } else if (this.currentPhase === 9) { // Capítulo 9: Planeta
-                    // Itens para o Capítulo 9: Reciclagem e Meio Ambiente (3 itens temáticos)
-                    this.itens.push(this.createGameObject('lixeira_reciclagem', '♻️', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('garrafa_plastico', '🧴', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('arvore_muda', '🌱', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('saco_lixo', '🗑️', this.ITEM_SIZE, true, false, null, false)); // Não objetivo
-                    this.itens.push(this.createGameObject('flor', '🌸', this.ITEM_SIZE, true, false, null, false)); // Não objetivo
-                    this.chest = null; // Não há baú no Capítulo 9
-                } else if (this.currentPhase === 10) {
-                    // Itens para o Capítulo 10: Exploração da Natureza (3 itens temáticos)
-                    this.itens.push(this.createGameObject('planta_nativa', '🌿', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('animal_selvagem', '🦋', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('telescopio', '🔭', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('lupa', '🔎', this.ITEM_SIZE, true, false, null, false)); // Não objetivo
-                    this.chest = null; // Não há baú no Capítulo 10
-                } else if (this.currentPhase === 11) {
-                    // Itens para o Capítulo 11: Oficina de Artes (3 itens temáticos)
-                    this.itens.push(this.createGameObject('pincel', '🖌️', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('tinta', '🎨', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('argila', '🏺', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('lapis_cor', '🖍️', this.ITEM_SIZE, true, false, null, false)); // Não objetivo
-                    this.itens.push(this.createGameObject('tela', '🖼️', this.ITEM_SIZE, true, false, null, false)); // Não objetivo
-                    this.chest = null; // Não há baú no Capítulo 11
-                } else if (this.currentPhase === 12) {
-                    // Itens para o Capítulo 12: Música e Dança
-                    this.itens.push(this.createGameObject('violao', '🎸', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('piano', '🎹', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('microfone', '🎤', this.ITEM_SIZE, true, false, null, true));
-                    this.itens.push(this.createGameObject('fones_ouvido', '🎧', this.ITEM_SIZE, true, false, null, false)); // Não objetivo
-                    this.itens.push(this.createGameObject('partitura', '🎼', this.ITEM_SIZE, true, false, null, false)); // Não objetivo
-                    this.chest = null; // Não há baú no Capítulo 12
-                }
 
                 // Gera os obstáculos temáticos da escola (comum para todas as fases)
                 for (let i = 0; i < 3; i++) {
