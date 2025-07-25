@@ -214,7 +214,7 @@
             /* Ajustado para 80% do tamanho anterior (90% * 0.8 = 72%, 80vh * 0.8 = 64vh) */
             width: 72vw; /* Reduzido em 20% */
             height: 64vh; /* Reduzido em 20% */
-            margin: 5vh auto 2vh auto; /* Adjusted margins to be responsive */
+            margin: 130px auto 2vh auto; /* Margin top to push it below HUD and chapter title */
         }
 
         /* Mensagem de dica LLM */
@@ -362,7 +362,7 @@
             #hud {
                 font-size: 0.9em;
                 padding: 8px;
-                top: 20px; /* Adjusted top for mobile */
+                top: 40px; /* Adjusted top for mobile */
             }
             .hud-column {
                 align-items: flex-start; /* Default for both columns */
@@ -400,13 +400,13 @@
                 font-size: 1.2em;
             }
             canvas {
-                margin: 8vh auto 2vh auto; /* Slightly more top margin for mobile canvas */
+                margin: 100px auto 2vh auto; /* Adjusted margin for mobile */
             }
         }
 
         @media (max-width: 360px) { /* Adjusted breakpoint for stacking columns on very small screens */
             #hud {
-                top: 20px; /* Consistent with desktop now */
+                top: 40px; /* Consistent with desktop now */
             }
             .hud-column:last-child {
                 align-items: center; /* Center text when stacked */
@@ -1381,14 +1381,14 @@
                     this.itens.push(this.createGameObject('saco_lixo', '🗑️', this.ITEM_SIZE, true, false, null, false)); // Não objetivo
                     this.itens.push(this.createGameObject('flor', '🌸', this.ITEM_SIZE, true, false, null, false)); // Não objetivo
                     this.chest = null; // Não há baú no Capítulo 9
-                } else if (this.currentPhase === 10) { // Capítulo 10: Exploração da Natureza
+                } else if (this.currentPhase === 10) {
                     // Itens para o Capítulo 10: Exploração da Natureza (3 itens temáticos)
                     this.itens.push(this.createGameObject('planta_nativa', '🌿', this.ITEM_SIZE, true, false, null, true));
                     this.itens.push(this.createGameObject('animal_selvagem', '🦋', this.ITEM_SIZE, true, false, null, true));
                     this.itens.push(this.createGameObject('telescopio', '🔭', this.ITEM_SIZE, true, false, null, true));
                     this.itens.push(this.createGameObject('lupa', '🔎', this.ITEM_SIZE, true, false, null, false)); // Não objetivo
                     this.chest = null; // Não há baú no Capítulo 10
-                } else if (this.currentPhase === 11) { // Capítulo 11: Oficina de Artes
+                } else if (this.currentPhase === 11) {
                     // Itens para o Capítulo 11: Oficina de Artes (3 itens temáticos)
                     this.itens.push(this.createGameObject('pincel', '🖌️', this.ITEM_SIZE, true, false, null, true));
                     this.itens.push(this.createGameObject('tinta', '🎨', this.ITEM_SIZE, true, false, null, true));
@@ -1396,8 +1396,8 @@
                     this.itens.push(this.createGameObject('lapis_cor', '🖍️', this.ITEM_SIZE, true, false, null, false)); // Não objetivo
                     this.itens.push(this.createGameObject('tela', '🖼️', this.ITEM_SIZE, true, false, null, false)); // Não objetivo
                     this.chest = null; // Não há baú no Capítulo 11
-                } else if (this.currentPhase === 12) { // Capítulo 12: Música e Dança
-                    // Itens para o Capítulo 12: Música e Dança (3 itens temáticos)
+                } else if (this.currentPhase === 12) {
+                    // Itens para o Capítulo 12: Música e Dança
                     this.itens.push(this.createGameObject('violao', '🎸', this.ITEM_SIZE, true, false, null, true));
                     this.itens.push(this.createGameObject('piano', '🎹', this.ITEM_SIZE, true, false, null, true));
                     this.itens.push(this.createGameObject('microfone', '🎤', this.ITEM_SIZE, true, false, null, true));
