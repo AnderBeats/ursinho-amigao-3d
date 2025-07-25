@@ -355,6 +355,8 @@
                 padding-top: 50px; /* Further adjusted padding-top for very small screens */
             }
             #hud {
+                font-size: 0.9em;
+                padding: 8px;
                 margin-top: 5px;
                 margin-bottom: 5px;
             }
@@ -654,23 +656,43 @@
                 if (!this.canvas) return;
 
                 // Get heights of fixed elements
-                const chapterTitleHeight = document.getElementById('chapterTitleDisplay').offsetHeight;
+                const chapterTitleElement = document.getElementById('chapterTitleDisplay');
                 const hudElement = document.getElementById('hud');
+                const direcionalElement = document.getElementById('direcional');
+                const soundControlElement = document.getElementById('soundControlBtn');
+
+                // Get actual heights of elements that take up vertical space
+                const chapterTitleHeight = chapterTitleElement ? chapterTitleElement.offsetHeight : 0;
                 const hudHeight = hudElement ? hudElement.offsetHeight : 0;
                 const hudMarginTop = hudElement ? parseFloat(getComputedStyle(hudElement).marginTop) : 0;
                 const hudMarginBottom = hudElement ? parseFloat(getComputedStyle(hudElement).marginBottom) : 0;
-                const controlsHeight = 100; // Approximate height of bottom controls (direcional, action, sound)
-                const verticalPaddingBuffer = 20; // Extra buffer for spacing
+                
+                // Initialize direcionalHeight and soundControlHeight with default values
+                let direcionalHeight = 0;
+                let soundControlHeight = 0;
 
-                // Calculate available height for the canvas
-                const availableHeightForCanvasArea = window.innerHeight - chapterTitleHeight - hudHeight - hudMarginTop - hudMarginBottom - controlsHeight - verticalPaddingBuffer;
+                if (direcionalElement) {
+                    direcionalHeight = direcionalElement.offsetHeight;
+                }
+                if (soundControlElement) {
+                    soundControlHeight = soundControlElement.offsetHeight;
+                }
+
+                const controlsBottomMargin = 20; // Margin from bottom of controls to viewport edge
+                const controlsSpacing = 10; // Spacing between direcional and sound control
+
+                // Calculate total vertical space consumed by static/fixed elements and desired gaps
+                const totalFixedAndSpacedHeight = chapterTitleHeight + hudHeight + hudMarginTop + hudMarginBottom + Math.max(direcionalHeight, soundControlHeight) + controlsBottomMargin + controlsSpacing;
+
+                // Calculate available vertical space for the canvas
+                const availableCanvasHeight = window.innerHeight - totalFixedAndSpacedHeight;
 
                 // User explicitly requested a square canvas (1:1 aspect ratio)
                 const aspectRatio = 1; // Desired 1:1 aspect ratio (width / height)
 
                 // Determine the maximum possible size for the square canvas
                 // It should be limited by both available width and available height
-                let newCanvasSize = Math.min(window.innerWidth * 0.95, availableHeightForCanvasArea); // Start with 95vw for mobile, or available height
+                let newCanvasSize = Math.min(window.innerWidth * 0.95, availableCanvasHeight); // Start with 95vw for mobile, or available height
 
                 // Apply max width limit for desktop
                 const maxWidthLimit = 720;
