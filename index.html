@@ -390,8 +390,7 @@
                 bottom: 10px;
                 right: 2px;
             }
-        }
-    </style>
+        </style>
 </head>
 <body>
     <!-- Tela de Introdução -->
@@ -1255,6 +1254,136 @@
                 this.obstaculos = [];
                 this.schoolItems = [];
                 this.chest = null;
+
+                // Geração de itens com base na fase
+                if (this.currentPhase === 1) {
+                    // Itens do objetivo principal da Fase 1: 3 Pedras, 3 Chaves, 1 Baú
+                    for (let i = 0; i < this.TOTAL_PEDRAS; i++) {
+                        this.itens.push(this.createGameObject('pedra', '🔴', this.ITEM_SIZE, true, false, null, true));
+                    }
+                    for (let i = 0; i < this.TOTAL_CHAVES; i++) {
+                        this.itens.push(this.createGameObject('chave', '🔑', this.ITEM_SIZE, true, false, null, true));
+                    }
+                    this.chest = this.createGameObject('bau', '📦', this.CHEST_SIZE, false, false, null, true);
+                } else if (this.currentPhase === 2) {
+                    // Itens do objetivo principal da Fase 2: 4 Vales Sorvete, 4 Sorvetes
+                    for (let i = 0; i < this.TOTAL_VALES_SORVETE; i++) {
+                        this.itens.push(this.createGameObject('vale_sorvete', '🎟️', this.ITEM_SIZE, true, false, null, true));
+                    }
+                    for (let i = 0; i < this.TOTAL_SORVETES_OBJETIVO; i++) {
+                        this.itens.push(this.createGameObject('sorvete', '🍫🍦', this.ITEM_SIZE, true, false, null, true));
+                    }
+                } else if (this.currentPhase === 3) {
+                    // Itens do objetivo principal da Fase 3: 3 Troféus, 3 Bolas, 3 Pipas
+                    for (let i = 0; i < this.TOTAL_TROFEUS; i++) {
+                        this.itens.push(this.createGameObject('trofeu', '🏆', this.ITEM_SIZE, true, false, null, true));
+                    }
+                    for (let i = 0; i < this.TOTAL_BOLAS_FASE3; i++) {
+                        this.itens.push(this.createGameObject('bola', '⚽', this.ITEM_SIZE, true, false, null, true));
+                    }
+                    for (let i = 0; i < this.TOTAL_PIPAS; i++) {
+                        this.itens.push(this.createGameObject('pipa', '🪁', this.ITEM_SIZE, true, false, null, true));
+                    }
+                } else if (this.currentPhase === 4) {
+                    // Itens do objetivo principal da Fase 4: 3 Tubos de Ensaio, 3 Ímãs, 3 Microscópios
+                    for (let i = 0; i < this.TOTAL_TUBOS_ENSAIO; i++) {
+                        this.itens.push(this.createGameObject('tubo_ensaio', '🧪', this.ITEM_SIZE, true, false, null, true));
+                    }
+                    for (let i = 0; i < this.TOTAL_IMAS; i++) {
+                        this.itens.push(this.createGameObject('ima', '🧲', this.ITEM_SIZE, true, false, null, true));
+                    }
+                    for (let i = 0; i < this.TOTAL_MICROSCOPIO; i++) {
+                        this.itens.push(this.createGameObject('microscopio', '🔬', this.ITEM_SIZE, true, false, null, true));
+                    }
+                } else if (this.currentPhase === 5) {
+                    // Itens do objetivo principal da Fase 5: 3 Elefantes, 3 Leões, 3 Aves
+                    for (let i = 0; i < this.TOTAL_ELEFANTES; i++) {
+                        this.itens.push(this.createGameObject('elefante', '🐘', this.ITEM_SIZE, true, false, null, true));
+                    }
+                    for (let i = 0; i < this.TOTAL_LEOES; i++) {
+                        this.itens.push(this.createGameObject('leao', '🦁', this.ITEM_SIZE, true, false, null, true));
+                    }
+                    for (let i = 0; i < this.TOTAL_AVES; i++) {
+                        this.itens.push(this.createGameObject('ave', '🦜', this.ITEM_SIZE, true, false, null, true));
+                    }
+                } else if (this.currentPhase === 6) {
+                    // Itens do objetivo principal da Fase 6: 3 Pinturas, 3 Esculturas, 3 Fósseis
+                    for (let i = 0; i < this.TOTAL_PINTURAS; i++) {
+                        this.itens.push(this.createGameObject('pintura', '🎨', this.ITEM_SIZE, true, false, null, true));
+                    }
+                    for (let i = 0; i < this.TOTAL_ESCULTURAS; i++) {
+                        this.itens.push(this.createGameObject('escultura', '🗿', this.ITEM_SIZE, true, false, null, true));
+                    }
+                    for (let i = 0; i < this.TOTAL_FOSSEIS; i++) {
+                        this.itens.push(this.createGameObject('fossil', '🦴', this.ITEM_SIZE, true, false, null, true));
+                    }
+                } else if (this.currentPhase === 7) {
+                    // Itens do objetivo principal da Fase 7: 3 Cestas de Piquenique, 3 Bolas, 3 Brinquedos de Parque
+                    for (let i = 0; i < this.TOTAL_CESTAS_PIQUENIQUE; i++) {
+                        this.itens.push(this.createGameObject('cesta_piquenique', '🧺', this.ITEM_SIZE, true, false, null, true));
+                    }
+                    for (let i = 0; i < this.TOTAL_BOLAS_FASE7; i++) {
+                        this.itens.push(this.createGameObject('bola', '⚽', this.ITEM_SIZE, true, false, null, true));
+                    }
+                    for (let i = 0; i < this.TOTAL_BRINQUEDOS_PARQUE; i++) {
+                        this.itens.push(this.createGameObject('brinquedo_parque', '🎠', this.ITEM_SIZE, true, false, null, true));
+                    }
+                } else if (this.currentPhase === 8) {
+                    // Itens do objetivo principal da Fase 8: 3 Livros de Aventura, 3 Livros de Animais, 3 Livros de Fábula
+                    for (let i = 0; i < this.TOTAL_LIVRO_AVENTURA; i++) {
+                        this.itens.push(this.createGameObject('livro_aventura', '📖', this.ITEM_SIZE, true, false, null, true));
+                    }
+                    for (let i = 0; i < this.TOTAL_LIVRO_ANIMAIS; i++) {
+                        this.itens.push(this.createGameObject('livro_animais', '🦁', this.ITEM_SIZE, true, false, null, true));
+                    }
+                    for (let i = 0; i < this.TOTAL_LIVRO_FABULA; i++) {
+                        this.itens.push(this.createGameObject('livro_fabula', '📜', this.ITEM_SIZE, true, false, null, true));
+                    }
+                } else if (this.currentPhase === 9) {
+                    // Itens do objetivo principal da Fase 9: 3 Lixeiras de Reciclagem, 3 Garrafas Plásticas, 3 Mudas de Árvore
+                    for (let i = 0; i < this.TOTAL_LIXEIRA_RECICLAGEM; i++) {
+                        this.itens.push(this.createGameObject('lixeira_reciclagem', '♻️', this.ITEM_SIZE, true, false, null, true));
+                    }
+                    for (let i = 0; i < this.TOTAL_GARRAFA_PLASTICO; i++) {
+                        this.itens.push(this.createGameObject('garrafa_plastico', '🧴', this.ITEM_SIZE, true, false, null, true));
+                    }
+                    for (let i = 0; i < this.TOTAL_ARVORE_MUDA; i++) {
+                        this.itens.push(this.createGameObject('arvore_muda', '🌱', this.ITEM_SIZE, true, false, null, true));
+                    }
+                } else if (this.currentPhase === 10) {
+                    // Itens do objetivo principal da Fase 10: 3 Plantas Nativas, 3 Animais Selvagens, 3 Telescópios
+                    for (let i = 0; i < this.TOTAL_PLANTAS_NATIVAS; i++) {
+                        this.itens.push(this.createGameObject('planta_nativa', '🌿', this.ITEM_SIZE, true, false, null, true));
+                    }
+                    for (let i = 0; i < this.TOTAL_ANIMAIS_SELVAGENS; i++) {
+                        this.itens.push(this.createGameObject('animal_selvagem', '🦁', this.ITEM_SIZE, true, false, null, true));
+                    }
+                    for (let i = 0; i < this.TOTAL_TELESCOPIO; i++) {
+                        this.itens.push(this.createGameObject('telescopio', '🔭', this.ITEM_SIZE, true, false, null, true));
+                    }
+                } else if (this.currentPhase === 11) {
+                    // Itens do objetivo principal da Fase 11: 3 Pincéis, 3 Tintas, 3 Argilas
+                    for (let i = 0; i < this.TOTAL_PINCEL; i++) {
+                        this.itens.push(this.createGameObject('pincel', '🖌️', this.ITEM_SIZE, true, false, null, true));
+                    }
+                    for (let i = 0; i < this.TOTAL_TINTA; i++) {
+                        this.itens.push(this.createGameObject('tinta', '🎨', this.ITEM_SIZE, true, false, null, true));
+                    }
+                    for (let i = 0; i < this.TOTAL_ARGILA; i++) {
+                        this.itens.push(this.createGameObject('argila', '🏺', this.ITEM_SIZE, true, false, null, true));
+                    }
+                } else if (this.currentPhase === 12) {
+                    // Itens do objetivo principal da Fase 12: 3 Violões, 3 Pianos, 3 Microfones
+                    for (let i = 0; i < this.TOTAL_VIOLAO; i++) {
+                        this.itens.push(this.createGameObject('violao', '🎸', this.ITEM_SIZE, true, false, null, true));
+                    }
+                    for (let i = 0; i < this.TOTAL_PIANO; i++) {
+                        this.itens.push(this.createGameObject('piano', '🎹', this.ITEM_SIZE, true, false, null, true));
+                    }
+                    for (let i = 0; i < this.TOTAL_MICROFONE; i++) {
+                        this.itens.push(this.createGameObject('microfone', '🎤', this.ITEM_SIZE, true, false, null, true));
+                    }
+                }
 
                 // Gera os obstáculos temáticos da escola (comum para todas as fases)
                 for (let i = 0; i < 3; i++) {
