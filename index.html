@@ -181,24 +181,12 @@
             height: auto;
         }
 
-        /* Container para todos os controles inferiores */
-        #bottomControlsContainer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            display: flex;
-            justify-content: space-between; /* Distribui os itens */
-            align-items: flex-end; /* Alinha os itens na parte inferior */
-            padding: 10px 20px; /* Preenchimento dentro do contêiner */
-            box-sizing: border-box;
-            z-index: 100; /* Garante que fique acima de outros elementos */
-            background: rgba(0,0,0,0.2); /* Fundo semi-transparente para visibilidade */
-        }
-
-        /* Controles posicionados estaticamente dentro de seu contêiner */
+        /* Controls positioned fixed relative to viewport */
         #direcional {
-            position: static; /* Não é mais fixo, agora é relativo a #bottomControlsContainer */
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 10;
             display: flex;
             flex-direction: column;
             gap: 5px;
@@ -225,19 +213,42 @@
             transform: translateY(2px);
         }
         #botao-acao {
-            position: static; /* Não é mais fixo, agora é relativo a #bottomControlsContainer */
-            margin-left: auto; /* Empurra para a direita */
-            margin-right: 10px; /* Espaço do controle de som */
-            width: 70px; /* Torna um pouco maior */
-            height: 70px;
+            position: fixed;
+            bottom: 30px;
+            right: 20px;
+            z-index: 10;
+            background: rgba(76, 175, 80, 0.3);
+            color: white;
             border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
         }
 
         #soundControlBtn {
-            position: static; /* Não é mais fixo, agora é relativo a #bottomControlsContainer */
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             width: 60px;
             height: 60px;
-            margin: 0 auto; /* Centraliza horizontalmente dentro do flex container */
+            background: rgba(255, 255, 255, 0.3);
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+            cursor: pointer;
+            z-index: 10;
+            transition: background 0.2s, transform 0.1s;
+        }
+        #soundControlBtn:active {
+            background: rgba(255, 255, 255, 0.5);
+            transform: translateX(-50%) translateY(2px);
         }
         #soundControlBtn svg {
             width: 30px;
@@ -379,7 +390,8 @@
                 bottom: 10px;
                 right: 2px;
             }
-        </style>
+        }
+    </style>
 </head>
 <body>
     <!-- Tela de Introdução -->
@@ -593,7 +605,7 @@
             OBSTACLE_SIZE: 25, // Tamanho dos obstáculos (AJUSTADO)
             SCHOOL_ITEM_SIZE: 25, // Tamanho dos itens escolares não coletáveis (AJUSTADO)
             CHEST_SIZE: 45, // Tamanho do baú (AJUSTADO)
-            PLAYER_SPEED: 2, // Velocidade do personagem (AJUSTADO PARA SER MAIS LENTO)
+            PLAYER_SPEED: 0.8, // Velocidade do personagem (AJUSTADO PARA SER MAIS LENTO)
 
             // Variáveis para o limitador de FPS
             targetFPS: 30, // FPS alvo
@@ -666,6 +678,7 @@
                 let soundControlHeight = soundControlElement ? soundControlElement.offsetHeight : 0;
 
                 const controlsBottomMargin = 20; // Margin from bottom of controls to viewport edge
+                const controlsPadding = 10; // Padding of bottomControlsContainer
                 const controlsSpacing = 10; // Spacing between direcional and sound control
 
                 // Calculate the total height of the bottom fixed controls area
@@ -682,10 +695,10 @@
                     mainGameContainer.style.bottom = `${bottomControlsTotalHeight}px`;
                 }
 
-                // Calculate the available height for the canvas within the mainGameContainer.
+                // Recalculate available space for canvas within mainGameContainer.
                 // This is the total height of mainGameContainer minus the HUD height and its margins.
                 const availableSpaceInMainContainer = mainGameContainer ? mainGameContainer.clientHeight : window.innerHeight; // Fallback
-                const availableCanvasHeight = availableSpaceInMainContainer - hudHeight - hudMarginTop - hudMarginBottom;
+                const availableCanvasHeight = availableSpaceInMainContainer - hudHeight - hudMarginTop - hudMarginBottom; // Subtract HUD height and its padding
 
                 // User explicitly requested a square canvas (1:1 aspect ratio)
                 const aspectRatio = 1; // Desired 1:1 aspect ratio (width / height)
