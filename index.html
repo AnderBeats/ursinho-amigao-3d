@@ -112,26 +112,29 @@
 
         /* Main game content container */
         #mainGameContainer {
+            position: absolute; /* Changed to absolute to fit between fixed header/footer */
+            top: 0; /* Will be set dynamically by JS */
+            bottom: 0; /* Will be set dynamically by JS */
+            left: 0;
+            right: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 100%;
-            flex-grow: 1; /* Allow it to take available vertical space */
-            padding-top: 60px; /* Space for chapter title (approx height of title) */
+            justify-content: space-around; /* Centraliza verticalmente HUD e Canvas com espaço ao redor */
             box-sizing: border-box;
         }
 
         #chapterTitleDisplay {
-            position: fixed; /* Keep it fixed at the top */
-            top: 0; /* Align to the very top */
+            position: fixed; /* Mantém fixo no topo */
+            top: 0; /* Alinha no topo */
             left: 50%;
             transform: translateX(-50%);
             color: white;
             background: rgba(0, 0, 0, 0.6);
             padding: 10px 20px;
-            border-radius: 0 0 8px 8px; /* Rounded corners only at the bottom */
+            border-radius: 0 0 8px 8px; /* Cantos arredondados apenas na parte inferior */
             font-size: 1.2em;
-            z-index: 10;
+            z-index: 100; /* Garante que fique acima de outros elementos */
             text-align: center;
             white-space: nowrap;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
@@ -145,13 +148,12 @@
             border-radius: 8px;
             z-index: 10;
             font-size: 1.1em;
-            display: flex; /* Always flex when visible */
+            display: flex; /* Sempre flexível quando visível */
             flex-direction: row;
             justify-content: space-between;
             align-items: flex-start;
             box-sizing: border-box;
-            margin-top: 10px; /* Space from chapter title */
-            margin-bottom: 10px; /* Space to canvas */
+            /* Margens controladas por justify-content: space-around no pai */
         }
         .hud-column {
             display: flex;
@@ -172,18 +174,31 @@
             border-radius: 8px;
             box-shadow: 0 0 15px rgba(0,0,0,0.3);
             display: block;
-            margin: 0 auto; /* Center horizontally */
-            flex-grow: 1; /* Allow to take vertical space */
-            width: 100%; /* Will be overridden by JS attributes, but good fallback */
-            height: auto; /* Will be overridden by JS attributes, but good fallback */
+            margin: 0 auto; /* Centraliza horizontalmente */
+            flex-shrink: 0; /* Impede que o canvas encolha abaixo do seu tamanho de conteúdo */
+            /* Largura e altura serão definidas dinamicamente pelo JS para manter a proporção 1:1 */
+            width: auto;
+            height: auto;
         }
 
-        /* Controls positioned fixed relative to viewport */
-        #direcional {
+        /* Container para todos os controles inferiores */
+        #bottomControlsContainer {
             position: fixed;
-            bottom: 20px;
-            left: 20px;
-            z-index: 10;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between; /* Distribui os itens */
+            align-items: flex-end; /* Alinha os itens na parte inferior */
+            padding: 10px 20px; /* Preenchimento dentro do contêiner */
+            box-sizing: border-box;
+            z-index: 100; /* Garante que fique acima de outros elementos */
+            background: rgba(0,0,0,0.2); /* Fundo semi-transparente para visibilidade */
+        }
+
+        /* Controles posicionados estaticamente dentro de seu contêiner */
+        #direcional {
+            position: static; /* Não é mais fixo, agora é relativo a #bottomControlsContainer */
             display: flex;
             flex-direction: column;
             gap: 5px;
@@ -210,42 +225,19 @@
             transform: translateY(2px);
         }
         #botao-acao {
-            position: fixed;
-            bottom: 30px;
-            right: 20px;
-            z-index: 10;
-            background: rgba(76, 175, 80, 0.3);
-            color: white;
+            position: static; /* Não é mais fixo, agora é relativo a #bottomControlsContainer */
+            margin-left: auto; /* Empurra para a direita */
+            margin-right: 10px; /* Espaço do controle de som */
+            width: 70px; /* Torna um pouco maior */
+            height: 70px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 30px;
         }
 
         #soundControlBtn {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            position: static; /* Não é mais fixo, agora é relativo a #bottomControlsContainer */
             width: 60px;
             height: 60px;
-            background: rgba(255, 255, 255, 0.3);
-            border: none;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: white;
-            box-shadow: 0 3px 5px rgba(0,0,0,0.2);
-            cursor: pointer;
-            z-index: 10;
-            transition: background 0.2s, transform 0.1s;
-        }
-        #soundControlBtn:active {
-            background: rgba(255, 255, 255, 0.5);
-            transform: translateX(-50%) translateY(2px);
+            margin: 0 auto; /* Centraliza horizontalmente dentro do flex container */
         }
         #soundControlBtn svg {
             width: 30px;
@@ -387,8 +379,7 @@
                 bottom: 10px;
                 right: 2px;
             }
-        }
-    </style>
+        </style>
 </head>
 <body>
     <!-- Tela de Introdução -->
@@ -436,26 +427,29 @@
         <canvas id="gameCanvas" tabindex="0"></canvas>
     </div>
 
-    <!-- Controles Direcionais para Celular -->
-    <div id="direcional">
-        <div class="linha">
-            <button class="botao-direcional" id="btnUp">▲</button>
+    <!-- Container para todos os controles inferiores -->
+    <div id="bottomControlsContainer">
+        <!-- Controles Direcionais para Celular -->
+        <div id="direcional">
+            <div class="linha">
+                <button class="botao-direcional" id="btnUp">▲</button>
+            </div>
+            <div class="linha">
+                <button class="botao-direcional" id="btnLeft">◄</button>
+                <button class="botao-direcional" id="btnDown">▼</button>
+                <button class="botao-direcional" id="btnRight">►</button>
+            </div>
         </div>
-        <div class="linha">
-            <button class="botao-direcional" id="btnLeft">◄</button>
-            <button class="botao-direcional" id="btnDown">▼</button>
-            <button class="botao-direcional" id="btnRight">►</button>
-        </div>
+
+        <!-- Botão de controle de som -->
+        <button id="soundControlBtn" class="botao-jogo">
+            <svg id="soundOnIcon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-volume-2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+            <svg id="soundOffIcon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-volume-x" style="display: none;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+        </button>
+
+        <!-- Botão de Ação para Celular -->
+        <button id="botao-acao" class="botao-jogo">A</button>
     </div>
-
-    <!-- Botão de Ação para Celular -->
-    <button id="botao-acao" class="botao-jogo">A</button>
-
-    <!-- Botão de controle de som -->
-    <button id="soundControlBtn" class="botao-jogo">
-        <svg id="soundOnIcon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-volume-2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
-        <svg id="soundOffIcon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-volume-x" style="display: none;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
-    </button>
 
     <!-- Mensagem de Dica LLM -->
     <div id="llmHintMessage" style="display: none;">
@@ -599,7 +593,7 @@
             OBSTACLE_SIZE: 25, // Tamanho dos obstáculos (AJUSTADO)
             SCHOOL_ITEM_SIZE: 25, // Tamanho dos itens escolares não coletáveis (AJUSTADO)
             CHEST_SIZE: 45, // Tamanho do baú (AJUSTADO)
-            PLAYER_SPEED: 3, // Velocidade do personagem (ajustada para médio)
+            PLAYER_SPEED: 2, // Velocidade do personagem (AJUSTADO PARA SER MAIS LENTO)
 
             // Variáveis para o limitador de FPS
             targetFPS: 30, // FPS alvo
@@ -659,6 +653,7 @@
                 const chapterTitleElement = document.getElementById('chapterTitleDisplay');
                 const hudElement = document.getElementById('hud');
                 const direcionalElement = document.getElementById('direcional');
+                const botaoAcaoElement = document.getElementById('botao-acao');
                 const soundControlElement = document.getElementById('soundControlBtn');
 
                 // Get actual heights of elements that take up vertical space
@@ -667,25 +662,30 @@
                 const hudMarginTop = hudElement ? parseFloat(getComputedStyle(hudElement).marginTop) : 0;
                 const hudMarginBottom = hudElement ? parseFloat(getComputedStyle(hudElement).marginBottom) : 0;
                 
-                // Initialize direcionalHeight and soundControlHeight with default values
-                let direcionalHeight = 0;
-                let soundControlHeight = 0;
-
-                if (direcionalElement) {
-                    direcionalHeight = direcionalElement.offsetHeight;
-                }
-                if (soundControlElement) {
-                    soundControlHeight = soundControlElement.offsetHeight;
-                }
+                let direcionalHeight = direcionalElement ? direcionalElement.offsetHeight : 0;
+                let soundControlHeight = soundControlElement ? soundControlElement.offsetHeight : 0;
 
                 const controlsBottomMargin = 20; // Margin from bottom of controls to viewport edge
                 const controlsSpacing = 10; // Spacing between direcional and sound control
 
-                // Calculate total vertical space consumed by static/fixed elements and desired gaps
-                const totalFixedAndSpacedHeight = chapterTitleHeight + hudHeight + hudMarginTop + hudMarginBottom + Math.max(direcionalHeight, soundControlHeight) + controlsBottomMargin + controlsSpacing;
+                // Calculate the total height of the bottom fixed controls area
+                const bottomControlsTotalHeight = Math.max(direcionalHeight, (botaoAcaoElement ? botaoAcaoElement.offsetHeight : 0), soundControlHeight) + controlsBottomMargin + controlsSpacing;
 
-                // Calculate available vertical space for the canvas
-                const availableCanvasHeight = window.innerHeight - totalFixedAndSpacedHeight;
+                // Set the top and bottom CSS properties for mainGameContainer
+                const mainGameContainer = document.getElementById('mainGameContainer');
+                if (mainGameContainer) {
+                    // Calculate the desired top for mainGameContainer based on chapterTitleHeight
+                    // Add a fixed gap (e.g., 20px) between title and HUD
+                    mainGameContainer.style.top = `${chapterTitleHeight + 20}px`; // 20px is the desired gap
+
+                    // mainGameContainer ends right above bottom controls
+                    mainGameContainer.style.bottom = `${bottomControlsTotalHeight}px`;
+                }
+
+                // Calculate the available height for the canvas within the mainGameContainer.
+                // This is the total height of mainGameContainer minus the HUD height and its margins.
+                const availableSpaceInMainContainer = mainGameContainer ? mainGameContainer.clientHeight : window.innerHeight; // Fallback
+                const availableCanvasHeight = availableSpaceInMainContainer - hudHeight - hudMarginTop - hudMarginBottom;
 
                 // User explicitly requested a square canvas (1:1 aspect ratio)
                 const aspectRatio = 1; // Desired 1:1 aspect ratio (width / height)
@@ -700,6 +700,9 @@
                     newCanvasSize = maxWidthLimit;
                 }
                 
+                // Apply the 20% reduction to the height/width of the square field
+                newCanvasSize = newCanvasSize * 0.80; // Reduce by 20%
+
                 // Set the canvas element's attributes (drawing buffer size)
                 this.canvas.width = newCanvasSize;
                 this.canvas.height = newCanvasSize;
@@ -708,7 +711,7 @@
                 this.canvas.style.width = `${newCanvasSize}px`;
                 this.canvas.style.height = `${newCanvasSize}px`;
 
-                console.log(`DEBUG: Canvas resized to Width: ${newCanvasSize.toFixed(2)}px, Height: ${newCanvasSize.toFixed(2)}px (1:1 aspect ratio)`);
+                console.log(`DEBUG: Canvas resized to Width: ${newCanvasSize.toFixed(2)}px, Height: ${newCanvasSize.toFixed(2)}px (1:1 aspect ratio, 20% reduced)`);
 
                 // Reposition player
                 if (this.player) {
@@ -1082,7 +1085,8 @@
 
                 let coracao = "❤️".repeat(this.vidas); // Exibe corações com base nas vidas
                 let objectiveLine1Content = ''; // Conteúdo para a linha 1 do objetivo
-                let objectiveLine2Content = ''; // Conteúdo para a linha 2 do objetivo
+                let objectiveLine2Content = ''; // Conteúdo para a linha 2 do objetivo - Inicializado aqui
+
                 let hudTotalCollectedContent = `Total Coletado: ${this.totalAllItemsCollected}`;
                 let hudTempoContent = `Tempo: ${this.tempo}s`;
 
@@ -1628,8 +1632,6 @@
                 if (this.introMusicElement) {
                     this.introMusicElement.volume = 0.5; // Define um volume padrão
                 }
-
-                this.frameInterval = 1000 / this.targetFPS; // Calcula o intervalo do frame
 
                 console.log("DEBUG: tempoDisplayElement no onload:", this.tempoDisplayElement);
 
