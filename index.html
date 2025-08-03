@@ -16,6 +16,7 @@
             justify-content: flex-start; /* Align items to the top initially */
             min-height: 100vh; /* Garante que o corpo ocupa a altura total da viewport */
             position: relative; /* For absolute positioning of intro/selection screens */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
         }
         #introScreen, #personagemSelecao {
             position: absolute;
@@ -122,6 +123,7 @@
             align-items: center;
             justify-content: space-around; /* Centraliza verticalmente HUD e Canvas com espaço ao redor */
             box-sizing: border-box;
+            padding: 10px; /* Added padding to ensure elements don't touch edges */
         }
 
         #chapterTitleDisplay {
@@ -340,7 +342,6 @@
                 bottom: 20px;
                 right: 10px;
             }
-            /* Removed gameModal related styles as it's no longer used */
             #continueModal h2 {
                 font-size: 2em;
             }
@@ -362,6 +363,13 @@
                 padding: 8px;
                 margin-top: 5px;
                 margin-bottom: 5px;
+                flex-direction: column; /* Stack HUD columns on very small screens */
+                align-items: center; /* Center items when stacked */
+            }
+            .hud-column {
+                align-items: center; /* Center text when stacked */
+                flex-basis: auto; /* Allow columns to take full width when stacked */
+                width: 100%; /* Ensure full width */
             }
             .hud-column:last-child {
                 align-items: center; /* Center text when stacked */
@@ -390,7 +398,8 @@
                 bottom: 10px;
                 right: 2px;
             }
-        </style>
+        }
+    </style>
 </head>
 <body>
     <!-- Tela de Introdução -->
@@ -495,119 +504,272 @@
 
     <!-- Script principal do jogo -->
     <script>
+        // Mapeamento de nomes de tipo de item para nomes de exibição amigáveis, com acentuação correta.
+        const itemDisplayNames = {
+            pedra_vermelha: 'Pedra Vermelha',
+            pedra_azul: 'Pedra Azul',
+            pedra_verde: 'Pedra Verde',
+            chave: 'Chaves',
+            vale_sorvete: 'Vales Sorvetes',
+            sorvete: 'Sorvetes',
+            trofeu: 'Troféus',
+            bola: 'Bolas',
+            pipa: 'Pipas',
+            tubo_ensaio: 'Tubos Ensaio',
+            ima: 'Ímãs',
+            microscopio: 'Microscópios',
+            elefante: 'Elefantes',
+            leao: 'Leões',
+            ave: 'Aves',
+            pintura: 'Pinturas',
+            escultura: 'Esculturas',
+            fossil: 'Fósseis',
+            cesta_piquenique: 'Cestas Piquenique',
+            bola_fase7: 'Bolas',
+            brinquedo_parque: 'Brinquedos de Parque',
+            livro_aventura: 'Livros de Aventura',
+            livro_animais: 'Livros de Animais',
+            livro_fabula: 'Livros de Fábula',
+            lixeira_reciclagem: 'Lixeiras de Reciclagem',
+            garrafa_plastico: 'Garrafas Plásticas',
+            arvore_muda: 'Mudas de Árvore',
+            planta_nativa: 'Plantas Nativas',
+            animal_selvagem: 'Animais Selvagens',
+            telescopio: 'Telescópios',
+            pincel: 'Pincéis',
+            tinta: 'Tintas',
+            argila: 'Argila',
+            violao: 'Violão',
+            piano: 'Piano',
+            microfone: 'Microfones',
+            lapis: 'Lápis',
+            caderno: 'Caderno',
+            mochila: 'Mochilas',
+            livro_extra: 'Livros',
+            borracha: 'Borrachas'
+        };
+
+        // Dados de configuração de cada fase. Isso centraliza a lógica de itens e títulos.
+        const phasesData = {
+            1: {
+                title: "Capítulo 1: Uma Aventura de Aprendizados",
+                items: [
+                    { type: 'pedra_vermelha', emoji: '🔴', count: 1, isObjective: true, canBeCollected: true },
+                    { type: 'pedra_azul', emoji: '🔵', count: 1, isObjective: true, canBeCollected: true },
+                    { type: 'pedra_verde', emoji: '🟢', count: 1, isObjective: true, canBeCollected: true },
+                    { type: 'chave', emoji: '🔑', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'lapis', emoji: '✏️', count: 3, isObjective: false, canBeCollected: true },
+                    { type: 'caderno', emoji: '📓', count: 3, isObjective: false, canBeCollected: true },
+                    { type: 'livro_extra', emoji: '📚', count: 5, isObjective: false, canBeCollected: false },
+                    { type: 'borracha', emoji: '🧽', count: 5, isObjective: false, canBeCollected: false },
+                    { type: 'mochila', emoji: '🎒', count: 5, isObjective: false, canBeCollected: false }
+                ],
+                chest: { type: 'bau', emoji: '📦', size: 0.098, canBeCollected: false, isObjective: true },
+                obstacles: 9,
+                moneyBags: 2,
+            },
+            2: {
+                title: "Capítulo 2: A Festa do Sorvete",
+                items: [
+                    { type: 'vale_sorvete', emoji: '🎟️', count: 4, isObjective: true, canBeCollected: true },
+                    { type: 'sorvete', emoji: '🍦', count: 4, isObjective: true, flavors: ['🍓', '🍫', '🍋', '🫐'], canBeCollected: true },
+                    { type: 'lapis', emoji: '✏️', count: 3, isObjective: false, canBeCollected: true },
+                    { type: 'caderno', emoji: '📓', count: 3, isObjective: false, canBeCollected: true },
+                    { type: 'livro_extra', emoji: '📚', count: 5, isObjective: false, canBeCollected: false },
+                    { type: 'borracha', emoji: '🧽', count: 5, isObjective: false, canBeCollected: false },
+                    { type: 'mochila', emoji: '🎒', count: 5, isObjective: false, canBeCollected: false }
+                ],
+                obstacles: 10,
+                moneyBags: 2,
+            },
+            3: {
+                title: "Capítulo 3: Brincadeira de Criança",
+                items: [
+                    { type: 'trofeu', emoji: '🏆', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'bola', emoji: '⚽', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'pipa', emoji: '🪁', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'lapis', emoji: '✏️', count: 3, isObjective: false, canBeCollected: true },
+                    { type: 'caderno', emoji: '📓', count: 3, isObjective: false, canBeCollected: true },
+                    { type: 'livro_extra', emoji: '📚', count: 5, isObjective: false, canBeCollected: false },
+                    { type: 'borracha', emoji: '🧽', count: 5, isObjective: false, canBeCollected: false },
+                    { type: 'mochila', emoji: '🎒', count: 5, isObjective: false, canBeCollected: false }
+                ],
+                obstacles: 11,
+                moneyBags: 2,
+            },
+            4: {
+                title: "Capítulo 4: Nem Todo Dia é Brincadeira, mas Também é...",
+                items: [
+                    { type: 'tubo_ensaio', emoji: '🧪', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'ima', emoji: '🧲', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'microscopio', emoji: '🔬', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'lapis', emoji: '✏️', count: 3, isObjective: false, canBeCollected: true },
+                    { type: 'caderno', emoji: '📓', count: 3, isObjective: false, canBeCollected: true },
+                    { type: 'livro_extra', emoji: '📚', count: 5, isObjective: false, canBeCollected: false },
+                    { type: 'borracha', emoji: '🧽', count: 5, isObjective: false, canBeCollected: false },
+                    { type: 'mochila', emoji: '🎒', count: 5, isObjective: false, canBeCollected: false }
+                ],
+                obstacles: 12,
+                moneyBags: 2,
+            },
+            5: {
+                title: "Capítulo 5: No Reino dos Animais",
+                items: [
+                    { type: 'elefante', emoji: '🐘', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'leao', emoji: '🦁', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'ave', emoji: '🦜', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'lapis', emoji: '✏️', count: 3, isObjective: false, canBeCollected: true },
+                    { type: 'caderno', emoji: '📓', count: 3, isObjective: false, canBeCollected: true },
+                    { type: 'livro_extra', emoji: '📚', count: 5, isObjective: false, canBeCollected: false },
+                    { type: 'borracha', emoji: '🧽', count: 5, isObjective: false, canBeCollected: false },
+                    { type: 'mochila', emoji: '🎒', count: 5, isObjective: false, canBeCollected: false }
+                ],
+                obstacles: 13,
+                moneyBags: 2,
+            },
+            6: {
+                title: "Capítulo 6: Aprender é uma Arte",
+                items: [
+                    { type: 'pintura', emoji: '🎨', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'escultura', emoji: '🗿', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'fossil', emoji: '🦴', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'lapis', emoji: '✏️', count: 3, isObjective: false, canBeCollected: true },
+                    { type: 'caderno', emoji: '📓', count: 3, isObjective: false, canBeCollected: true },
+                    { type: 'livro_extra', emoji: '📚', count: 5, isObjective: false, canBeCollected: false },
+                    { type: 'borracha', emoji: '🧽', count: 5, isObjective: false, canBeCollected: false },
+                    { type: 'mochila', emoji: '🎒', count: 5, isObjective: false, canBeCollected: false }
+                ],
+                obstacles: 14,
+                moneyBags: 2,
+            },
+            7: {
+                title: "Capítulo 7: Lazer no Parque",
+                items: [
+                    { type: 'cesta_piquenique', emoji: '🧺', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'bola_fase7', emoji: '⚽', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'brinquedo_parque', emoji: '🎠', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'lapis', emoji: '✏️', count: 3, isObjective: false, canBeCollected: true },
+                    { type: 'caderno', emoji: '📓', count: 3, isObjective: false, canBeCollected: true },
+                    { type: 'livro_extra', emoji: '📚', count: 5, isObjective: false, canBeCollected: false },
+                    { type: 'borracha', emoji: '🧽', count: 5, isObjective: false, canBeCollected: false },
+                    { type: 'mochila', emoji: '🎒', count: 5, isObjective: false, canBeCollected: false }
+                ],
+                obstacles: 15,
+                moneyBags: 2,
+            },
+            8: {
+                title: "Capítulo 8: Leiturinhas",
+                items: [
+                    { type: 'livro_aventura', emoji: '📖', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'livro_animais', emoji: '🦁', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'livro_fabula', emoji: '📜', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'lapis', emoji: '✏️', count: 3, isObjective: false, canBeCollected: true },
+                    { type: 'caderno', emoji: '📓', count: 3, isObjective: false, canBeCollected: true },
+                    { type: 'livro_extra', emoji: '📚', count: 5, isObjective: false, canBeCollected: false },
+                    { type: 'borracha', emoji: '🧽', count: 5, isObjective: false, canBeCollected: false },
+                    { type: 'mochila', emoji: '🎒', count: 5, isObjective: false, canBeCollected: false }
+                ],
+                obstacles: 16,
+                moneyBags: 2,
+            },
+            9: {
+                title: "Capítulo 9: Planeta",
+                items: [
+                    { type: 'lixeira_reciclagem', emoji: '♻️', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'garrafa_plastico', emoji: '🧴', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'arvore_muda', emoji: '🌱', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'lapis', emoji: '✏️', count: 3, isObjective: false, canBeCollected: true },
+                    { type: 'caderno', emoji: '📓', count: 3, isObjective: false, canBeCollected: true },
+                    { type: 'livro_extra', emoji: '📚', count: 5, isObjective: false, canBeCollected: false },
+                    { type: 'borracha', emoji: '🧽', count: 5, isObjective: false, canBeCollected: false },
+                    { type: 'mochila', emoji: '🎒', count: 5, isObjective: false, canBeCollected: false }
+                ],
+                obstacles: 17,
+                moneyBags: 2,
+            },
+            10: {
+                title: "Capítulo 10: Exploração da Natureza",
+                items: [
+                    { type: 'planta_nativa', emoji: '🌿', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'animal_selvagem', emoji: '🦁', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'telescopio', emoji: '🔭', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'lapis', emoji: '✏️', count: 3, isObjective: false, canBeCollected: true },
+                    { type: 'caderno', emoji: '📓', count: 3, isObjective: false, canBeCollected: true },
+                    { type: 'livro_extra', emoji: '📚', count: 5, isObjective: false, canBeCollected: false },
+                    { type: 'borracha', emoji: '🧽', count: 5, isObjective: false, canBeCollected: false },
+                    { type: 'mochila', emoji: '🎒', count: 5, isObjective: false, canBeCollected: false }
+                ],
+                obstacles: 18,
+                moneyBags: 2,
+            },
+            11: {
+                title: "Capítulo 11: Oficina de Artes",
+                items: [
+                    { type: 'pincel', emoji: '🖌️', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'tinta', emoji: '🎨', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'argila', emoji: '🏺', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'lapis', emoji: '✏️', count: 3, isObjective: false, canBeCollected: true },
+                    { type: 'caderno', emoji: '📓', count: 3, isObjective: false, canBeCollected: true },
+                    { type: 'livro_extra', emoji: '📚', count: 5, isObjective: false, canBeCollected: false },
+                    { type: 'borracha', emoji: '🧽', count: 5, isObjective: false, canBeCollected: false },
+                    { type: 'mochila', emoji: '🎒', count: 5, isObjective: false, canBeCollected: false }
+                ],
+                obstacles: 19,
+                moneyBags: 2,
+            },
+            12: {
+                title: "Capítulo 12: Música e Dança",
+                items: [
+                    { type: 'violao', emoji: '🎸', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'piano', emoji: '🎹', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'microfone', emoji: '🎤', count: 3, isObjective: true, canBeCollected: true },
+                    { type: 'lapis', emoji: '✏️', count: 3, isObjective: false, canBeCollected: true },
+                    { type: 'caderno', emoji: '📓', count: 3, isObjective: false, canBeCollected: true },
+                    { type: 'livro_extra', emoji: '📚', count: 5, isObjective: false, canBeCollected: false },
+                    { type: 'borracha', emoji: '🧽', count: 5, isObjective: false, canBeCollected: false },
+                    { type: 'mochila', emoji: '🎒', count: 5, isObjective: false, canBeCollected: false }
+                ],
+                obstacles: 20,
+                moneyBags: 2,
+            }
+        };
+
         // Centraliza a lógica do jogo em um objeto global para melhor organização e evitar problemas de escopo.
         const game = {
             canvas: null,
             ctx: null,
             player: null,
             teclas: {}, // Armazena o estado das teclas pressionadas
-            itens: [], // Array para todos os itens do tesouro (coletáveis)
+            itens: [], // Array para todos os itens do jogo (coletáveis, não-coletáveis, etc)
             obstaculos: [], // Array para os obstáculos que bloqueiam o caminho
-            schoolItems: [], // Novos itens escolares que não são coletáveis nem obstáculos
+            // schoolItems não é mais usado, pois os itens escolares agora estão em 'itens'
             chest: null, // O baú do tesouro
-            pedrasColetadas: 0, // Contagem de pedras coletadas
-            TOTAL_PEDRAS: 3, // Total de pedras necessárias
-            keysColetadas: 0, // Novo: Contagem de chaves coletadas
-            TOTAL_CHAVES: 3, // Novo: Total de chaves necessárias para a Fase 1
 
-            valesSorveteColetados: 0, // Novo: Contagem de vales sorvete coletados
-            TOTAL_VALES_SORVETE: 4, // Novo: Total de vales sorvete necessários para a Fase 2
-            sorvetesObjetivoColetados: 0, // Novo: Contagem de sorvetes objetivo coletados
-            TOTAL_SORVETES_OBJETIVO: 4, // Novo: Total de sorvetes objetivo necessários para a Fase 2
-            trofeusColetados: 0, // Novo: Contagem de troféus coletados para a Fase 3
-            TOTAL_TROFEUS: 3, // Novo: Total de troféus necessários para a Fase 3
-            bolasColetadas: 0, // Novo: Contagem de bolas coletadas para a Fase 3
-            TOTAL_BOLAS_FASE3: 3, // Novo: Total de bolas necessárias para a Fase 3
-            pipasColetadas: 0, // Novo: Contagem de pipas coletadas para a Fase 3
-            TOTAL_PIPAS: 3, // Novo: Total de pipas necessárias para a Fase 3
-
-            tubosEnsaioColetados: 0, // Novo: Contagem de tubos de ensaio coletados para a Fase 4
-            TOTAL_TUBOS_ENSAIO: 3, // Novo: Total de tubos de ensaio necessários para a Fase 4
-            imasColetados: 0, // Novo: Contagem de ímãs coletados para a Fase 4
-            TOTAL_IMAS: 3, // Novo: Total de ímãs necessários para a Fase 4
-            microscopioColetados: 0, // Novo: Contagem de microscópios coletados para a Fase 4
-            TOTAL_MICROSCOPIO: 3, // Novo: Total de microscópios necessários para a Fase 4
-            elefantesColetados: 0, // Novo: Contagem de elefantes coletados para a Fase 5
-            TOTAL_ELEFANTES: 3, // Novo: Total de elefantes necessários para a Fase 5
-            leoesColetados: 0, // Novo: Contagem de leões coletados para a Fase 5
-            TOTAL_LEOES: 3, // Novo: Total de leões necessários para a Fase 5
-            avesColetadas: 0, // Novo: Contagem de aves coletadas para a Fase 5
-            TOTAL_AVES: 3, // Novo: Total de aves necessárias para a Fase 5
-            pinturasColetadas: 0, // Novo: Contagem de pinturas coletadas para a Fase 6
-            TOTAL_PINTURAS: 3, // Novo: Total de pinturas necessárias para a Fase 6
-            esculturasColetadas: 0, // Novo: Contagem de esculturas coletadas para a Fase 6
-            TOTAL_ESCULTURAS: 3, // Novo: Total de esculturas necessárias para a Fase 6
-            fosseisColetados: 0, // Novo: Contagem de fósseis coletados para a Fase 6
-            TOTAL_FOSSEIS: 3, // Novo: Total de fósseis necessários para a Fase 6
-            cestasPiqueniqueColetadas: 0, // Novo: Contagem de cestas de piquenique coletadas para a Fase 7
-            TOTAL_CESTAS_PIQUENIQUE: 3, // Novo: Total de cestas de piquenique necessárias para a Fase 7
-            bolasFase7Coletadas: 0, // Novo: Contagem de bolas coletadas para a Fase 7
-            TOTAL_BOLAS_FASE7: 3, // Novo: Total de bolas necessárias para a Fase 7
-            brinquedosParqueColetados: 0, // Novo: Contagem de brinquedos de parque coletados para a Fase 7
-            TOTAL_BRINQUEDOS_PARQUE: 3, // Novo: Total de brinquedos de parque necessários para a Fase 7
-
-            // Novos contadores para os capítulos 8 a 12
-            livroAventuraColetados: 0,
-            TOTAL_LIVRO_AVENTURA: 3,
-            livroAnimaisColetados: 0,
-            TOTAL_LIVRO_ANIMAIS: 3,
-            livroFabulaColetados: 0,
-            TOTAL_LIVRO_FABULA: 3,
-
-            lixeiraReciclagemColetados: 0,
-            TOTAL_LIXEIRA_RECICLAGEM: 3,
-            garrafaPlasticoColetados: 0,
-            TOTAL_GARRAFA_PLASTICO: 3,
-            arvoreMudaColetados: 0,
-            TOTAL_ARVORE_MUDA: 3,
-
-            plantaNativaColetados: 0,
-            TOTAL_PLANTAS_NATIVAS: 3,
-            animalSelvagemColetados: 0,
-            TOTAL_ANIMAIS_SELVAGENS: 3,
-            telescopioColetados: 0, // Renamed from binoculosColetados
-            TOTAL_TELESCOPIO: 3, // Renamed from TOTAL_BINOCULOS
-
-            pincelColetados: 0,
-            TOTAL_PINCEL: 3,
-            tintaColetados: 0,
-            TOTAL_TINTA: 3,
-            argilaColetados: 0,
-            TOTAL_ARGILA: 3,
-
-            violaoColetados: 0,
-            TOTAL_VIOLAO: 3,
-            pianoColetados: 0,
-            TOTAL_PIANO: 3,
-            microfoneColetados: 0,
-            TOTAL_MICROFONE: 3,
-
-            // Variáveis para o sistema de níveis
-            currentLevel: 1, // Começa no Nível 1
-            BASE_TIME: 90, // Tempo base em segundos para o Nível 1
-            TIME_DECREMENT_PER_LEVEL: 10, // Decremento de tempo por nível
-
+            // Contador de itens coletados para a fase atual
+            objectiveCounts: {}, 
+            
+            // Variáveis para o sistema de fases e pontuação
             totalAllItemsCollected: 0, // Nova variável para contar TODOS os itens coletados
             vidas: 3, // Vidas do jogador
-            tempo: 0, // Tempo do jogo em segundos (inicializado em iniciar)
+            tempo: 90, // Tempo do jogo em segundos (fixo para padronizar)
             coletando: false, // Flag para ação de coleta (coletar item ou usar chave no baú)
             gameInterval: null, // Para o temporador do jogo
             hintTimeout: null, // Para esconder a dica LLM
-            hasKey: false, // Flag para verificar se a chave foi coletada
             continueCountdownInterval: null, // Intervalo para a contagem regressiva do continue
             continueTime: 10, // Tempo inicial da contagem regressiva do continue
             currentPlayerType: '', // Armazena o tipo de personagem selecionado para reinícios
             currentPhase: 1, // Inicia na Fase 1
 
-            PLAYER_SIZE: 35, // Tamanho do personagem (AJUSTADO)
-            ITEM_SIZE: 25, // Tamanho dos itens coletáveis (AJUSTADO)
-            OBSTACLE_SIZE: 25, // Tamanho dos obstáculos (AJUSTADO)
-            SCHOOL_ITEM_SIZE: 25, // Tamanho dos itens escolares não coletáveis (AJUSTADO)
-            CHEST_SIZE: 45, // Tamanho do baú (AJUSTADO)
-            PLAYER_SPEED: 0.8, // Velocidade do personagem (AJUSTADO PARA SER MAIS LENTO)
+            // Dynamic sizes based on canvas size
+            PLAYER_SIZE: 0, 
+            ITEM_SIZE: 0, 
+            OBSTACLE_SIZE: 0, 
+            SCHOOL_ITEM_SIZE: 0, 
+            CHEST_SIZE: 0, 
+            PLAYER_SPEED: 1.0, // Velocidade do jogador (padronizado para 1.0)
 
             // Variáveis para o limitador de FPS
-            targetFPS: 30, // FPS alvo
+            targetFPS: 60, // FPS alvo (aumentado para uma experiência mais fluida)
             frameInterval: 0, // Intervalo de tempo entre frames em ms (calculado em initGame)
             lastFrameTime: 0, // Initialized globally
 
@@ -618,7 +780,6 @@
             totalAllItemsCollectedDisplayElement: null,
             tempoDisplayElement: null,
             chapterTitleDisplayElement: null,
-            objetivoFaseElement: null,
             
             // Variáveis de áudio
             introMusicElement: null,
@@ -723,13 +884,24 @@
                 this.canvas.style.width = `${newCanvasSize}px`;
                 this.canvas.style.height = `${newCanvasSize}px`;
 
+                // Update dynamic game object sizes based on new canvas size
+                this.PLAYER_SIZE = newCanvasSize * 0.078; // 8% of canvas size, slightly reduced
+                this.ITEM_SIZE = newCanvasSize * 0.061; // Adjusted to be smaller (approx 2px reduction from 0.066)
+                this.OBSTACLE_SIZE = newCanvasSize * 0.055; // Adjusted to be smaller (approx 2px reduction)
+                this.SCHOOL_ITEM_SIZE = newCanvasSize * 0.048; // 5% of canvas size, slightly reduced
+                this.CHEST_SIZE = newCanvasSize * 0.098; // 10% of canvas size, slightly reduced
+                // PLAYER_SPEED is now a fixed value, not scaled by newCanvasSize
+
                 console.log(`DEBUG: Canvas resized to Width: ${newCanvasSize.toFixed(2)}px, Height: ${newCanvasSize.toFixed(2)}px (1:1 aspect ratio, 20% reduced)`);
+                console.log(`DEBUG: Player Size: ${this.PLAYER_SIZE.toFixed(2)}, Item Size: ${this.ITEM_SIZE.toFixed(2)}, Obstacle Size: ${this.OBSTACLE_SIZE.toFixed(2)}`);
 
                 // Reposition player
                 if (this.player) {
-                    this.player.x = this.canvas.width / 2 - this.PLAYER_SIZE / 2;
-                    this.player.y = this.canvas.height / 2 - this.PLAYER_SIZE / 2;
+                    this.player.x = this.canvas.width / 2 - this.player.width / 2;
+                    this.player.y = this.canvas.height / 2 - this.player.height / 2;
                 }
+                // Re-place all game objects as their sizes might have changed
+                this.placeGameObjectsRandomly();
             },
 
             // Retorna o emoji do personagem selecionado
@@ -749,9 +921,9 @@
                     type: type,
                     emoji: emoji,
                     canBeCollected: canBeCollected, // Se pode ser coletado pelo botão de ação
-                    isObstacle: isObstacle,       // Se bloqueia o caminho
+                    isObstacle: isObstacle,      // Se bloqueia o caminho
                     color: color,
-                    isObjective: isObjective,       // Se conta para o objetivo principal
+                    isObjective: isObjective,      // Se conta para o objetivo principal
                     x: 0,  
                     y: 0,  
                     size: size,
@@ -784,7 +956,8 @@
                     let attempts = 0;
                     const maxAttempts = 1000; // Aumentado para mais chances de posicionamento
                     // Define a distância mínima de afastamento para objetos (3 vezes o tamanho de um obstáculo)
-                    const minClearanceBetweenObjects = 3 * this.OBSTACLE_SIZE;  
+                    // Diminuído para permitir mais itens visíveis
+                    const minClearanceBetweenObjects = 0.6 * this.OBSTACLE_SIZE;  
 
                     do {
                         collision = false;
@@ -821,37 +994,64 @@
                     return { x: newX, y: newY, width: objSize, height: objSize };
                 };
 
-                // Posicionar obstáculos primeiro para garantir o espaçamento
-                this.obstaculos.forEach(obstacle => {
-                    const pos = getRandomPosition(obstacle.size, true); // Passa true para isObstacle
-                    obstacle.x = pos.x;
-                    obstacle.y = pos.y;
-                    placedObjects.push(obstacle);
-                });
+                // Limpa os itens de tempo antes de repopular
+                this.itens = [];
+                this.obstaculos = [];
 
+                const phaseData = phasesData[this.currentPhase];
+
+                // Posicionar obstáculos primeiro para garantir o espaçamento
+                if (phaseData.obstacles) {
+                    const obstacleEmojis = ['🟫', '🪑', '🚪'];
+                    for (let i = 0; i < phaseData.obstacles; i++) {
+                        const obstacle = this.createGameObject('obstacle', obstacleEmojis[i % obstacleEmojis.length], this.OBSTACLE_SIZE, false, true);
+                        const pos = getRandomPosition(obstacle.size, true);
+                        obstacle.x = pos.x;
+                        obstacle.y = pos.y;
+                        this.obstaculos.push(obstacle);
+                        placedObjects.push(obstacle);
+                    }
+                }
+
+                // Posicionar itens de objetivo e não-objetivo
+                if (phaseData.items) {
+                    phaseData.items.forEach(itemData => {
+                        for (let i = 0; i < itemData.count; i++) {
+                            let emoji = itemData.emoji;
+                            // Lógica para sorvetes com sabores
+                            if (itemData.type === 'sorvete' && itemData.flavors && itemData.flavors[i]) {
+                                emoji = `🍦${itemData.flavors[i]}`;
+                            }
+                            const item = this.createGameObject(itemData.type, emoji, this.ITEM_SIZE, itemData.canBeCollected, false, null, itemData.isObjective);
+                            const pos = getRandomPosition(item.size);
+                            item.x = pos.x;
+                            item.y = pos.y;
+                            this.itens.push(item);
+                            placedObjects.push(item);
+                        }
+                    });
+                }
+                
                 // Posicionar o baú (apenas na Fase 1)
-                if (this.chest && this.currentPhase === 1) {
+                if (this.currentPhase === 1 && phaseData.chest) {
+                    this.chest = this.createGameObject(phaseData.chest.type, phaseData.chest.emoji, this.CHEST_SIZE, phaseData.chest.canBeCollected, false, null, phaseData.chest.isObjective);
                     const pos = getRandomPosition(this.chest.size);
                     this.chest.x = pos.x;
                     this.chest.y = pos.y;
                     placedObjects.push(this.chest);
                 }
 
-                // Posicionar itens
-                this.itens.forEach(item => {
-                    const pos = getRandomPosition(item.size);
-                    item.x = pos.x;
-                    item.y = pos.y;
-                    placedObjects.push(item);
-                });
-
-                // Posicionar itens escolares
-                this.schoolItems.forEach(sItem => {
-                    const pos = getRandomPosition(sItem.size);
-                    sItem.x = pos.x;
-                    sItem.y = pos.y;
-                    placedObjects.push(sItem);
-                });
+                // Posicionar sacos de dinheiro
+                if (phaseData.moneyBags) {
+                    for (let i = 0; i < phaseData.moneyBags; i++) {
+                        const moneyBag = this.createGameObject('moeda', '💰', this.ITEM_SIZE, true, false, null, false);
+                        const pos = getRandomPosition(moneyBag.size);
+                        moneyBag.x = pos.x;
+                        moneyBag.y = pos.y;
+                        this.itens.push(moneyBag);
+                        placedObjects.push(moneyBag);
+                    }
+                }
             },
 
             // Desenha um objeto no canvas
@@ -900,151 +1100,13 @@
                             this.totalAllItemsCollected++; // Incrementa a contagem total
 
                             if (collectedItem.isObjective) {
-                                if (this.currentPhase === 1) { // Lógica de objetivo da Fase 1
-                                    if (collectedItem.type === 'pedra') {
-                                        this.pedrasColetadas++;
-                                        console.log(`DEBUG: Pedra coletada! Total de pedras: ${this.pedrasColetadas}/${this.TOTAL_PEDRAS}`);
-                                    } else if (collectedItem.type === 'chave') {
-                                        this.keysColetadas++; // Incrementa o contador de chaves
-                                        console.log(`DEBUG: Chave coletada! Total de chaves: ${this.keysColetadas}/${this.TOTAL_CHAVES}`); // Log para a nova lógica de chaves
-                                    }
-                                } else if (this.currentPhase === 2) { // Lógica de objetivo da Fase 2
-                                    if (collectedItem.type === 'vale_sorvete') {
-                                        this.valesSorveteColetados++;
-                                        console.log(`DEBUG: Vale Sorvete coletado! Total de vales: ${this.valesSorveteColetados}/${this.TOTAL_VALES_SORVETE}`);
-                                    } else if (collectedItem.type === 'sorvete' && collectedItem.isObjective) { // Sorvetes objetivo na Fase 2
-                                        this.sorvetesObjetivoColetados++;
-                                        console.log(`DEBUG: Sorvete coletado! Total de sorvetes: ${this.sorvetesObjetivoColetados}/${this.TOTAL_SORVETES_OBJETIVO}`);
-                                    }
-                                } else if (this.currentPhase === 3) { // Lógica de objetivo da Fase 3
-                                    if (collectedItem.type === 'trofeu') {
-                                        this.trofeusColetados++;
-                                        console.log(`DEBUG: Troféu coletado! Total de troféus: ${this.trofeusColetados}/${this.TOTAL_TROFEUS}`);
-                                    } else if (collectedItem.type === 'bola' && collectedItem.isObjective) { // Bolas objetivo na Fase 3
-                                        this.bolasColetadas++;
-                                        console.log(`DEBUG: Bola coletada! Total de bolas: ${this.bolasColetadas}/${this.TOTAL_BOLAS_FASE3}`);
-                                    } else if (collectedItem.type === 'pipa') { // Novo objetivo
-                                        this.pipasColetadas++;
-                                        console.log(`DEBUG: Pipa coletada! Total: ${this.pipasColetadas}/${this.TOTAL_PIPAS}`);
-                                    }
-                                } else if (this.currentPhase === 4) { // Lógica de objetivo da Fase 4
-                                    if (collectedItem.type === 'tubo_ensaio') {
-                                        this.tubosEnsaioColetados++;
-                                        console.log(`DEBUG: Tubo de Ensaio coletado! Total: ${this.tubosEnsaioColetados}/${this.TOTAL_TUBOS_ENSAIO}`);
-                                    } else if (collectedItem.type === 'ima') {
-                                        this.imasColetados++;
-                                        console.log(`DEBUG: Ímã coletado! Total: ${this.imasColetados}/${this.TOTAL_IMAS}`);
-                                    } else if (collectedItem.type === 'microscopio') { // Novo objetivo
-                                        this.microscopioColetados++;
-                                        console.log(`DEBUG: Microscópio coletado! Total: ${this.microscopioColetados}/${this.TOTAL_MICROSCOPIO}`);
-                                    }
-                                } else if (this.currentPhase === 5) {
-                                    // Itens do objetivo principal da Fase 5: 3 Elefantes, 3 Leões, 3 Aves
-                                    if (collectedItem.type === 'elefante') {
-                                        this.elefantesColetados++;
-                                        console.log(`DEBUG: Elefante coletado! Total: ${this.elefantesColetados}/${this.TOTAL_ELEFANTES}`);
-                                    } else if (collectedItem.type === 'leao') {
-                                        this.leoesColetados++;
-                                        console.log(`DEBUG: Leão coletado! Total: ${this.leoesColetados}/${this.TOTAL_LEOES}`);
-                                    } else if (collectedItem.type === 'ave') {
-                                        this.avesColetadas++;
-                                        console.log(`DEBUG: Ave coletada! Total: ${this.avesColetadas}/${this.TOTAL_AVES}`);
-                                    }
-                                } else if (this.currentPhase === 6) {
-                                    // Itens do objetivo principal da Fase 6: 3 Pinturas, 3 Esculturas, 3 Fósseis
-                                    if (collectedItem.type === 'pintura') {
-                                        this.pinturasColetadas++;
-                                        console.log(`DEBUG: Pintura coletada! Total: ${this.pinturasColetadas}/${this.TOTAL_PINTURAS}`);
-                                    } else if (collectedItem.type === 'escultura') {
-                                        this.esculturasColetadas++;
-                                        console.log(`DEBUG: Escultura coletada! Total: ${this.esculturasColetadas}/${this.TOTAL_ESCULTURAS}`);
-                                    } else if (collectedItem.type === 'fossil') {
-                                        this.fosseisColetados++;
-                                        console.log(`DEBUG: Fóssil coletado! Total: ${this.fosseisColetados}/${this.TOTAL_FOSSEIS}`);
-                                    }
-                                } else if (this.currentPhase === 7) {
-                                    // Itens do objetivo principal da Fase 7: 3 Cestas de Piquenique, 3 Bolas, 3 Brinquedos de Parque
-                                    if (collectedItem.type === 'cesta_piquenique') {
-                                        this.cestasPiqueniqueColetadas++;
-                                        console.log(`DEBUG: Cesta de Piquenique coletada! Total: ${this.cestasPiqueniqueColetadas}/${this.TOTAL_CESTAS_PIQUENIQUE}`);
-                                    } else if (collectedItem.type === 'bola' && collectedItem.isObjective) {
-                                        this.bolasFase7Coletadas++;
-                                        console.log(`DEBUG: Bola (Fase 7) coletada! Total: ${this.bolasFase7Coletadas}/${this.TOTAL_BOLAS_FASE7}`);
-                                    } else if (collectedItem.type === 'brinquedo_parque') {
-                                        this.brinquedosParqueColetados++;
-                                        console.log(`DEBUG: Brinquedo de Parque coletado! Total: ${this.brinquedosParqueColetados}/${this.TOTAL_BRINQUEDOS_PARQUE}`);
-                                    }
-                                } else if (this.currentPhase === 8) { // Capítulo 8: Leiturinhas
-                                    if (collectedItem.type === 'livro_aventura') {
-                                        this.livroAventuraColetados++;
-                                        console.log(`DEBUG: Livro de Aventura coletado! Total: ${this.livroAventuraColetados}/${this.TOTAL_LIVRO_AVENTURA}`);
-                                    } else if (collectedItem.type === 'livro_animais') {
-                                        this.livroAnimaisColetados++;
-                                        console.log(`DEBUG: Livro de Animais coletado! Total: ${this.livroAnimaisColetados}/${this.TOTAL_LIVRO_ANIMAIS}`);
-                                    } else if (collectedItem.type === 'livro_fabula') {
-                                        this.livroFabulaColetados++;
-                                        console.log(`DEBUG: Livro de Fábula coletado! Total: ${this.livroFabulaColetados}/${this.TOTAL_LIVRO_FABULA}`);
-                                    }
-                                } else if (this.currentPhase === 9) {
-                                    if (collectedItem.type === 'lixeira_reciclagem') {
-                                        this.lixeiraReciclagemColetados++;
-                                        console.log(`DEBUG: Lixeira de Reciclagem coletada! Total: ${this.lixeiraReciclagemColetados}/${this.TOTAL_LIXEIRA_RECICLAGEM}`);
-                                    } else if (collectedItem.type === 'garrafa_plastico') {
-                                        this.garrafaPlasticoColetados++;
-                                        console.log(`DEBUG: Garrafa Plástica coletada! Total: ${this.garrafaPlasticoColetados}/${this.TOTAL_GARRAFA_PLASTICO}`);
-                                    } else if (collectedItem.type === 'arvore_muda') {
-                                        this.arvoreMudaColetados++;
-                                        console.log(`DEBUG: Muda de Árvore coletada! Total: ${this.arvoreMudaColetados}/${this.TOTAL_ARVORE_MUDA}`);
-                                    }
-                                } else if (this.currentPhase === 10) {
-                                    if (collectedItem.type === 'planta_nativa') {
-                                        this.plantaNativaColetados++;
-                                        console.log(`DEBUG: Planta Nativa coletada! Total: ${this.plantaNativaColetados}/${this.TOTAL_PLANTAS_NATIVAS}`);
-                                    } else if (collectedItem.type === 'animal_selvagem') {
-                                        this.animalSelvagemColetados++;
-                                        console.log(`DEBUG: Animal Selvagem coletado! Total: ${this.animalSelvagemColetados}/${this.TOTAL_ANIMAIS_SELVAGENS}`);
-                                    } else if (collectedItem.type === 'telescopio') {
-                                        this.telescopioColetados++;
-                                        console.log(`DEBUG: Telescópio coletado! Total: ${this.telescopioColetados}/${this.TOTAL_TELESCOPIO}`);
-                                    }
-                                } else if (this.currentPhase === 11) {
-                                    if (collectedItem.type === 'pincel') {
-                                        this.pincelColetados++;
-                                        console.log(`DEBUG: Pincel coletado! Total: ${this.pincelColetados}/${this.TOTAL_PINCEL}`);
-                                    } else if (collectedItem.type === 'tinta') {
-                                        this.tintaColetados++;
-                                        console.log(`DEBUG: Tinta coletada! Total: ${this.tintaColetados}/${this.TOTAL_TINTA}`);
-                                    } else if (collectedItem.type === 'argila') {
-                                        this.argilaColetados++;
-                                        console.log(`DEBUG: Argila coletada! Total: ${this.argilaColetados}/${this.TOTAL_ARGILA}`);
-                                    }
-                                } else if (this.currentPhase === 12) {
-                                    if (collectedItem.type === 'violao') {
-                                        this.violaoColetados++;
-                                        console.log(`DEBUG: Violão coletado! Total: ${this.violaoColetados}/${this.TOTAL_VIOLAO}`);
-                                    } else if (collectedItem.type === 'piano') {
-                                        this.pianoColetados++;
-                                        console.log(`DEBUG: Piano coletado! Total: ${this.pianoColetados}/${this.TOTAL_PIANO}`);
-                                    } else if (collectedItem.type === 'microfone') {
-                                        this.microfoneColetados++;
-                                        console.log(`DEBUG: Microfone coletado! Total: ${this.microfoneColetados}/${this.TOTAL_MICROFONE}`);
-                                    }
-                                }
-                            } else if (collectedItem.type === 'moeda') {
-                                this.tempo += 5;
-                                console.log(`DEBUG: Moeda coletada! Tempo +5s. Tempo atual: ${this.tempo}`);
+                                // Usa a nova estrutura de dados para contagem
+                                this.objectiveCounts[collectedItem.type]++;
+                                console.log(`DEBUG: Item objetivo coletado! Tipo: ${collectedItem.type}, Total: ${this.objectiveCounts[collectedItem.type]}`);
+                            } else {
+                                // Estes são itens coletáveis que não são objetivos da fase
+                                console.log(`DEBUG: Item coletado: ${collectedItem.type}`);
                             }
-                            this.atualizarHUD();
-                            this.coletando = false;
-                            return;
-                        }
-                    }
-
-                    // Depois verifica itens escolares não coletáveis (se houver)
-                    for (let i = 0; i < this.schoolItems.length; i++) {
-                        if (this.schoolItems[i].canBeCollected && this.checkCollision(this.player, this.schoolItems[i])) {
-                            const collectedItem = this.schoolItems.splice(i, 1)[0];
-                            this.totalAllItemsCollected++; // Incrementa a contagem total
                             this.atualizarHUD();
                             this.coletando = false;
                             return;
@@ -1052,31 +1114,45 @@
                     }
 
                     // 2. Interação com o Baú (apenas na Fase 1)
-                    if (this.currentPhase === 1 && this.chest && this.checkCollision(this.player, this.chest)) { // Only check collision if chest exists
-                        if (this.pedrasColetadas === this.TOTAL_PEDRAS && this.keysColetadas === this.TOTAL_CHAVES) { // Updated condition
-                            this.chest.isOpened = true; // Marca o baú como aberto
-                            this.chest.emoji = '🗃️'; // Muda o emoji do baú para aberto
+                    const phaseData = phasesData[this.currentPhase];
+                    if (phaseData.chest && this.checkCollision(this.player, this.chest)) { 
+                        let allObjectivesMet = true;
+                        if (phaseData.items) {
+                            for (const item of phaseData.items) {
+                                if (item.isObjective && (this.objectiveCounts[item.type] || 0) < item.count) {
+                                    allObjectivesMet = false;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (allObjectivesMet) {
+                            this.chest.isOpened = true;
+                            this.chest.emoji = '🗃️'; 
                             console.log("DEBUG: Baú aberto com sucesso!");
                             this.coletando = false;
-                            this.atualizarHUD(); // Atualiza o HUD para mostrar o baú aberto
-                            // A transição de fase é tratada no setInterval principal, que agora verifica chest.isOpened
+                            this.atualizarHUD(); 
                             return;
-                        } else { // If trying to open but not all collected
+                        } else {
                             const hintMessageDiv = document.getElementById('llmHintMessage');
                             let msg = "Você precisa coletar todos os itens do objetivo antes de abrir o baú!";
-                            if (this.pedrasColetadas < this.TOTAL_PEDRAS) {
-                                msg += ` Faltam ${this.TOTAL_PEDRAS - this.pedrasColetadas} pedras.`;
+                            
+                            // Adiciona a contagem de itens faltantes na dica
+                            const missingItems = phaseData.items.filter(item => item.isObjective && (this.objectiveCounts[item.type] || 0) < item.count);
+                            if (missingItems.length > 0) {
+                                msg += ` Faltam: `;
+                                missingItems.forEach(item => {
+                                    msg += `${item.emoji} ${item.count - (this.objectiveCounts[item.type] || 0)} `;
+                                });
                             }
-                            if (this.keysColetadas < this.TOTAL_CHAVES) {
-                                msg += ` Faltam ${this.TOTAL_CHAVES - this.keysColetadas} chaves.`;
-                            }
-                            if (hintMessageDiv) { // Check if element exists before setting innerText
-                               hintMessageDiv.innerText = msg;
-                               hintMessageDiv.style.display = 'block';
+
+                            if (hintMessageDiv) {
+                                hintMessageDiv.innerText = msg;
+                                hintMessageDiv.style.display = 'block';
                             }
                             if (this.hintTimeout) clearTimeout(this.hintTimeout);
                             this.hintTimeout = setTimeout(() => {
-                                if (hintMessageDiv) { // Check again before hiding
+                                if (hintMessageDiv) {
                                     hintMessageDiv.style.display = 'none';
                                 }
                             }, 5000);
@@ -1088,63 +1164,47 @@
 
             // Método para atualizar a exibição do HUD
             atualizarHUD: function() {
-                // Obtenha as referências dos elementos do HUD aqui para garantir que são válidas
                 const currentVidasDisplayElement = document.getElementById('vidasDisplay');
                 const currentHudObjectiveLine1Element = document.getElementById('hudObjectiveLine1');
                 const currentHudObjectiveLine2Element = document.getElementById('hudObjectiveLine2');
                 const currentTotalAllItemsCollectedDisplayElement = document.getElementById('totalAllItemsCollectedDisplay');
                 const currentTempoDisplayElement = document.getElementById('tempo');
 
-                let coracao = "❤️".repeat(this.vidas); // Exibe corações com base nas vidas
-                let objectiveLine1Content = ''; // Conteúdo para a linha 1 do objetivo
-                let objectiveLine2Content = ''; // Conteúdo para a linha 2 do objetivo - Inicializado aqui
+                let coracao = "❤️".repeat(this.vidas);
+                let objectiveLine1Content = '';
+                let objectiveLine2Content = '';
+                
+                const phaseData = phasesData[this.currentPhase];
+                if (!phaseData) return;
 
-                let hudTotalCollectedContent = `Total Coletado: ${this.totalAllItemsCollected}`;
-                let hudTempoContent = `Tempo: ${this.tempo}s`;
+                const objectives = phaseData.items.filter(item => item.isObjective);
 
-                // Conteúdo do HUD principal (canto superior esquerdo)
-                if (this.currentPhase === 1) {
-                    objectiveLine1Content = `🔴 Pedras: ${this.pedrasColetadas} / ${this.TOTAL_PEDRAS}`;
-                    objectiveLine2Content = `🔑 Chaves: ${this.keysColetadas} / ${this.TOTAL_CHAVES}<br>📦 Baú: ${this.chest && this.chest.isOpened ? '1/1 🔓' : '0/1 🔒'}`;
-                } else if (this.currentPhase === 2) {
-                    objectiveLine1Content = `🎟️ Vales Sorvete: ${this.valesSorveteColetados} / ${this.TOTAL_VALES_SORVETE}`;
-                    objectiveLine2Content = `🍫🍦 Sorvetes: ${this.sorvetesObjetivoColetados} / ${this.TOTAL_SORVETES_OBJETIVO}`;
-                } else if (this.currentPhase === 3) {
-                    objectiveLine1Content = `🏆 Troféus: ${this.trofeusColetados} / ${this.TOTAL_TROFEUS}`;
-                    objectiveLine2Content = `⚽ Bolas: ${this.bolasColetadas} / ${this.TOTAL_BOLAS_FASE3}<br>🪁 Pipas: ${this.pipasColetadas} / ${this.TOTAL_PIPAS}`;
-                } else if (this.currentPhase === 4) {
-                    objectiveLine1Content = `🧪 Tubos Ensaio: ${this.tubosEnsaioColetados} / ${this.TOTAL_TUBOS_ENSAIO}`;
-                    objectiveLine2Content = `🧲 Ímãs: ${this.imasColetados} / ${this.TOTAL_IMAS}<br>🔬 Microscópios: ${this.microscopioColetados} / ${this.TOTAL_MICROSCOPIO}`;
-                } else if (this.currentPhase === 5) {
-                    objectiveLine1Content = `🐘 Elefantes: ${this.elefantesColetados} / ${this.TOTAL_ELEFANTES}`;
-                    objectiveLine2Content = `🦁 Leões: ${this.leoesColetados} / ${this.TOTAL_LEOES}<br>🦜 Aves: ${this.avesColetadas} / ${this.TOTAL_AVES}`;
-                } else if (this.currentPhase === 6) {
-                    objectiveLine1Content = `🎨 Pinturas: ${this.pinturasColetadas} / ${this.TOTAL_PINTURAS}`;
-                    objectiveLine2Content = `🗿 Esculturas: ${this.esculturasColetadas} / ${this.TOTAL_ESCULTURAS}<br>🦴 Fósseis: ${this.fosseisColetados} / ${this.TOTAL_FOSSEIS}`;
-                } else if (this.currentPhase === 7) {
-                    objectiveLine1Content = `🧺 Cestas Piquenique: ${this.cestasPiqueniqueColetadas} / ${this.TOTAL_CESTAS_PIQUENIQUE}`;
-                    objectiveLine2Content = `⚽ Bolas: ${this.bolasFase7Coletadas} / ${this.TOTAL_BOLAS_FASE7}<br>🎠 Brinquedos: ${this.brinquedosParqueColetados} / ${this.TOTAL_BRINQUEDOS_PARQUE}`;
-                } else if (this.currentPhase === 8) {
-                    objectiveLine1Content = `📖 Aventura: ${this.livroAventuraColetados} / ${this.TOTAL_LIVRO_AVENTURA}`;
-                    objectiveLine2Content = `🦁 Animais: ${this.livroAnimaisColetados} / ${this.TOTAL_LIVRO_ANIMAIS}<br>📜 Fábula: ${this.livroFabulaColetados} / ${this.TOTAL_LIVRO_FABULA}`;
-                } else if (this.currentPhase === 9) {
-                    objectiveLine1Content = `♻️ Reciclagem: ${this.lixeiraReciclagemColetados} / ${this.TOTAL_LIXEIRA_RECICLAGEM}`;
-                    objectiveLine2Content = `🧴 Plástico: ${this.garrafaPlasticoColetados} / ${this.TOTAL_GARRAFA_PLASTICO}<br>🌱 Árvore: ${this.arvoreMudaColetados} / ${this.TOTAL_ARVORE_MUDA}`;
-                } else if (this.currentPhase === 10) {
-                    objectiveLine1Content = `🌿 Plantas: ${this.plantaNativaColetados} / ${this.TOTAL_PLANTAS_NATIVAS}`;
-                    objectiveLine2Content = `🦁 Animais: ${this.animalSelvagemColetados} / ${this.TOTAL_ANIMAIS_SELVAGENS}<br>🔭 Telescópios: ${this.telescopioColetados} / ${this.TOTAL_TELESCOPIO}`;
-                } else if (this.currentPhase === 11) {
-                    objectiveLine1Content = `🖌️ Pincéis: ${this.pincelColetados} / ${this.TOTAL_PINCEL}`;
-                    objectiveLine2Content = `🎨 Tintas: ${this.tintaColetados} / ${this.TOTAL_TINTA}<br>🏺 Argila: ${this.argilaColetados} / ${this.TOTAL_ARGILA}`;
-                } else if (this.currentPhase === 12) {
-                    objectiveLine1Content = `🎸 Violão: ${this.violaoColetados} / ${this.TOTAL_VIOLAO}`;
-                    objectiveLine2Content = `🎹 Piano: ${this.pianoColetados} / ${this.TOTAL_PIANO}<br>🎤 Microfone: ${this.microfoneColetados} / ${this.TOTAL_MICROFONE}`;
+                // Build first line of objectives
+                const firstLineObjectives = objectives.slice(0, 2);
+                let line1Text = '';
+                firstLineObjectives.forEach(obj => {
+                    const itemName = itemDisplayNames[obj.type] || obj.type;
+                    line1Text += `${obj.emoji} ${itemName}: ${this.objectiveCounts[obj.type] || 0} / ${obj.count}<br>`;
+                });
+                objectiveLine1Content = line1Text;
+
+                // Build second line of objectives
+                let line2Text = '';
+                const secondLineObjectives = objectives.slice(2, 4);
+                secondLineObjectives.forEach(obj => {
+                    const itemName = itemDisplayNames[obj.type] || obj.type;
+                    line2Text += `${obj.emoji} ${itemName}: ${this.objectiveCounts[obj.type] || 0} / ${obj.count}<br>`;
+                });
+                // Adiciona o baú se for a fase 1
+                if (this.currentPhase === 1 && this.chest) {
+                    line2Text += `📦 Baú: ${this.chest.isOpened ? '1/1 🔓' : '0/1 🔒'}`;
                 }
+                objectiveLine2Content = line2Text;
 
-                // Atualiza o texto dos elementos do HUD
-                if (currentVidasDisplayElement) currentVidasDisplayElement.innerText = `Vidas: ${coracao}`; // Adiciona o rótulo "Vidas:"
+
+                if (currentVidasDisplayElement) currentVidasDisplayElement.innerText = `Vidas: ${coracao}`;
                 if (currentTotalAllItemsCollectedDisplayElement) currentTotalAllItemsCollectedDisplayElement.innerText = `Total Coletado: ${this.totalAllItemsCollected}`;
-                if (currentTempoDisplayElement) currentTempoDisplayElement.innerText = `Tempo: ${this.tempo}s`; // Adiciona o rótulo "Tempo:"
+                if (currentTempoDisplayElement) currentTempoDisplayElement.innerText = `Tempo: ${this.tempo}s`;
 
                 if (currentHudObjectiveLine1Element) currentHudObjectiveLine1Element.innerHTML = objectiveLine1Content;
                 if (currentHudObjectiveLine2Element) currentHudObjectiveLine2Element.innerHTML = objectiveLine2Content;
@@ -1164,12 +1224,15 @@
             // Inicializa o canvas 2D e os elementos do jogo
             iniciar: function(tipo, phase) {
                 console.log(`Iniciando o jogo 2D com personagem: ${tipo}, Fase: ${phase}`);
-                this.currentPhase = phase; // Atualiza a fase atual
+                this.currentPhase = phase;
+                const phaseData = phasesData[this.currentPhase];
+                if (!phaseData) {
+                    this.encerrar("O jogo terminou! Não há mais capítulos.");
+                    return;
+                }
 
-                // Atualiza o título da página com o nome do capítulo
                 this.updatePageTitle(this.currentPhase);
 
-                // Garante que os modais estejam ocultos ao iniciar um novo jogo
                 const gameModalElement = document.getElementById('gameModal');
                 if (gameModalElement) gameModalElement.style.display = 'none';
                 
@@ -1183,65 +1246,32 @@
                 if (temporaryMessageElement) temporaryMessageElement.style.display = 'none';
 
 
-                // Torna o HUD visível ao iniciar a fase
                 const hudElementDiv = document.getElementById('hud');
                 if (hudElementDiv) {
-                    hudElementDiv.style.display = 'flex'; // Changed to flex
+                    hudElementDiv.style.display = 'flex'; 
                 }
 
-                // Se for um "continue", reinicia vidas para 3. Se for reinício de fase por tempo, apenas reinicia o tempo e itens.
-                if (this.continueCountdownInterval) { // Se veio do continue screen
+                if (this.continueCountdownInterval) {
                     clearInterval(this.continueCountdownInterval);
                     this.continueCountdownInterval = null;
-                    this.continueTime = 10; // Reseta o contador para a próxima vez
-                } else if (this.vidas === 0) { // Se vidas chegou a 0 e não é um continue, então é um game over completo
-                    this.vidas = 3; // Reinicia vidas se for um novo jogo após game over
+                    this.continueTime = 10;
+                } else if (this.vidas === 0) {
+                    this.vidas = 3;
                 }
-                // Se vidas > 0 (reinício de fase por tempo), vidas não é resetada aqui
 
-                // Reinicia as variáveis de fase
-                this.pedrasColetadas = 0;
-                this.keysColetadas = 0;
-                this.valesSorveteColetados = 0; 
-                this.sorvetesObjetivoColetados = 0;
-                this.trofeusColetados = 0; 
-                this.bolasColetadas = 0; 
-                this.pipasColetadas = 0;
-                this.tubosEnsaioColetados = 0; 
-                this.imasColetados = 0; 
-                this.microscopioColetados = 0;
-                this.elefantesColetados = 0; 
-                this.leoesColetados = 0; 
-                this.avesColetadas = 0; 
-                this.pinturasColetadas = 0; 
-                this.esculturasColetadas = 0; 
-                this.fosseisColetados = 0; 
-                this.cestasPiqueniqueColetadas = 0; 
-                this.bolasFase7Coletadas = 0; 
-                this.brinquedosParqueColetados = 0; 
-                this.totalAllItemsCollected = 0; // Reinicia a contagem total de itens coletados
-                this.livroAventuraColetados = 0;
-                this.livroAnimaisColetados = 0;
-                this.livroFabulaColetados = 0;
-                this.lixeiraReciclagemColetados = 0;
-                this.garrafaPlasticoColetados = 0;
-                this.arvoreMudaColetados = 0;
-                this.plantaNativaColetados = 0;
-                this.animalSelvagemColetados = 0;
-                this.telescopioColetados = 0;
-                this.pincelColetados = 0;
-                this.tintaColetados = 0;
-                this.argilaColetados = 0;
-                this.violaoColetados = 0;
-                this.pianoColetados = 0;
-                this.microfoneColetados = 0;
-
-                this.tempo = this.BASE_TIME - (this.currentLevel - 1) * this.TIME_DECREMENT_PER_LEVEL; // Tempo baseado no nível
-                if (this.tempo < 30) this.tempo = 30; // Garante um tempo mínimo
+                this.tempo = 90; // Tempo fixo para cada fase.
                 this.coletando = false;
-                this.hasKey = false;
-                
-                // Configura o personagem do jogador (posição inicial)
+                this.objectiveCounts = {};
+                this.totalAllItemsCollected = 0;
+                // Inicializa a contagem de objetivos para a nova fase
+                if (phaseData.items) {
+                    phaseData.items.forEach(itemData => {
+                        if (itemData.isObjective) {
+                           this.objectiveCounts[itemData.type] = 0;
+                        }
+                    });
+                }
+
                 this.player = {
                     x: this.canvas.width / 2 - this.PLAYER_SIZE / 2,
                     y: this.canvas.height / 2 - this.PLAYER_SIZE / 2,
@@ -1252,252 +1282,124 @@
 
                 this.itens = [];
                 this.obstaculos = [];
-                this.schoolItems = [];
                 this.chest = null;
 
-                // Geração de itens com base na fase
-                if (this.currentPhase === 1) {
-                    // Itens do objetivo principal da Fase 1: 3 Pedras, 3 Chaves, 1 Baú
-                    for (let i = 0; i < this.TOTAL_PEDRAS; i++) {
-                        this.itens.push(this.createGameObject('pedra', '🔴', this.ITEM_SIZE, true, false, null, true));
+                // Geração de itens com base nos dados da fase
+                if (phaseData.items) {
+                    phaseData.items.forEach(itemData => {
+                        for (let i = 0; i < itemData.count; i++) {
+                            let emoji = itemData.emoji;
+                            // Se tiver sabores, use o sabor específico
+                            if (itemData.type === 'sorvete' && itemData.flavors && itemData.flavors[i]) {
+                                emoji = `🍦${itemData.flavors[i]}`;
+                            }
+                            this.itens.push(this.createGameObject(itemData.type, emoji, this.ITEM_SIZE, itemData.canBeCollected, false, null, itemData.isObjective));
+                        }
+                    });
+                }
+
+                if (phaseData.chest) {
+                    this.chest = this.createGameObject(phaseData.chest.type, phaseData.chest.emoji, this.CHEST_SIZE, phaseData.chest.canBeCollected, false, null, phaseData.chest.isObjective);
+                    this.chest.isOpened = false;
+                }
+                
+                // Gera obstáculos com base na nova contagem
+                const obstacleEmojis = ['🟫', '🪑', '🚪'];
+                if (phaseData.obstacles) {
+                    for (let i = 0; i < phaseData.obstacles; i++) {
+                        const obstacle = this.createGameObject('obstacle', obstacleEmojis[i % obstacleEmojis.length], this.OBSTACLE_SIZE, false, true);
+                        this.obstaculos.push(obstacle);
                     }
-                    for (let i = 0; i < this.TOTAL_CHAVES; i++) {
-                        this.itens.push(this.createGameObject('chave', '🔑', this.ITEM_SIZE, true, false, null, true));
-                    }
-                    this.chest = this.createGameObject('bau', '📦', this.CHEST_SIZE, false, false, null, true);
-                } else if (this.currentPhase === 2) {
-                    // Itens do objetivo principal da Fase 2: 4 Vales Sorvete, 4 Sorvetes
-                    for (let i = 0; i < this.TOTAL_VALES_SORVETE; i++) {
-                        this.itens.push(this.createGameObject('vale_sorvete', '🎟️', this.ITEM_SIZE, true, false, null, true));
-                    }
-                    for (let i = 0; i < this.TOTAL_SORVETES_OBJETIVO; i++) {
-                        this.itens.push(this.createGameObject('sorvete', '🍫🍦', this.ITEM_SIZE, true, false, null, true));
-                    }
-                } else if (this.currentPhase === 3) {
-                    // Itens do objetivo principal da Fase 3: 3 Troféus, 3 Bolas, 3 Pipas
-                    for (let i = 0; i < this.TOTAL_TROFEUS; i++) {
-                        this.itens.push(this.createGameObject('trofeu', '🏆', this.ITEM_SIZE, true, false, null, true));
-                    }
-                    for (let i = 0; i < this.TOTAL_BOLAS_FASE3; i++) {
-                        this.itens.push(this.createGameObject('bola', '⚽', this.ITEM_SIZE, true, false, null, true));
-                    }
-                    for (let i = 0; i < this.TOTAL_PIPAS; i++) {
-                        this.itens.push(this.createGameObject('pipa', '🪁', this.ITEM_SIZE, true, false, null, true));
-                    }
-                } else if (this.currentPhase === 4) {
-                    // Itens do objetivo principal da Fase 4: 3 Tubos de Ensaio, 3 Ímãs, 3 Microscópios
-                    for (let i = 0; i < this.TOTAL_TUBOS_ENSAIO; i++) {
-                        this.itens.push(this.createGameObject('tubo_ensaio', '🧪', this.ITEM_SIZE, true, false, null, true));
-                    }
-                    for (let i = 0; i < this.TOTAL_IMAS; i++) {
-                        this.itens.push(this.createGameObject('ima', '🧲', this.ITEM_SIZE, true, false, null, true));
-                    }
-                    for (let i = 0; i < this.TOTAL_MICROSCOPIO; i++) {
-                        this.itens.push(this.createGameObject('microscopio', '🔬', this.ITEM_SIZE, true, false, null, true));
-                    }
-                } else if (this.currentPhase === 5) {
-                    // Itens do objetivo principal da Fase 5: 3 Elefantes, 3 Leões, 3 Aves
-                    for (let i = 0; i < this.TOTAL_ELEFANTES; i++) {
-                        this.itens.push(this.createGameObject('elefante', '🐘', this.ITEM_SIZE, true, false, null, true));
-                    }
-                    for (let i = 0; i < this.TOTAL_LEOES; i++) {
-                        this.itens.push(this.createGameObject('leao', '🦁', this.ITEM_SIZE, true, false, null, true));
-                    }
-                    for (let i = 0; i < this.TOTAL_AVES; i++) {
-                        this.itens.push(this.createGameObject('ave', '🦜', this.ITEM_SIZE, true, false, null, true));
-                    }
-                } else if (this.currentPhase === 6) {
-                    // Itens do objetivo principal da Fase 6: 3 Pinturas, 3 Esculturas, 3 Fósseis
-                    for (let i = 0; i < this.TOTAL_PINTURAS; i++) {
-                        this.itens.push(this.createGameObject('pintura', '🎨', this.ITEM_SIZE, true, false, null, true));
-                    }
-                    for (let i = 0; i < this.TOTAL_ESCULTURAS; i++) {
-                        this.itens.push(this.createGameObject('escultura', '🗿', this.ITEM_SIZE, true, false, null, true));
-                    }
-                    for (let i = 0; i < this.TOTAL_FOSSEIS; i++) {
-                        this.itens.push(this.createGameObject('fossil', '🦴', this.ITEM_SIZE, true, false, null, true));
-                    }
-                } else if (this.currentPhase === 7) {
-                    // Itens do objetivo principal da Fase 7: 3 Cestas de Piquenique, 3 Bolas, 3 Brinquedos de Parque
-                    for (let i = 0; i < this.TOTAL_CESTAS_PIQUENIQUE; i++) {
-                        this.itens.push(this.createGameObject('cesta_piquenique', '🧺', this.ITEM_SIZE, true, false, null, true));
-                    }
-                    for (let i = 0; i < this.TOTAL_BOLAS_FASE7; i++) {
-                        this.itens.push(this.createGameObject('bola', '⚽', this.ITEM_SIZE, true, false, null, true));
-                    }
-                    for (let i = 0; i < this.TOTAL_BRINQUEDOS_PARQUE; i++) {
-                        this.itens.push(this.createGameObject('brinquedo_parque', '🎠', this.ITEM_SIZE, true, false, null, true));
-                    }
-                } else if (this.currentPhase === 8) {
-                    // Itens do objetivo principal da Fase 8: 3 Livros de Aventura, 3 Livros de Animais, 3 Livros de Fábula
-                    for (let i = 0; i < this.TOTAL_LIVRO_AVENTURA; i++) {
-                        this.itens.push(this.createGameObject('livro_aventura', '📖', this.ITEM_SIZE, true, false, null, true));
-                    }
-                    for (let i = 0; i < this.TOTAL_LIVRO_ANIMAIS; i++) {
-                        this.itens.push(this.createGameObject('livro_animais', '🦁', this.ITEM_SIZE, true, false, null, true));
-                    }
-                    for (let i = 0; i < this.TOTAL_LIVRO_FABULA; i++) {
-                        this.itens.push(this.createGameObject('livro_fabula', '📜', this.ITEM_SIZE, true, false, null, true));
-                    }
-                } else if (this.currentPhase === 9) {
-                    // Itens do objetivo principal da Fase 9: 3 Lixeiras de Reciclagem, 3 Garrafas Plásticas, 3 Mudas de Árvore
-                    for (let i = 0; i < this.TOTAL_LIXEIRA_RECICLAGEM; i++) {
-                        this.itens.push(this.createGameObject('lixeira_reciclagem', '♻️', this.ITEM_SIZE, true, false, null, true));
-                    }
-                    for (let i = 0; i < this.TOTAL_GARRAFA_PLASTICO; i++) {
-                        this.itens.push(this.createGameObject('garrafa_plastico', '🧴', this.ITEM_SIZE, true, false, null, true));
-                    }
-                    for (let i = 0; i < this.TOTAL_ARVORE_MUDA; i++) {
-                        this.itens.push(this.createGameObject('arvore_muda', '🌱', this.ITEM_SIZE, true, false, null, true));
-                    }
-                } else if (this.currentPhase === 10) {
-                    // Itens do objetivo principal da Fase 10: 3 Plantas Nativas, 3 Animais Selvagens, 3 Telescópios
-                    for (let i = 0; i < this.TOTAL_PLANTAS_NATIVAS; i++) {
-                        this.itens.push(this.createGameObject('planta_nativa', '🌿', this.ITEM_SIZE, true, false, null, true));
-                    }
-                    for (let i = 0; i < this.TOTAL_ANIMAIS_SELVAGENS; i++) {
-                        this.itens.push(this.createGameObject('animal_selvagem', '🦁', this.ITEM_SIZE, true, false, null, true));
-                    }
-                    for (let i = 0; i < this.TOTAL_TELESCOPIO; i++) {
-                        this.itens.push(this.createGameObject('telescopio', '🔭', this.ITEM_SIZE, true, false, null, true));
-                    }
-                } else if (this.currentPhase === 11) {
-                    // Itens do objetivo principal da Fase 11: 3 Pincéis, 3 Tintas, 3 Argilas
-                    for (let i = 0; i < this.TOTAL_PINCEL; i++) {
-                        this.itens.push(this.createGameObject('pincel', '🖌️', this.ITEM_SIZE, true, false, null, true));
-                    }
-                    for (let i = 0; i < this.TOTAL_TINTA; i++) {
-                        this.itens.push(this.createGameObject('tinta', '🎨', this.ITEM_SIZE, true, false, null, true));
-                    }
-                    for (let i = 0; i < this.TOTAL_ARGILA; i++) {
-                        this.itens.push(this.createGameObject('argila', '🏺', this.ITEM_SIZE, true, false, null, true));
-                    }
-                } else if (this.currentPhase === 12) {
-                    // Itens do objetivo principal da Fase 12: 3 Violões, 3 Pianos, 3 Microfones
-                    for (let i = 0; i < this.TOTAL_VIOLAO; i++) {
-                        this.itens.push(this.createGameObject('violao', '🎸', this.ITEM_SIZE, true, false, null, true));
-                    }
-                    for (let i = 0; i < this.TOTAL_PIANO; i++) {
-                        this.itens.push(this.createGameObject('piano', '🎹', this.ITEM_SIZE, true, false, null, true));
-                    }
-                    for (let i = 0; i < this.TOTAL_MICROFONE; i++) {
-                        this.itens.push(this.createGameObject('microfone', '🎤', this.ITEM_SIZE, true, false, null, true));
+                }
+                
+                // Gera sacos de dinheiro
+                if (phaseData.moneyBags) {
+                    for (let i = 0; i < phaseData.moneyBags; i++) {
+                        this.itens.push(this.createGameObject('moeda', '💰', this.ITEM_SIZE, true, false, null, false));
                     }
                 }
 
-                // Gera os obstáculos temáticos da escola (comum para todas as fases)
-                for (let i = 0; i < 3; i++) {
-                    this.obstaculos.push(this.createGameObject('mesa', '🟫', this.OBSTACLE_SIZE, false, true));
-                    this.obstaculos.push(this.createGameObject('cadeira', '🪑', this.OBSTACLE_SIZE, false, true));
-                    this.obstaculos.push(this.createGameObject('armario', '🚪', this.OBSTACLE_SIZE, false, true));
-                }
-
-                // Gera os itens escolares (não coletáveis, não obstáculos - comum para todas as fases)
-                for (let i = 0; i < 5; i++) { 
-                    this.schoolItems.push(this.createGameObject('lapis', '✏️', this.SCHOOL_ITEM_SIZE, true, false, null, false)); 
-                    this.schoolItems.push(this.createGameObject('caderno', '📓', this.SCHOOL_ITEM_SIZE, true, false, null, false)); 
-                    this.schoolItems.push(this.createGameObject('livro', '📚', this.SCHOOL_ITEM_SIZE, false, false)); 
-                    this.schoolItems.push(this.createGameObject('borracha', '🧽', this.SCHOOL_ITEM_SIZE, false, false)); 
-                    this.schoolItems.push(this.createGameObject('mochila', '🎒', this.SCHOOL_ITEM_SIZE, false, false)); 
-                }
-
-                // Posiciona todos os objetos no canvas de forma aleatória, evitando sobreposição inicial
                 this.placeGameObjectsRandomly();
+                this.atualizarHUD();
 
-                this.atualizarHUD(); // Atualiza o HUD com o novo total e objetivo
-
-                // Limpa qualquer temporizador anterior e inicia o novo
                 if (this.gameInterval) clearInterval(this.gameInterval);
                 this.gameInterval = setInterval(() => {
                     let winConditionMet = false;
+                    
                     if (this.currentPhase === 1) {
-                        winConditionMet = (this.chest && this.chest.isOpened);
-                    } else if (this.currentPhase === 2) {
-                        winConditionMet = (this.valesSorveteColetados === this.TOTAL_VALES_SORVETE && this.sorvetesObjetivoColetados === this.TOTAL_SORVETES_OBJETIVO);
-                    } else if (this.currentPhase === 3) {
-                        winConditionMet = (this.trofeusColetados >= this.TOTAL_TROFEUS && this.bolasColetadas >= this.TOTAL_BOLAS_FASE3 && this.pipasColetadas >= this.TOTAL_PIPAS);
-                    } else if (this.currentPhase === 4) {
-                        winConditionMet = (this.tubosEnsaioColetados >= this.TOTAL_TUBOS_ENSAIO && this.imasColetados >= this.TOTAL_IMAS && this.microscopioColetados >= this.TOTAL_MICROSCOPIO);
-                    } else if (this.currentPhase === 5) {
-                        winConditionMet = (this.elefantesColetados >= this.TOTAL_ELEFANTES && this.leoesColetados >= this.TOTAL_LEOES && this.avesColetadas >= this.TOTAL_AVES);
-                    } else if (this.currentPhase === 6) {
-                        winConditionMet = (this.pinturasColetadas === this.TOTAL_PINTURAS && this.esculturasColetadas === this.TOTAL_ESCULTURAS && this.fosseisColetados >= this.TOTAL_FOSSEIS);
-                    } else if (this.currentPhase === 7) {
-                        winConditionMet = (this.cestasPiqueniqueColetadas >= this.TOTAL_CESTAS_PIQUENIQUE && this.bolasFase7Coletadas >= this.TOTAL_BOLAS_FASE7 && this.brinquedosParqueColetados >= this.TOTAL_BRINQUEDOS_PARQUE);
-                    } else if (this.currentPhase === 8) {
-                        winConditionMet = (this.livroAventuraColetados >= this.TOTAL_LIVRO_AVENTURA && this.livroAnimaisColetados >= this.TOTAL_LIVRO_ANIMAIS && this.livroFabulaColetados >= this.TOTAL_LIVRO_FABULA);
-                    } else if (this.currentPhase === 9) {
-                        winConditionMet = (this.lixeiraReciclagemColetados >= this.TOTAL_LIXEIRA_RECICLAGEM && this.garrafaPlasticoColetados >= this.TOTAL_GARRAFA_PLASTICO && this.arvoreMudaColetados >= this.TOTAL_ARVORE_MUDA);
-                    } else if (this.currentPhase === 10) {
-                        winConditionMet = (this.plantaNativaColetados >= this.TOTAL_PLANTAS_NATIVAS && this.animalSelvagemColetados >= this.TOTAL_ANIMAIS_SELVAGENS && this.telescopioColetados >= this.TOTAL_TELESCOPIO);
-                    } else if (this.currentPhase === 11) {
-                        winConditionMet = (this.pincelColetados >= this.TOTAL_PINCEL && this.tintaColetados >= this.TOTAL_TINTA && this.argilaColetados >= this.TOTAL_ARGILA);
-                    } else if (this.currentPhase === 12) {
-                        winConditionMet = (this.violaoColetados >= this.TOTAL_VIOLAO && this.pianoColetados >= this.TOTAL_PIANO && this.microfoneColetados >= this.TOTAL_MICROFONE);
+                        // Verifica se todas as pedras e chaves foram coletadas
+                        const redStoneCollected = (this.objectiveCounts['pedra_vermelha'] || 0) >= phasesData[1].items.find(item => item.type === 'pedra_vermelha').count;
+                        const blueStoneCollected = (this.objectiveCounts['pedra_azul'] || 0) >= phasesData[1].items.find(item => item.type === 'pedra_azul').count;
+                        const greenStoneCollected = (this.objectiveCounts['pedra_verde'] || 0) >= phasesData[1].items.find(item => item.type === 'pedra_verde').count;
+                        const keysCollected = (this.objectiveCounts['chave'] || 0) >= phasesData[1].items.find(item => item.type === 'chave').count;
+                        
+                        if (redStoneCollected && blueStoneCollected && greenStoneCollected && keysCollected) {
+                            winConditionMet = (this.chest && this.chest.isOpened);
+                        }
+                    } else if (phaseData) {
+                        winConditionMet = phaseData.items.filter(item => item.isObjective).every(item => {
+                            return (this.objectiveCounts[item.type] || 0) >= item.count;
+                        });
                     }
 
                     if (this.tempo > 0 && this.vidas > 0 && !winConditionMet) {
-                        this.tempo--; // DECREMENTO DE TEMPO
+                        this.tempo--;
                         const currentTempoElement = document.getElementById('tempo');
                         if (currentTempoElement) {
-                            currentTempoElement.innerText = `Tempo: ${this.tempo}s`; // Atualiza o texto do tempo
-                        } else {
-                            console.error("Erro: Elemento 'tempo' não encontrado no DOM (dentro do setInterval).");
+                            currentTempoElement.innerText = `Tempo: ${this.tempo}s`;
                         }
-                        
                         if (this.tempo === 0) {
-                            clearInterval(this.gameInterval); // Para o jogo enquanto a mensagem é exibida
-                            this.showTemporaryMessage("Perdeu!", 3000); // Exibe "Perdeu!" por 3 segundos
+                            clearInterval(this.gameInterval);
+                            this.showTemporaryMessage("Perdeu!", 3000);
                             
-                            setTimeout(() => { // Após a mensagem temporária
-                                this.vidas--; // Consome uma vida
-                                this.atualizarHUD(); // Atualiza o HUD para mostrar a vida perdida
+                            setTimeout(() => {
+                                this.vidas--;
+                                this.atualizarHUD();
 
                                 if (this.vidas > 0) {
-                                    this.iniciar(this.currentPlayerType, this.currentPhase); // Reinicia a fase atual
+                                    this.iniciar(this.currentPlayerType, this.currentPhase);
                                 } else {
                                     this.showContinueScreen();
                                 }
-                            }, 3000); // Espera a duração da mensagem temporária
+                            }, 3000);
                         }
                     } else if (winConditionMet) {
-                        clearInterval(this.gameInterval); // Para o jogo
-                        if (this.currentPhase < 12) { // Se ainda não é a última fase
+                        clearInterval(this.gameInterval);
+                        if (this.currentPhase < 12) {
                             this.showTemporaryMessage(`Capítulo ${this.currentPhase} Concluído!`, 2000);
                             setTimeout(() => {
-                                this.currentLevel++; // Aumenta o nível para a próxima fase
-                                this.iniciar(this.currentPlayerType, this.currentPhase + 1); // Inicia a próxima fase
+                                this.currentPhase++; // Avança para o próximo capítulo
+                                this.iniciar(this.currentPlayerType, this.currentPhase);
                             }, 2000);
                         } else {
-                            this.encerrar("✅ Parabéns! Você completou todos os capítulos!"); // Vitória final após o Capítulo 12
+                            this.encerrar("✅ Parabéns! Você completou todos os capítulos!");
                         }
                     } else if (this.vidas <= 0) {
-                        clearInterval(this.gameInterval); // Para o jogo
+                        clearInterval(this.gameInterval);
                         this.showContinueScreen();
                     }
                 }, 1000);
 
-                // Inicia o loop principal de animação
                 this.lastFrameTime = performance.now();
                 this.animar();
-                if (this.canvas) { // Garante que o canvas tenha foco ao iniciar o jogo
+                if (this.canvas) {
                     this.canvas.focus();
                 }
             },
 
             encerrar: function(msg) {
-                console.log("DEBUG: Encerrar chamado com mensagem:", msg); // Log de depuração
-                clearInterval(this.gameInterval); // Para o temporador do jogo
-                const llmHintMessageElement = document.getElementById('llmHintMessage'); // Get reference here
-                if (llmHintMessageElement) llmHintMessageElement.style.display = 'none'; // Oculta a mensagem de dica LLM
-                if (this.hintTimeout) clearTimeout(this.hintTimeout); // Limpa qualquer timeout de dica
+                console.log("DEBUG: Encerrar chamado com mensagem:", msg);
+                clearInterval(this.gameInterval);
+                const llmHintMessageElement = document.getElementById('llmHintMessage');
+                if (llmHintMessageElement) llmHintMessageElement.style.display = 'none';
+                if (this.hintTimeout) clearTimeout(this.hintTimeout);
 
                 const modal = document.getElementById('gameModal');
-                if (modal) { // Added null check
+                if (modal) {
                     document.getElementById('modalMessage').innerText = msg;
-                    modal.style.display = 'flex'; // Mostra o modal
+                    modal.style.display = 'flex';
                 }
-                this.stopAllMusic(); // Parar música ao encerrar o jogo
+                this.stopAllMusic();
             },
 
             showTemporaryMessage: function(msg, duration) {
@@ -1513,12 +1415,12 @@
 
             showContinueScreen: function() {
                 const continueModalElement = document.getElementById('continueModal');
-                if (continueModalElement) { // Added null check
+                if (continueModalElement) {
                     continueModalElement.style.display = 'flex';
                 }
                 this.continueTime = 10;
                 const continueCountdownElement = document.getElementById('continueCountdown');
-                if (continueCountdownElement) { // Added null check
+                if (continueCountdownElement) {
                     continueCountdownElement.innerText = this.continueTime;
                 }
 
@@ -1526,7 +1428,7 @@
                 if (this.continueCountdownInterval) clearInterval(this.continueCountdownInterval);
                 this.continueCountdownInterval = setInterval(() => {
                     this.continueTime--;
-                    if (continueCountdownElement) { // Added null check
+                    if (continueCountdownElement) {
                         continueCountdownElement.innerText = this.continueTime;
                     }
                     if (this.continueTime <= 0) {
@@ -1534,13 +1436,13 @@
                         this.handleContinue('nao');
                     }
                 }, 1000);
-                this.stopAllMusic(); // Parar música na tela de continue
+                this.stopAllMusic();
             },
 
             handleContinue: function(choice) {
                 clearInterval(this.continueCountdownInterval);
                 const continueModalElement = document.getElementById('continueModal');
-                if (continueModalElement) { // Added null check
+                if (continueModalElement) {
                     continueModalElement.style.display = 'none';
                 }
 
@@ -1548,64 +1450,24 @@
                     console.log("DEBUG: Jogador escolheu SIM. Reiniciando para seleção de personagem.");
                     this.vidas = 3;
                     const personagemSelecaoElement = document.getElementById('personagemSelecao');
-                    if (personagemSelecaoElement) { // Added null check
+                    if (personagemSelecaoElement) {
                         personagemSelecaoElement.style.display = 'flex';
                     }
-                    if (this.ctx && this.canvas) this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); // Added canvas null check
-                    this.pedrasColetadas = 0;
-                    this.keysColetadas = 0;
-                    this.valesSorveteColetados = 0;
-                    this.sorvetesObjetivoColetados = 0;
-                    this.trofeusColetados = 0;
-                    this.bolasColetadas = 0;
-                    this.pipasColetadas = 0;
-                    this.tubosEnsaioColetados = 0;
-                    this.imasColetados = 0;
-                    this.microscopioColetados = 0;
-                    this.elefantesColetados = 0;
-                    this.leoesColetados = 0;
-                    this.avesColetadas = 0;
-                    this.pinturasColetadas = 0;
-                    this.esculturasColetadas = 0;
-                    this.fosseisColetados = 0;
-                    this.cestasPiqueniqueColetadas = 0;
-                    this.bolasFase7Coletadas = 0;
-                    this.brinquedosParqueColetados = 0;
+                    if (this.ctx && this.canvas) this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                     this.totalAllItemsCollected = 0;
-                    this.livroAventuraColetados = 0;
-                    this.livroAnimaisColetados = 0;
-                    this.livroFabulaColetados = 0;
-                    this.lixeiraReciclagemColetados = 0;
-                    this.garrafaPlasticoColetados = 0;
-                    this.arvoreMudaColetados = 0;
-                    this.plantaNativaColetados = 0;
-                    this.animalSelvagemColetados = 0;
-                    this.telescopioColetados = 0;
-                    this.pincelColetados = 0;
-                    this.tintaColetados = 0;
-                    this.argilaColetados = 0;
-                    this.violaoColetados = 0;
-                    this.pianoColetados = 0;
-                    this.microfoneColetados = 0;
-                    this.tempo = this.BASE_TIME; // Reset time to base for new game
+                    this.tempo = 90;
                     this.coletando = false;
-                    this.hasKey = false;
                     this.itens = [];
                     this.obstaculos = [];
-                    this.schoolItems = [];
-                    this.chest = null; // Reset chest for new game
-                    this.currentPhase = 1; // Reseta para a Fase 1
-                    this.currentLevel = 1; // Reseta o nível para 1
-                    // Go back to intro screen for a full restart
+                    this.chest = null;
+                    this.currentPhase = 1;
+                    this.objectiveCounts = {};
                     const introScreenElement = document.getElementById('introScreen');
-                    if (introScreenElement) { // Added null check
+                    if (introScreenElement) {
                         introScreenElement.style.display = 'flex';
                     }
-                    if (personagemSelecaoElement) { // Added null check
-                        personagemSelecaoElement.style.display = 'none';
-                    }
                     const hudElement = document.getElementById('hud');
-                    if (hudElement) { // Added null check
+                    if (hudElement) {
                         hudElement.style.display = 'none';
                     }
                 } else {
@@ -1615,173 +1477,114 @@
             },
 
             animar: function(currentTime) {
-                requestAnimationFrame(this.animar.bind(this)); // Bind 'this' for recursive call
+                requestAnimationFrame(this.animar.bind(this));
 
-                if (currentTime < this.lastFrameTime + this.frameInterval) {
-                    return;
-                }
-                this.lastFrameTime = currentTime;
-
-                let winConditionMet = false;
-                if (this.currentPhase === 1) {
-                    winConditionMet = (this.chest && this.chest.isOpened);
-                } else if (this.currentPhase === 2) {
-                    winConditionMet = (this.valesSorveteColetados === this.TOTAL_VALES_SORVETE && this.sorvetesObjetivoColetados === this.TOTAL_SORVETES_OBJETIVO);
-                } else if (this.currentPhase === 3) {
-                    winConditionMet = (this.trofeusColetados >= this.TOTAL_TROFEUS && this.bolasColetadas >= this.TOTAL_BOLAS_FASE3 && this.pipasColetadas >= this.TOTAL_PIPAS);
-                } else if (this.currentPhase === 4) {
-                    winConditionMet = (this.tubosEnsaioColetados >= this.TOTAL_TUBOS_ENSAIO && this.imasColetados >= this.TOTAL_IMAS && this.microscopioColetados >= this.TOTAL_MICROSCOPIO);
-                } else if (this.currentPhase === 5) {
-                    winConditionMet = (this.elefantesColetados >= this.TOTAL_ELEFANTES && this.leoesColetados >= this.TOTAL_LEOES && this.avesColetadas >= this.TOTAL_AVES);
-                } else if (this.currentPhase === 6) {
-                    winConditionMet = (this.pinturasColetadas === this.TOTAL_PINTURAS && this.esculturasColetadas === this.TOTAL_ESCULTURAS && this.fosseisColetados >= this.TOTAL_FOSSEIS);
-                } else if (this.currentPhase === 7) {
-                    winConditionMet = (this.cestasPiqueniqueColetadas >= this.TOTAL_CESTAS_PIQUENIQUE && this.bolasFase7Coletadas >= this.TOTAL_BOLAS_FASE7 && this.brinquedosParqueColetados >= this.TOTAL_BRINQUEDOS_PARQUE);
-                } else if (this.currentPhase === 8) {
-                    winConditionMet = (this.livroAventuraColetados >= this.TOTAL_LIVRO_AVENTURA && this.livroAnimaisColetados >= this.TOTAL_LIVRO_ANIMAIS && this.livroFabulaColetados >= this.TOTAL_LIVRO_FABULA);
-                } else if (this.currentPhase === 9) {
-                    winConditionMet = (this.lixeiraReciclagemColetados >= this.TOTAL_LIXEIRA_RECICLAGEM && this.garrafaPlasticoColetados >= this.TOTAL_GARRAFA_PLASTICO && this.arvoreMudaColetados >= this.TOTAL_ARVORE_MUDA);
-                } else if (this.currentPhase === 10) {
-                    winConditionMet = (this.plantaNativaColetados >= this.TOTAL_PLANTAS_NATIVAS && this.animalSelvagemColetados >= this.TOTAL_ANIMAIS_SELVAGENS && this.telescopioColetados >= this.TOTAL_TELESCOPIO);
-                } else if (this.currentPhase === 11) {
-                    winConditionMet = (this.pincelColetados >= this.TOTAL_PINCEL && this.tintaColetados >= this.TOTAL_TINTA && this.argilaColetados >= this.TOTAL_ARGILA);
-                } else if (this.currentPhase === 12) {
-                    winConditionMet = (this.violaoColetados >= this.TOTAL_VIOLAO && this.pianoColetados >= this.TOTAL_PIANO && this.microfoneColetados >= this.TOTAL_MICROFONE);
+                if (!this.lastFrameTime) {
+                    this.lastFrameTime = currentTime;
                 }
 
-                if (this.vidas <= 0 || this.tempo <= 0 || winConditionMet) {
-                    return;
-                }
+                const elapsed = currentTime - this.lastFrameTime;
+                this.frameInterval = 1000 / this.targetFPS;
 
-                if (this.ctx && this.canvas) { // Added null checks
-                    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                } else {
-                    console.error("Erro: Canvas ou contexto 2D não está disponível para limpeza.");
-                    return;
-                }
+                if (elapsed > this.frameInterval) {
+                    this.lastFrameTime = currentTime - (elapsed % this.frameInterval);
 
-
-                const prevX = this.player.x;
-                const prevY = this.player.y;
-
-                if (this.teclas["w"]) this.player.y -= this.PLAYER_SPEED;
-                if (this.teclas["s"]) this.player.y += this.PLAYER_SPEED;
-                if (this.teclas["a"]) this.player.x -= this.PLAYER_SPEED;
-                if (this.teclas["d"]) this.player.x += this.PLAYER_SPEED;
-
-                this.player.x = Math.max(0, Math.min(this.canvas.width - this.player.width, this.player.x));
-                this.player.y = Math.max(0, Math.min(this.canvas.height - this.player.height, this.player.y));
-
-                this.obstaculos.forEach(obstacle => {
-                    const exclusionZone = 1.0;
-                    const expandedObstacleRect = {
-                        x: obstacle.x - (obstacle.size * (exclusionZone - 1) / 2),
-                        y: obstacle.y - (obstacle.size * (exclusionZone - 1) / 2),
-                        width: obstacle.width * exclusionZone,
-                        height: obstacle.height * exclusionZone
-                    };
-                    if (obstacle.isObstacle && this.checkCollision(this.player, expandedObstacleRect)) {
-                        this.player.x = prevX;
-                        this.player.y = prevY;
+                    let winConditionMet = false;
+                    const phaseData = phasesData[this.currentPhase];
+                    if (phaseData && phaseData.chest) {
+                        winConditionMet = (this.chest && this.chest.isOpened);
+                    } else if (phaseData) {
+                        winConditionMet = phaseData.items.filter(item => item.isObjective).every(item => {
+                            return (this.objectiveCounts[item.type] || 0) >= item.count;
+                        });
                     }
-                });
 
-                this.handleInteractions();
+                    if (this.vidas <= 0 || this.tempo <= 0 || winConditionMet) {
+                        return;
+                    }
 
-                if (this.chest && this.currentPhase === 1) {
-                    this.drawItem(this.chest);
+                    if (this.ctx && this.canvas) {
+                        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                    } else {
+                        console.error("Erro: Canvas ou contexto 2D não está disponível para limpeza.");
+                        return;
+                    }
+
+
+                    const prevX = this.player.x;
+                    const prevY = this.player.y;
+
+                    if (this.teclas["w"]) this.player.y -= this.PLAYER_SPEED;
+                    if (this.teclas["s"]) this.player.y += this.PLAYER_SPEED;
+                    if (this.teclas["a"]) this.player.x -= this.PLAYER_SPEED;
+                    if (this.teclas["d"]) this.player.x += this.PLAYER_SPEED;
+
+                    this.player.x = Math.max(0, Math.min(this.canvas.width - this.player.width, this.player.x));
+                    this.player.y = Math.max(0, Math.min(this.canvas.height - this.player.height, this.player.y));
+
+                    this.obstaculos.forEach(obstacle => {
+                        const exclusionZone = 1.0;
+                        const expandedObstacleRect = {
+                            x: obstacle.x - (obstacle.size * (exclusionZone - 1) / 2),
+                            y: obstacle.y - (obstacle.size * (exclusionZone - 1) / 2),
+                            width: obstacle.width * exclusionZone,
+                            height: obstacle.height * exclusionZone
+                        };
+                        if (obstacle.isObstacle && this.checkCollision(this.player, expandedObstacleRect)) {
+                            this.player.x = prevX;
+                            this.player.y = prevY;
+                        }
+                    });
+
+                    this.handleInteractions();
+
+                    if (this.chest && this.currentPhase === 1) {
+                        this.drawItem(this.chest);
+                    }
+                    this.itens.forEach(this.drawItem.bind(this));
+                    this.obstaculos.forEach(this.drawItem.bind(this));
+                    this.drawPlayer();
                 }
-                this.schoolItems.forEach(this.drawItem.bind(this)); // Bind 'this'
-                this.obstaculos.forEach(this.drawItem.bind(this)); // Bind 'this'
-                this.itens.forEach(this.drawItem.bind(this)); // Bind 'this'
-                this.drawPlayer();
             },
 
             updatePageTitle: function(phase) {
-                let title = "Ursinho Amigão 2D - ";
-                switch (phase) {
-                    case 1:
-                        title += "Capítulo 1: Uma Aventura de Aprendizados";
-                        break;
-                    case 2:
-                        title += "Capítulo 2: A Festa do Sorvete";
-                        break;
-                    case 3:
-                        title += "Capítulo 3: Brincadeira de Criança";
-                        break;
-                    case 4:
-                        title += "Capítulo 4: Nem Todo Dia é Brincadeira, mas Também é...";
-                        break;
-                    case 5:
-                        title += "Capítulo 5: No Reino dos Animais";
-                        break;
-                    case 6:
-                        title += "Capítulo 6: Aprender é uma Arte";
-                        break;
-                    case 7:
-                        title += "Capítulo 7: Lazer no Parque";
-                        break;
-                    case 8:
-                        title += "Capítulo 8: Leiturinhas";
-                        break;
-                    case 9:
-                        title += "Capítulo 9: Planeta";
-                        break;
-                    case 10:
-                        title += "Capítulo 10: Exploração da Natureza";
-                        break;
-                    case 11:
-                        title += "Capítulo 11: Oficina de Artes";
-                        break;
-                    case 12:
-                        title += "Capítulo 12: Música e Dança";
-                        break;
-                    default:
-                        title += "Aventura Desconhecida";
-                }
-                document.title = title;
-                const currentChapterTitleDisplayElement = document.getElementById('chapterTitleDisplay');
-                if (currentChapterTitleDisplayElement) {
-                    currentChapterTitleDisplayElement.innerText = title.split(" - ")[1];
+                const phaseData = phasesData[phase];
+                if (phaseData) {
+                    document.title = `Ursinho Amigão 2D - ${phaseData.title}`;
+                    const currentChapterTitleDisplayElement = document.getElementById('chapterTitleDisplay');
+                    if (currentChapterTitleDisplayElement) {
+                        currentChapterTitleDisplayElement.innerText = phaseData.title;
+                    }
                 }
             },
 
-            // Função principal de inicialização do jogo
             initGame: function() {
-                // Obtenha as referências globais aos elementos do HUD aqui
                 this.vidasDisplayElement = document.getElementById('vidasDisplay');
                 this.hudObjectiveLine1Element = document.getElementById('hudObjectiveLine1');
                 this.hudObjectiveLine2Element = document.getElementById('hudObjectiveLine2');
                 this.totalAllItemsCollectedDisplayElement = document.getElementById('totalAllItemsCollectedDisplay');
                 this.tempoDisplayElement = document.getElementById('tempo');
                 this.chapterTitleDisplayElement = document.getElementById('chapterTitleDisplay');
-                this.objetivoFaseElement = document.getElementById('objetivoFase');
 
-                // Atribui canvas e ctx após o DOM estar carregado
                 this.canvas = document.getElementById('gameCanvas');
                 if (this.canvas) {
                     this.ctx = this.canvas.getContext('2d');
-                    // Initial call to resizeCanvas to set initial dimensions
                     this.resizeCanvas();
-                    // Add listener for window resize events
                     window.addEventListener('resize', this.resizeCanvas.bind(this));
                 } else {
                     console.error("Erro: Elemento 'gameCanvas' não encontrado no DOM.");
                     return;
                 }
-
+                
                 this.introMusicElement = document.getElementById('introMusic');
                 if (this.introMusicElement) {
-                    this.introMusicElement.volume = 0.5; // Define um volume padrão
+                    this.introMusicElement.volume = 0.6;
                 }
-
-                console.log("DEBUG: tempoDisplayElement no onload:", this.tempoDisplayElement);
 
                 const introScreen = document.getElementById('introScreen');
                 const personagemSelecao = document.getElementById('personagemSelecao');
                 
                 const dismissIntro = () => {
-                    console.log("DEBUG: dismissIntro called.");
                     const currentIntroScreen = document.getElementById('introScreen');
                     const currentPersonagemSelecao = document.getElementById('personagemSelecao');
 
@@ -1789,14 +1592,10 @@
                         currentIntroScreen.style.display = 'none';
                         if (currentPersonagemSelecao) {
                             currentPersonagemSelecao.style.display = 'flex';
-                            console.log("DEBUG: Transição para seleção de personagem.");
-                        } else {
-                            console.error("ERRO: Elemento 'personagemSelecao' não encontrado no DOM (dentro de dismissIntro).");
                         }
-                        // Tentar tocar a música aqui, após a interação do usuário
                         if (this.introMusicElement && this.introMusicElement.paused) {
                             this.introMusicElement.play().catch(e => console.log("Erro ao tocar música de introdução após interação:", e));
-                            this.currentMusic = this.introMusicElement; // Define a música de introdução como a música atual
+                            this.currentMusic = this.introMusicElement;
                         }
                         document.removeEventListener('keydown', dismissIntro);
                         currentIntroScreen.removeEventListener('click', dismissIntro);
@@ -1812,7 +1611,6 @@
                 }
                 document.addEventListener('keydown', dismissIntro);
 
-                // Adicionado null checks para os botões de seleção de personagem
                 const personagemUrsoBtn = document.getElementById('personagemUrso');
                 if (personagemUrsoBtn) personagemUrsoBtn.addEventListener('click', () => this.selecionar('urso'));
                 
@@ -1825,7 +1623,6 @@
                 const personagemCoelhoBtn = document.getElementById('personagemCoelho');
                 if (personagemCoelhoBtn) personagemCoelhoBtn.addEventListener('click', () => this.selecionar('coelho'));
 
-                // Adicionado null checks para os botões direcionais (toque)
                 const btnUp = document.getElementById('btnUp');
                 if (btnUp) {
                     btnUp.addEventListener('touchstart', (e) => { e.preventDefault(); this.tecla('w', true); });
@@ -1871,29 +1668,26 @@
                 });
 
                 const botaoAcao = document.getElementById('botao-acao');
-                if (botaoAcao) { // Added null check
+                if (botaoAcao) {
                     botaoAcao.addEventListener('touchstart', (e) => { e.preventDefault(); this.coletando = true; });
                     botaoAcao.addEventListener('touchend', (e) => { e.preventDefault(); this.coletando = false; });
                 }
 
-                // Lógica do botão de controle de som
                 const soundControlBtn = document.getElementById('soundControlBtn');
                 const soundOnIcon = document.getElementById('soundOnIcon');
                 const soundOffIcon = document.getElementById('soundOffIcon');
 
                 if (soundControlBtn && soundOnIcon && soundOffIcon) {
                     soundControlBtn.addEventListener('click', () => {
-                        // Verifica qual música está atualmente tocando para controlar o mute
                         const musicToControl = this.currentMusic; 
                         if (musicToControl) {
-                            musicToControl.muted = !musicToControl.muted; // Alterna o estado mudo
+                            musicToControl.muted = !musicToControl.muted;
                             if (musicToControl.muted) {
                                 soundOnIcon.style.display = 'none';
                                 soundOffIcon.style.display = 'block';
                             } else {
                                 soundOnIcon.style.display = 'block';
                                 soundOffIcon.style.display = 'none';
-                                // Tenta tocar apenas se não estiver tocando (para evitar múltiplos play() chamadas)
                                 if (musicToControl.paused) {
                                     musicToControl.play().catch(e => console.log("Erro ao tentar tocar música após desmutar:", e));
                                 }
@@ -1902,25 +1696,20 @@
                     });
                 }
 
-                // Adicionado null checks para os botões do modal de continue
                 const btnSim = document.getElementById('btnSim');
                 if (btnSim) btnSim.addEventListener('click', () => this.handleContinue('sim'));
                 
                 const btnNao = document.getElementById('btnNao');
                 if (btnNao) btnNao.addEventListener('click', () => this.handleContinue('nao'));
-
-                console.log("DEBUG: Ouvintes de seleção de personagem, botões direcionais e botões de continue adicionados.");
                 
-                // Foca o canvas para garantir que ele receba eventos de teclado
-                if (this.canvas) { 
+                if (this.canvas) {
                     this.canvas.focus();
                 }
 
-                this.atualizarHUD(); // Atualiza o HUD com os valores iniciais
+                this.atualizarHUD();
             }
         };
 
-        // Chama a função principal de inicialização do jogo quando o DOM estiver completamente carregado
         document.addEventListener('DOMContentLoaded', () => game.initGame());
     </script>
 </body>
