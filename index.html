@@ -112,31 +112,42 @@
         }
 
         /* Main game content container */
+        @media (max-width: 768px) {
+            #mainGameContainer {
+                padding-top: 80px; 
+            }
+        }
+        @media (max-width: 360px) {
+            #mainGameContainer {
+                padding-top: 70px;
+            }
+        }
+
         #mainGameContainer {
-            position: absolute; /* Changed to absolute to fit between fixed header/footer */
-            top: 0; /* Will be set dynamically by JS */
-            bottom: 0; /* Will be set dynamically by JS */
+            position: absolute;
+            top: 0;
+            bottom: 0;
             left: 0;
             right: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-around; /* Centraliza verticalmente HUD e Canvas com espaço ao redor */
+            justify-content: space-around;
             box-sizing: border-box;
-            padding: 10px; /* Added padding to ensure elements don't touch edges */
+            padding: 10px;
         }
 
         #chapterTitleDisplay {
-            position: fixed; /* Mantém fixo no topo */
-            top: 0; /* Alinha no topo */
+            position: fixed;
+            top: 0;
             left: 50%;
             transform: translateX(-50%);
             color: white;
             background: rgba(0, 0, 0, 0.6);
             padding: 10px 20px;
-            border-radius: 0 0 8px 8px; /* Cantos arredondados apenas na parte inferior */
+            border-radius: 0 0 8px 8px;
             font-size: 1.2em;
-            z-index: 100; /* Garante que fique acima de outros elementos */
+            z-index: 100;
             text-align: center;
             white-space: nowrap;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
@@ -309,8 +320,9 @@
             #introScreen p {
                 font-size: 1.2em;
             }
+            /* Corrigido para garantir que o HUD e o título não se sobreponham em telas pequenas */
             #mainGameContainer {
-                padding-top: 60px; /* Adjusted padding-top for mobile */
+                padding-top: 80px; 
             }
             #hud {
                 font-size: 0.9em;
@@ -356,7 +368,7 @@
 
         @media (max-width: 360px) {
             #mainGameContainer {
-                padding-top: 50px; /* Further adjusted padding-top for very small screens */
+                padding-top: 70px; /* Further adjusted padding-top for very small screens */
             }
             #hud {
                 font-size: 0.9em;
@@ -565,7 +577,11 @@
                     { type: 'mochila', emoji: '🎒', count: 5, isObjective: false, canBeCollected: false }
                 ],
                 chest: { type: 'bau', emoji: '📦', size: 0.098, canBeCollected: false, isObjective: true },
-                obstacles: 9,
+                obstacles: [
+                    { type: 'mesa', emoji: '🟫', count: 3 },
+                    { type: 'cadeira', emoji: '🪑', count: 3 },
+                    { type: 'armario', emoji: '🚪', count: 3 }
+                ],
                 moneyBags: 2,
             },
             2: {
@@ -579,7 +595,11 @@
                     { type: 'borracha', emoji: '🧽', count: 5, isObjective: false, canBeCollected: false },
                     { type: 'mochila', emoji: '🎒', count: 5, isObjective: false, canBeCollected: false }
                 ],
-                obstacles: 10,
+                obstacles: [
+                    { type: 'mesa', emoji: '🟫', count: 3 },
+                    { type: 'cadeira', emoji: '🪑', count: 3 },
+                    { type: 'armario', emoji: '🚪', count: 3 }
+                ],
                 moneyBags: 2,
             },
             3: {
@@ -594,7 +614,11 @@
                     { type: 'borracha', emoji: '🧽', count: 5, isObjective: false, canBeCollected: false },
                     { type: 'mochila', emoji: '🎒', count: 5, isObjective: false, canBeCollected: false }
                 ],
-                obstacles: 11,
+                obstacles: [
+                    { type: 'mesa', emoji: '🟫', count: 3 },
+                    { type: 'cadeira', emoji: '🪑', count: 3 },
+                    { type: 'armario', emoji: '🚪', count: 3 }
+                ],
                 moneyBags: 2,
             },
             4: {
@@ -609,7 +633,11 @@
                     { type: 'borracha', emoji: '🧽', count: 5, isObjective: false, canBeCollected: false },
                     { type: 'mochila', emoji: '🎒', count: 5, isObjective: false, canBeCollected: false }
                 ],
-                obstacles: 12,
+                obstacles: [
+                    { type: 'mesa', emoji: '🟫', count: 3 },
+                    { type: 'cadeira', emoji: '🪑', count: 3 },
+                    { type: 'armario', emoji: '🚪', count: 3 }
+                ],
                 moneyBags: 2,
             },
             5: {
@@ -624,7 +652,11 @@
                     { type: 'borracha', emoji: '🧽', count: 5, isObjective: false, canBeCollected: false },
                     { type: 'mochila', emoji: '🎒', count: 5, isObjective: false, canBeCollected: false }
                 ],
-                obstacles: 13,
+                obstacles: [
+                    { type: 'mesa', emoji: '🟫', count: 3 },
+                    { type: 'cadeira', emoji: '🪑', count: 3 },
+                    { type: 'armario', emoji: '🚪', count: 3 }
+                ],
                 moneyBags: 2,
             },
             6: {
@@ -639,7 +671,11 @@
                     { type: 'borracha', emoji: '🧽', count: 5, isObjective: false, canBeCollected: false },
                     { type: 'mochila', emoji: '🎒', count: 5, isObjective: false, canBeCollected: false }
                 ],
-                obstacles: 14,
+                obstacles: [
+                    { type: 'mesa', emoji: '🟫', count: 3 },
+                    { type: 'cadeira', emoji: '🪑', count: 3 },
+                    { type: 'armario', emoji: '🚪', count: 3 }
+                ],
                 moneyBags: 2,
             },
             7: {
@@ -654,7 +690,11 @@
                     { type: 'borracha', emoji: '🧽', count: 5, isObjective: false, canBeCollected: false },
                     { type: 'mochila', emoji: '🎒', count: 5, isObjective: false, canBeCollected: false }
                 ],
-                obstacles: 15,
+                obstacles: [
+                    { type: 'mesa', emoji: '🟫', count: 3 },
+                    { type: 'cadeira', emoji: '🪑', count: 3 },
+                    { type: 'armario', emoji: '🚪', count: 3 }
+                ],
                 moneyBags: 2,
             },
             8: {
@@ -669,7 +709,11 @@
                     { type: 'borracha', emoji: '🧽', count: 5, isObjective: false, canBeCollected: false },
                     { type: 'mochila', emoji: '🎒', count: 5, isObjective: false, canBeCollected: false }
                 ],
-                obstacles: 16,
+                obstacles: [
+                    { type: 'mesa', emoji: '🟫', count: 3 },
+                    { type: 'cadeira', emoji: '🪑', count: 3 },
+                    { type: 'armario', emoji: '🚪', count: 3 }
+                ],
                 moneyBags: 2,
             },
             9: {
@@ -684,7 +728,11 @@
                     { type: 'borracha', emoji: '🧽', count: 5, isObjective: false, canBeCollected: false },
                     { type: 'mochila', emoji: '🎒', count: 5, isObjective: false, canBeCollected: false }
                 ],
-                obstacles: 17,
+                obstacles: [
+                    { type: 'mesa', emoji: '🟫', count: 3 },
+                    { type: 'cadeira', emoji: '🪑', count: 3 },
+                    { type: 'armario', emoji: '🚪', count: 3 }
+                ],
                 moneyBags: 2,
             },
             10: {
@@ -699,7 +747,11 @@
                     { type: 'borracha', emoji: '🧽', count: 5, isObjective: false, canBeCollected: false },
                     { type: 'mochila', emoji: '🎒', count: 5, isObjective: false, canBeCollected: false }
                 ],
-                obstacles: 18,
+                obstacles: [
+                    { type: 'mesa', emoji: '🟫', count: 3 },
+                    { type: 'cadeira', emoji: '🪑', count: 3 },
+                    { type: 'armario', emoji: '🚪', count: 3 }
+                ],
                 moneyBags: 2,
             },
             11: {
@@ -714,7 +766,11 @@
                     { type: 'borracha', emoji: '🧽', count: 5, isObjective: false, canBeCollected: false },
                     { type: 'mochila', emoji: '🎒', count: 5, isObjective: false, canBeCollected: false }
                 ],
-                obstacles: 19,
+                obstacles: [
+                    { type: 'mesa', emoji: '🟫', count: 3 },
+                    { type: 'cadeira', emoji: '🪑', count: 3 },
+                    { type: 'armario', emoji: '🚪', count: 3 }
+                ],
                 moneyBags: 2,
             },
             12: {
@@ -729,7 +785,11 @@
                     { type: 'borracha', emoji: '🧽', count: 5, isObjective: false, canBeCollected: false },
                     { type: 'mochila', emoji: '🎒', count: 5, isObjective: false, canBeCollected: false }
                 ],
-                obstacles: 20,
+                obstacles: [
+                    { type: 'mesa', emoji: '🟫', count: 3 },
+                    { type: 'cadeira', emoji: '🪑', count: 3 },
+                    { type: 'armario', emoji: '🚪', count: 3 }
+                ],
                 moneyBags: 2,
             }
         };
@@ -742,7 +802,6 @@
             teclas: {}, // Armazena o estado das teclas pressionadas
             itens: [], // Array para todos os itens do jogo (coletáveis, não-coletáveis, etc)
             obstaculos: [], // Array para os obstáculos que bloqueiam o caminho
-            // schoolItems não é mais usado, pois os itens escolares agora estão em 'itens'
             chest: null, // O baú do tesouro
 
             // Contador de itens coletados para a fase atual
@@ -848,8 +907,8 @@
                 const mainGameContainer = document.getElementById('mainGameContainer');
                 if (mainGameContainer) {
                     // Calculate the desired top for mainGameContainer based on chapterTitleHeight
-                    // Add a fixed gap (e.g., 20px) between title and HUD
-                    mainGameContainer.style.top = `${chapterTitleHeight + 20}px`; // 20px is the desired gap
+                    // Adicione um espaçamento fixo de 20px entre o título e o HUD
+                    mainGameContainer.style.top = `${chapterTitleHeight + 20}px`;
 
                     // mainGameContainer ends right above bottom controls
                     mainGameContainer.style.bottom = `${bottomControlsTotalHeight}px`;
@@ -994,26 +1053,28 @@
                     return { x: newX, y: newY, width: objSize, height: objSize };
                 };
 
-                // Limpa os itens de tempo antes de repopular
+                // Limpa os itens e obstáculos antes de repopular
                 this.itens = [];
                 this.obstaculos = [];
+                this.chest = null;
 
                 const phaseData = phasesData[this.currentPhase];
 
-                // Posicionar obstáculos primeiro para garantir o espaçamento
+                // Posicionar obstáculos
                 if (phaseData.obstacles) {
-                    const obstacleEmojis = ['🟫', '🪑', '🚪'];
-                    for (let i = 0; i < phaseData.obstacles; i++) {
-                        const obstacle = this.createGameObject('obstacle', obstacleEmojis[i % obstacleEmojis.length], this.OBSTACLE_SIZE, false, true);
-                        const pos = getRandomPosition(obstacle.size, true);
-                        obstacle.x = pos.x;
-                        obstacle.y = pos.y;
-                        this.obstaculos.push(obstacle);
-                        placedObjects.push(obstacle);
-                    }
+                    phaseData.obstacles.forEach(obstacleData => {
+                        for (let i = 0; i < obstacleData.count; i++) {
+                            const obstacle = this.createGameObject(obstacleData.type, obstacleData.emoji, this.OBSTACLE_SIZE, false, true);
+                            const pos = getRandomPosition(obstacle.size, true);
+                            obstacle.x = pos.x;
+                            obstacle.y = pos.y;
+                            this.obstaculos.push(obstacle);
+                            placedObjects.push(obstacle);
+                        }
+                    });
                 }
 
-                // Posicionar itens de objetivo e não-objetivo
+                // Posicionar itens de objetivo e não-objetivo (incluindo lápis e caderno)
                 if (phaseData.items) {
                     phaseData.items.forEach(itemData => {
                         for (let i = 0; i < itemData.count; i++) {
@@ -1056,8 +1117,7 @@
 
             // Desenha um objeto no canvas
             drawItem: function(item) {
-                if (!this.ctx) return; // Adicionado null check
-                // Tenta usar uma lista de fontes de emoji para melhor compatibilidade
+                if (!this.ctx) return;
                 this.ctx.font = `${item.size}px "Segoe UI Emoji", "Apple Color Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif`;
                 this.ctx.textAlign = 'center';
                 this.ctx.textBaseline = 'middle';
@@ -1066,8 +1126,7 @@
 
             // Desenha o personagem no canvas
             drawPlayer: function() {
-                if (!this.ctx) return; // Adicionado null check
-                // Tenta usar uma lista de fontes de emoji para melhor compatibilidade
+                if (!this.ctx) return;
                 this.ctx.font = `${this.player.width}px "Segoe UI Emoji", "Apple Color Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif`;
                 this.ctx.textAlign = 'center';
                 this.ctx.textBaseline = 'middle';
@@ -1101,7 +1160,7 @@
 
                             if (collectedItem.isObjective) {
                                 // Usa a nova estrutura de dados para contagem
-                                this.objectiveCounts[collectedItem.type]++;
+                                this.objectiveCounts[collectedItem.type] = (this.objectiveCounts[collectedItem.type] || 0) + 1;
                                 console.log(`DEBUG: Item objetivo coletado! Tipo: ${collectedItem.type}, Total: ${this.objectiveCounts[collectedItem.type]}`);
                             } else {
                                 // Estes são itens coletáveis que não são objetivos da fase
@@ -1142,7 +1201,8 @@
                             if (missingItems.length > 0) {
                                 msg += ` Faltam: `;
                                 missingItems.forEach(item => {
-                                    msg += `${item.emoji} ${item.count - (this.objectiveCounts[item.type] || 0)} `;
+                                    const itemName = itemDisplayNames[item.type] || item.type;
+                                    msg += `${item.emoji} ${itemName} (${item.count - (this.objectiveCounts[item.type] || 0)}) `;
                                 });
                             }
 
@@ -1280,16 +1340,18 @@
                     emoji: this.getCharacterEmoji(tipo)
                 };
 
+                // Limpa arrays antes de preencher
                 this.itens = [];
                 this.obstaculos = [];
                 this.chest = null;
 
-                // Geração de itens com base nos dados da fase
+
+                // Geração de itens de objetivo e não-objetivo
                 if (phaseData.items) {
                     phaseData.items.forEach(itemData => {
                         for (let i = 0; i < itemData.count; i++) {
                             let emoji = itemData.emoji;
-                            // Se tiver sabores, use o sabor específico
+                            // Lógica para sorvetes com sabores
                             if (itemData.type === 'sorvete' && itemData.flavors && itemData.flavors[i]) {
                                 emoji = `🍦${itemData.flavors[i]}`;
                             }
@@ -1298,18 +1360,20 @@
                     });
                 }
 
-                if (phaseData.chest) {
+                // Cria e posiciona o baú se ele existir para a fase atual
+                if (this.currentPhase === 1 && phaseData.chest) {
                     this.chest = this.createGameObject(phaseData.chest.type, phaseData.chest.emoji, this.CHEST_SIZE, phaseData.chest.canBeCollected, false, null, phaseData.chest.isObjective);
-                    this.chest.isOpened = false;
+                    this.itens.push(this.chest); // Adiciona o baú na lista de itens para ser posicionado
                 }
                 
                 // Gera obstáculos com base na nova contagem
-                const obstacleEmojis = ['🟫', '🪑', '🚪'];
                 if (phaseData.obstacles) {
-                    for (let i = 0; i < phaseData.obstacles; i++) {
-                        const obstacle = this.createGameObject('obstacle', obstacleEmojis[i % obstacleEmojis.length], this.OBSTACLE_SIZE, false, true);
-                        this.obstaculos.push(obstacle);
-                    }
+                    phaseData.obstacles.forEach(obstacleData => {
+                        for (let i = 0; i < obstacleData.count; i++) {
+                            const obstacle = this.createGameObject(obstacleData.type, obstacleData.emoji, this.OBSTACLE_SIZE, false, true);
+                            this.obstaculos.push(obstacle);
+                        }
+                    });
                 }
                 
                 // Gera sacos de dinheiro
@@ -1328,10 +1392,10 @@
                     
                     if (this.currentPhase === 1) {
                         // Verifica se todas as pedras e chaves foram coletadas
-                        const redStoneCollected = (this.objectiveCounts['pedra_vermelha'] || 0) >= phasesData[1].items.find(item => item.type === 'pedra_vermelha').count;
-                        const blueStoneCollected = (this.objectiveCounts['pedra_azul'] || 0) >= phasesData[1].items.find(item => item.type === 'pedra_azul').count;
-                        const greenStoneCollected = (this.objectiveCounts['pedra_verde'] || 0) >= phasesData[1].items.find(item => item.type === 'pedra_verde').count;
-                        const keysCollected = (this.objectiveCounts['chave'] || 0) >= phasesData[1].items.find(item => item.type === 'chave').count;
+                        const redStoneCollected = (this.objectiveCounts['pedra_vermelha'] || 0) >= (phasesData[1].items.find(item => item.type === 'pedra_vermelha')?.count || 0);
+                        const blueStoneCollected = (this.objectiveCounts['pedra_azul'] || 0) >= (phasesData[1].items.find(item => item.type === 'pedra_azul')?.count || 0);
+                        const greenStoneCollected = (this.objectiveCounts['pedra_verde'] || 0) >= (phasesData[1].items.find(item => item.type === 'pedra_verde')?.count || 0);
+                        const keysCollected = (this.objectiveCounts['chave'] || 0) >= (phasesData[1].items.find(item => item.type === 'chave')?.count || 0);
                         
                         if (redStoneCollected && blueStoneCollected && greenStoneCollected && keysCollected) {
                             winConditionMet = (this.chest && this.chest.isOpened);
