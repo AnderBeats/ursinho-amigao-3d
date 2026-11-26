@@ -1,0 +1,31 @@
+.diploma-name-dialog {
+    box-sizing: border-box;
+    width: min(440px, calc(100vw - 32px));
+    max-height: 85dvh;
+    overflow: auto;
+    padding: 26px 22px;
+    border: 2px solid #ffd36a;
+    border-radius: 22px;
+    background: #14243b;
+    color: #fff8e7;
+    box-shadow: 0 12px 48px #0008;
+    text-align: center;
+    font-family: system-ui, sans-serif;
+}
+.diploma-name-dialog::backdrop { background: #071222b8; }
+.diploma-name-dialog h2 { color: #ffd36a; font-size: 24px; margin: 0 0 20px; }
+.diploma-name-dialog label { display: block; font-size: 18px; font-weight: 700; }
+.diploma-name-dialog p { font-size: 14px; line-height: 1.5; margin: 12px 0 18px; }
+.diploma-name-dialog input {
+    box-sizing: border-box; width: 100%; min-height: 48px; padding: 12px;
+    background: #fff8e7; color: #14243b; border: 2px solid #ffd36a;
+    border-radius: 10px; font: 18px system-ui, sans-serif;
+}
+.diploma-name-actions { display: grid; gap: 12px; margin-top: 20px; }
+.diploma-name-dialog button {
+    width: 100%; min-height: 48px; margin: 0; padding: 12px;
+    background: #ffd36a; color: #14243b; border: 2px solid #ffd36a;
+    border-radius: 12px; font: 700 16px system-ui, sans-serif; cursor: pointer;
+}
+.diploma-name-dialog .diploma-name-skip { background: transparent; color: #ffd36a; }
+.diploma-name-dialog :focus-visible { outline: 3px solid #fff; outline-offset: 3px; }

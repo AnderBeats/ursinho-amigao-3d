@@ -1,0 +1,48 @@
+/* Direcional à esquerda e ações à direita */
+#bottomControlsContainer {
+    grid-template-columns: max-content minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    box-sizing: border-box;
+}
+#bottomControlsContainer #direcional {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+}
+#bottomControlsContainer .linha { gap: 4px; }
+#bottomControlsContainer .botao-direcional {
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+    box-sizing: border-box;
+}
+#bottomControlsContainer > .utility-controls {
+    grid-column: 2;
+    grid-row: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 44px);
+    justify-self: end;
+    justify-content: end;
+    gap: 6px;
+    min-width: 0;
+}
+@media (max-width: 360px) {
+    #bottomControlsContainer > .utility-controls {
+        grid-template-columns: repeat(2, 44px);
+    }
+}
+
+#bottomControlsContainer button {
+ display:inline-flex; align-items:center; justify-content:center;
+ padding:0; line-height:1; -webkit-appearance:none;
+}
+#bottomControlsContainer .utility-controls button { margin:0; }
+#bottomControlsContainer button svg {
+ width:22px; height:22px; flex:0 0 22px; pointer-events:none; overflow:visible;
+}
+[hidden] { display:none !important; }

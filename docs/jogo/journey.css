@@ -1,0 +1,9 @@
+.journey-dialog{box-sizing:border-box;width:min(90vw,410px);max-height:90dvh;overflow:auto;padding:26px 22px;border:2px solid #ffd166;border-radius:22px;background:#19283f;color:#ffda80;text-align:center;box-shadow:0 18px 65px #0006}
+.journey-dialog::backdrop{background:#101b30d9}
+.journey-dialog h2{font:bold clamp(1.4rem,6vw,1.9rem)/1.2 Georgia,serif;color:#ffda80;margin:16px 0}
+.journey-dialog p{color:#ffda80}.journey-eyebrow{font:bold .8rem/1.4 Arial,sans-serif;letter-spacing:1px}.journey-icons{font-size:2.5rem;margin:22px 0}.journey-label{font-weight:bold;letter-spacing:2px;font-size:.85rem;border-top:2px solid #ffd166;padding-top:20px}.journey-description{font-size:1.1rem;line-height:1.6}
+.journey-dialog button{display:block;width:100%;padding:14px 12px;border:1px solid #ffe8ad;border-radius:13px;margin:12px 0 0;font-weight:700;font-size:1rem;background:#ffd166;color:#19283f;cursor:pointer}
+.journey-dialog .journey-cancel{background:transparent;color:#ffda80}.journey-dialog button:focus-visible{outline:3px solid white;outline-offset:3px}
+.journey-complete{font:bold 1.6rem/1.25 Georgia,serif;color:#ffda80}.journey-congratulation{color:#ffda80;font-size:1.1rem;line-height:1.6;text-align:center}
+#gameModal:has(.victory-art) {background:#19283f;border:2px solid #ffd166;border-radius:22px;color:#ffda80}
+#gameModal:has(.victory-art) > .modal-content > button:not(.next-series-action) {display:block;width:100%;margin-top:18px;padding:14px;border:1px solid #ffe8ad;border-radius:13px;background:#ffd166;color:#19283f;font-weight:700;font-size:1rem;cursor:pointer}
