@@ -31,6 +31,15 @@ const Journey = (() => {
         });
     }
     return {copy,objectives,
+        hasCampaignProgress(saved){return Boolean(saved && (saved.series > 1 || saved.phase > 1 || saved.unlocked > 1 || saved.finished || Object.keys(saved.diplomas || {}).length));},
+        confirmExit(lang){
+            const text = {
+                pt:['Voltar ao início?', 'Os itens coletados nesta tentativa serão perdidos. Seu progresso salvo e seus diplomas permanecem. Você poderá retomar pelo botão Continuar.', 'Sair para o início', 'Continuar jogando'],
+                en:['Return to the start?', 'Items collected in this attempt will be lost. Your saved progress and diplomas remain. You can resume with Continue.', 'Exit to start', 'Keep playing'],
+                es:['¿Volver al inicio?', 'Se perderán los objetos recogidos en este intento. Tu progreso guardado y tus diplomas se conservarán. Podrás volver con Continuar.', 'Salir al inicio', 'Seguir jugando']
+            }[lang] || ['Return to the start?', 'Your saved progress and diplomas remain.', 'Exit to start', 'Keep playing'];
+            return modal({heading:text[0],body:text[1],icon:'🏠',accept:text[2],cancel:text[3]});
+        },
         objective(lang,series,phase,heading){const c=copy(lang);const grade=lang==='pt'?series+'ª série':lang==='es'?series+'.º grado':'Grade '+series;return modal({heading,eyebrow:grade+' · '+c.subject+' '+phase,icon:icons[phase-1],label:c.goal,body:(objectives[lang]||objectives.en)[phase-1],accept:c.play});},
         confirmNew(lang){const c=copy(lang);return modal({heading:c.newTitle,body:c.newBody,icon:'🎒',accept:c.confirm,cancel:c.cancel});},
         storageError(lang){const c=copy(lang);return modal({heading:c.storage,body:'',accept:c.cancel});},

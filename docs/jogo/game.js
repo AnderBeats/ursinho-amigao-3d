@@ -2387,8 +2387,9 @@
                 });
 
                 document.getElementById('startGame').addEventListener('click', async () => {
-                    if (readProgress()) {
-                        if (!await Journey.confirmNew(language)) return;
+                    const saved = readProgress();
+                    if (saved) {
+                        if (Journey.hasCampaignProgress(saved) && !await Journey.confirmNew(language)) return;
                         try { localStorage.removeItem(progressKey); }
                         catch { await Journey.storageError(language); return; }
                         this.resumePhase = null; this.pendingCharacterChoice = false;
@@ -2408,13 +2409,31 @@
                     const saved = saveProgress(this.currentPhase, this.currentPlayerType, this.currentPhase, false, this.series ?? 1);
                     document.getElementById('saveStatus').textContent = t(saved ? 'savedNotice' : 'saveFailed');
                 });
-                document.getElementById('exitGame').addEventListener('click', () => {
-                    if (window.confirm(t('confirmExit'))) location.reload();
+                document.getElementById('exitGame').addEventListener('click', async () => {
+                    if (this.exitPending) return;
+                    const wasPaused = this.paused;
+                    this.exitPending = true;
+                    this.paused = true;
+                    this.touchTarget = null;
+                    this.teclas = {};
+                    let leaving = false;
+                    try {
+                        leaving = await Journey.confirmExit(language);
+                        if (leaving) location.reload();
+                    } finally {
+                        if (!leaving) {
+                            this.exitPending = false;
+                            this.teclas = {}; this.touchTarget = null;
+                            this.paused = wasPaused;
+                            this.lastFrameTime = performance.now();
+                            if (!this.guided && !document.querySelector('dialog[open]')) this.canvas.focus();
+                        }
+                    }
                 });
                 const pauseDialog = document.getElementById('pauseDialog');
                 const pauseButton = document.getElementById('pauseButton');
                 const pause = () => {
-                    if (pauseButton.disabled || pauseDialog.open) return;
+                    if (pauseButton.disabled || pauseDialog.open || this.exitPending) return;
                     this.paused = true;
                     this.touchTarget = null;
                     this.teclas = {};
@@ -2424,11 +2443,11 @@
                 pauseButton.addEventListener('click', pause);
                 document.getElementById('resumeGame').addEventListener('click', () => pauseDialog.close());
                 pauseDialog.addEventListener('close', () => {
-                    this.paused = false;
+                    this.paused = Boolean(this.exitPending);
                     if (!this.guided) this.canvas.focus();
                 });
                 document.addEventListener('keydown', (event) => {
-                    if (event.key.toLowerCase() !== 'p' || event.repeat) return;
+                    if (event.key.toLowerCase() !== 'p' || event.repeat || this.exitPending || document.querySelector('.journey-dialog[open]')) return;
                     if (pauseDialog.open) pauseDialog.close();
                     else pause();
                 });
@@ -2644,3 +2663,4 @@
         document.addEventListener('DOMContentLoaded', () => game.initGame());
     
 document.addEventListener("click",event=>{if(event.target instanceof Element && event.target.closest("[data-reload-game]")) location.reload();});
+
